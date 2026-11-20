@@ -212,6 +212,17 @@ async function getCapability(id, version = 1) {
   return r;
 }
 
+// 안전장치: 쓰기 작업(이벤트 주입/수정/삭제)은 가상 기기에만 허용한다. 확인된 id 는 캐시.
+const verifiedVirtual = new Set();
+async function assertVirtual(id) {
+  if (verifiedVirtual.has(id)) return;
+  const r = await runCli(['devices', id]);
+  if (!r.ok) throw httpError(502, r.error);
+  const d = r.data || {};
+  if (!(d.type === 'VIRTUAL' || d.virtual)) throw httpError(403, '가상 기기가 아니어서 변경할 수 없습니다');
+  verifiedVirtual.add(id);
+}
+
 const routes = [
   ['GET', /^\/api\/info$/, async () => {
     const info = await detectCli(true);
@@ -242,10 +253,12 @@ const routes = [
   ['GET', /^\/api\/devices\/([^/]+)\/status$/, async (req, m) => { assertId(m[1]); return runCli(['devices:status', m[1]]); }],
   ['DELETE', /^\/api\/devices\/([^/]+)$/, async (req, m) => {
     assertId(m[1]);
+    await assertVirtual(m[1]);
     return runCli(['virtualdevices:delete', m[1]], { json: false });
   }],
   ['PATCH', /^\/api\/devices\/([^/]+)$/, async (req, m) => {
     assertId(m[1]);
+    await assertVirtual(m[1]);
     const body = await readBody(req);
     const update = {};
     if (body.label) update.label = String(body.label);
@@ -292,6 +305,7 @@ const routes = [
   // 이벤트(상태) 주입: body = { events: [{component, capability, attribute, value, unit?}] }
   ['POST', /^\/api\/devices\/([^/]+)\/events$/, async (req, m) => {
     assertId(m[1]);
+    await assertVirtual(m[1]);
     const { events } = await readBody(req);
     if (!Array.isArray(events) || events.length === 0) throw httpError(400, 'events 배열이 필요합니다');
     const clean = events.map((e) => {
