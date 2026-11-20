@@ -1,0 +1,27 @@
+{
+  "name": "smartthings-virtual-gui",
+  "version": "0.1.0",
+  "description": "SmartThings CLI로 가상 기기를 만들고 상태를 주입하는 로컬 GUI",
+  "private": true,
+  "bin": {
+    "st-virtual-gui": "server.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "mock": "node server.js --mock"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "server.js",
+    "public",
+    "mock",
+    "templates",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Twohyunpa/SmartThings_Virtual.git"
+  }
+}

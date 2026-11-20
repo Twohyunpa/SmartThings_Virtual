@@ -1,0 +1,776 @@
+[
+  {
+    "id": "washer",
+    "name": "세탁기",
+    "icon": "🧺",
+    "description": "전원, 세탁기 동작 상태/코스, 원격제어, 전력",
+    "deviceProfile": {
+      "name": "Virtual Samsung Washer",
+      "components": [
+        {
+          "id": "main",
+          "capabilities": [
+            {
+              "id": "switch",
+              "version": 1
+            },
+            {
+              "id": "washerOperatingState",
+              "version": 1
+            },
+            {
+              "id": "washerMode",
+              "version": 1
+            },
+            {
+              "id": "remoteControlStatus",
+              "version": 1
+            },
+            {
+              "id": "powerMeter",
+              "version": 1
+            },
+            {
+              "id": "energyMeter",
+              "version": 1
+            },
+            {
+              "id": "refresh",
+              "version": 1
+            }
+          ],
+          "categories": [
+            {
+              "name": "Washer"
+            }
+          ]
+        }
+      ]
+    },
+    "presets": [
+      {
+        "label": "세탁 시작",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "on"
+          },
+          {
+            "component": "main",
+            "capability": "washerOperatingState",
+            "attribute": "machineState",
+            "value": "run"
+          },
+          {
+            "component": "main",
+            "capability": "washerOperatingState",
+            "attribute": "washerJobState",
+            "value": "wash"
+          },
+          {
+            "component": "main",
+            "capability": "powerMeter",
+            "attribute": "power",
+            "value": 350,
+            "unit": "W"
+          }
+        ]
+      },
+      {
+        "label": "헹굼",
+        "events": [
+          {
+            "component": "main",
+            "capability": "washerOperatingState",
+            "attribute": "washerJobState",
+            "value": "rinse"
+          }
+        ]
+      },
+      {
+        "label": "탈수",
+        "events": [
+          {
+            "component": "main",
+            "capability": "washerOperatingState",
+            "attribute": "washerJobState",
+            "value": "spin"
+          },
+          {
+            "component": "main",
+            "capability": "powerMeter",
+            "attribute": "power",
+            "value": 500,
+            "unit": "W"
+          }
+        ]
+      },
+      {
+        "label": "일시정지",
+        "events": [
+          {
+            "component": "main",
+            "capability": "washerOperatingState",
+            "attribute": "machineState",
+            "value": "pause"
+          }
+        ]
+      },
+      {
+        "label": "세탁 완료",
+        "events": [
+          {
+            "component": "main",
+            "capability": "washerOperatingState",
+            "attribute": "machineState",
+            "value": "stop"
+          },
+          {
+            "component": "main",
+            "capability": "washerOperatingState",
+            "attribute": "washerJobState",
+            "value": "finish"
+          },
+          {
+            "component": "main",
+            "capability": "powerMeter",
+            "attribute": "power",
+            "value": 0,
+            "unit": "W"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dryer",
+    "name": "건조기",
+    "icon": "🌀",
+    "description": "전원, 건조기 동작 상태/모드, 원격제어",
+    "deviceProfile": {
+      "name": "Virtual Samsung Dryer",
+      "components": [
+        {
+          "id": "main",
+          "capabilities": [
+            {
+              "id": "switch",
+              "version": 1
+            },
+            {
+              "id": "dryerOperatingState",
+              "version": 1
+            },
+            {
+              "id": "dryerMode",
+              "version": 1
+            },
+            {
+              "id": "remoteControlStatus",
+              "version": 1
+            },
+            {
+              "id": "powerMeter",
+              "version": 1
+            },
+            {
+              "id": "refresh",
+              "version": 1
+            }
+          ],
+          "categories": [
+            {
+              "name": "Dryer"
+            }
+          ]
+        }
+      ]
+    },
+    "presets": [
+      {
+        "label": "건조 시작",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "on"
+          },
+          {
+            "component": "main",
+            "capability": "dryerOperatingState",
+            "attribute": "machineState",
+            "value": "run"
+          },
+          {
+            "component": "main",
+            "capability": "dryerOperatingState",
+            "attribute": "dryerJobState",
+            "value": "drying"
+          }
+        ]
+      },
+      {
+        "label": "냉각",
+        "events": [
+          {
+            "component": "main",
+            "capability": "dryerOperatingState",
+            "attribute": "dryerJobState",
+            "value": "cooling"
+          }
+        ]
+      },
+      {
+        "label": "건조 완료",
+        "events": [
+          {
+            "component": "main",
+            "capability": "dryerOperatingState",
+            "attribute": "machineState",
+            "value": "stop"
+          },
+          {
+            "component": "main",
+            "capability": "dryerOperatingState",
+            "attribute": "dryerJobState",
+            "value": "finished"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "aircon",
+    "name": "에어컨",
+    "icon": "❄️",
+    "description": "전원, 운전 모드, 풍량, 희망/현재 온도, 습도",
+    "deviceProfile": {
+      "name": "Virtual Samsung Air Conditioner",
+      "components": [
+        {
+          "id": "main",
+          "capabilities": [
+            {
+              "id": "switch",
+              "version": 1
+            },
+            {
+              "id": "airConditionerMode",
+              "version": 1
+            },
+            {
+              "id": "airConditionerFanMode",
+              "version": 1
+            },
+            {
+              "id": "thermostatCoolingSetpoint",
+              "version": 1
+            },
+            {
+              "id": "temperatureMeasurement",
+              "version": 1
+            },
+            {
+              "id": "relativeHumidityMeasurement",
+              "version": 1
+            },
+            {
+              "id": "powerMeter",
+              "version": 1
+            },
+            {
+              "id": "refresh",
+              "version": 1
+            }
+          ],
+          "categories": [
+            {
+              "name": "AirConditioner"
+            }
+          ]
+        }
+      ]
+    },
+    "presets": [
+      {
+        "label": "냉방 24℃",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "on"
+          },
+          {
+            "component": "main",
+            "capability": "airConditionerMode",
+            "attribute": "airConditionerMode",
+            "value": "cool"
+          },
+          {
+            "component": "main",
+            "capability": "thermostatCoolingSetpoint",
+            "attribute": "coolingSetpoint",
+            "value": 24,
+            "unit": "C"
+          }
+        ]
+      },
+      {
+        "label": "제습",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "on"
+          },
+          {
+            "component": "main",
+            "capability": "airConditionerMode",
+            "attribute": "airConditionerMode",
+            "value": "dry"
+          }
+        ]
+      },
+      {
+        "label": "실내 30℃ / 70%",
+        "events": [
+          {
+            "component": "main",
+            "capability": "temperatureMeasurement",
+            "attribute": "temperature",
+            "value": 30,
+            "unit": "C"
+          },
+          {
+            "component": "main",
+            "capability": "relativeHumidityMeasurement",
+            "attribute": "humidity",
+            "value": 70,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "label": "전원 끄기",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "off"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "purifier",
+    "name": "공기청정기",
+    "icon": "🍃",
+    "description": "전원, 팬 모드, 미세먼지/초미세먼지, 공기질",
+    "deviceProfile": {
+      "name": "Virtual Samsung Air Purifier",
+      "components": [
+        {
+          "id": "main",
+          "capabilities": [
+            {
+              "id": "switch",
+              "version": 1
+            },
+            {
+              "id": "airPurifierFanMode",
+              "version": 1
+            },
+            {
+              "id": "dustSensor",
+              "version": 1
+            },
+            {
+              "id": "fineDustSensor",
+              "version": 1
+            },
+            {
+              "id": "airQualitySensor",
+              "version": 1
+            },
+            {
+              "id": "refresh",
+              "version": 1
+            }
+          ],
+          "categories": [
+            {
+              "name": "AirPurifier"
+            }
+          ]
+        }
+      ]
+    },
+    "presets": [
+      {
+        "label": "공기 나쁨",
+        "events": [
+          {
+            "component": "main",
+            "capability": "dustSensor",
+            "attribute": "dustLevel",
+            "value": 120,
+            "unit": "μg/m^3"
+          },
+          {
+            "component": "main",
+            "capability": "fineDustSensor",
+            "attribute": "fineDustLevel",
+            "value": 80,
+            "unit": "μg/m^3"
+          },
+          {
+            "component": "main",
+            "capability": "airQualitySensor",
+            "attribute": "airQuality",
+            "value": 4,
+            "unit": "CAQI"
+          }
+        ]
+      },
+      {
+        "label": "공기 좋음",
+        "events": [
+          {
+            "component": "main",
+            "capability": "dustSensor",
+            "attribute": "dustLevel",
+            "value": 15,
+            "unit": "μg/m^3"
+          },
+          {
+            "component": "main",
+            "capability": "fineDustSensor",
+            "attribute": "fineDustLevel",
+            "value": 8,
+            "unit": "μg/m^3"
+          },
+          {
+            "component": "main",
+            "capability": "airQualitySensor",
+            "attribute": "airQuality",
+            "value": 1,
+            "unit": "CAQI"
+          }
+        ]
+      },
+      {
+        "label": "자동 운전",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "on"
+          },
+          {
+            "component": "main",
+            "capability": "airPurifierFanMode",
+            "attribute": "airPurifierFanMode",
+            "value": "auto"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "robot",
+    "name": "로봇청소기",
+    "icon": "🤖",
+    "description": "전원, 이동 상태, 청소 모드, 배터리",
+    "deviceProfile": {
+      "name": "Virtual Samsung Robot Cleaner",
+      "components": [
+        {
+          "id": "main",
+          "capabilities": [
+            {
+              "id": "switch",
+              "version": 1
+            },
+            {
+              "id": "robotCleanerMovement",
+              "version": 1
+            },
+            {
+              "id": "robotCleanerCleaningMode",
+              "version": 1
+            },
+            {
+              "id": "battery",
+              "version": 1
+            },
+            {
+              "id": "refresh",
+              "version": 1
+            }
+          ],
+          "categories": [
+            {
+              "name": "RobotCleaner"
+            }
+          ]
+        }
+      ]
+    },
+    "presets": [
+      {
+        "label": "청소 시작",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "on"
+          },
+          {
+            "component": "main",
+            "capability": "robotCleanerMovement",
+            "attribute": "robotCleanerMovement",
+            "value": "cleaning"
+          },
+          {
+            "component": "main",
+            "capability": "robotCleanerCleaningMode",
+            "attribute": "robotCleanerCleaningMode",
+            "value": "auto"
+          }
+        ]
+      },
+      {
+        "label": "복귀/충전",
+        "events": [
+          {
+            "component": "main",
+            "capability": "robotCleanerMovement",
+            "attribute": "robotCleanerMovement",
+            "value": "homing"
+          }
+        ]
+      },
+      {
+        "label": "충전 중",
+        "events": [
+          {
+            "component": "main",
+            "capability": "robotCleanerMovement",
+            "attribute": "robotCleanerMovement",
+            "value": "charging"
+          }
+        ]
+      },
+      {
+        "label": "배터리 15%",
+        "events": [
+          {
+            "component": "main",
+            "capability": "battery",
+            "attribute": "battery",
+            "value": 15,
+            "unit": "%"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dishwasher",
+    "name": "식기세척기",
+    "icon": "🍽️",
+    "description": "전원, 동작 상태, 세척 모드",
+    "deviceProfile": {
+      "name": "Virtual Samsung Dishwasher",
+      "components": [
+        {
+          "id": "main",
+          "capabilities": [
+            {
+              "id": "switch",
+              "version": 1
+            },
+            {
+              "id": "dishwasherOperatingState",
+              "version": 1
+            },
+            {
+              "id": "dishwasherMode",
+              "version": 1
+            },
+            {
+              "id": "remoteControlStatus",
+              "version": 1
+            },
+            {
+              "id": "refresh",
+              "version": 1
+            }
+          ],
+          "categories": [
+            {
+              "name": "Dishwasher"
+            }
+          ]
+        }
+      ]
+    },
+    "presets": [
+      {
+        "label": "세척 시작",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "on"
+          },
+          {
+            "component": "main",
+            "capability": "dishwasherOperatingState",
+            "attribute": "machineState",
+            "value": "run"
+          },
+          {
+            "component": "main",
+            "capability": "dishwasherOperatingState",
+            "attribute": "dishwasherJobState",
+            "value": "wash"
+          }
+        ]
+      },
+      {
+        "label": "건조",
+        "events": [
+          {
+            "component": "main",
+            "capability": "dishwasherOperatingState",
+            "attribute": "dishwasherJobState",
+            "value": "drying"
+          }
+        ]
+      },
+      {
+        "label": "완료",
+        "events": [
+          {
+            "component": "main",
+            "capability": "dishwasherOperatingState",
+            "attribute": "machineState",
+            "value": "stop"
+          },
+          {
+            "component": "main",
+            "capability": "dishwasherOperatingState",
+            "attribute": "dishwasherJobState",
+            "value": "finish"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tv",
+    "name": "TV",
+    "icon": "📺",
+    "description": "전원, 볼륨, 음소거, 입력 소스, 채널",
+    "deviceProfile": {
+      "name": "Virtual Samsung TV",
+      "components": [
+        {
+          "id": "main",
+          "capabilities": [
+            {
+              "id": "switch",
+              "version": 1
+            },
+            {
+              "id": "audioVolume",
+              "version": 1
+            },
+            {
+              "id": "audioMute",
+              "version": 1
+            },
+            {
+              "id": "mediaInputSource",
+              "version": 1
+            },
+            {
+              "id": "tvChannel",
+              "version": 1
+            },
+            {
+              "id": "refresh",
+              "version": 1
+            }
+          ],
+          "categories": [
+            {
+              "name": "Television"
+            }
+          ]
+        }
+      ]
+    },
+    "presets": [
+      {
+        "label": "켜기 + 볼륨 20",
+        "events": [
+          {
+            "component": "main",
+            "capability": "switch",
+            "attribute": "switch",
+            "value": "on"
+          },
+          {
+            "component": "main",
+            "capability": "audioVolume",
+            "attribute": "volume",
+            "value": 20,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "label": "음소거",
+        "events": [
+          {
+            "component": "main",
+            "capability": "audioMute",
+            "attribute": "mute",
+            "value": "muted"
+          }
+        ]
+      },
+      {
+        "label": "HDMI1",
+        "events": [
+          {
+            "component": "main",
+            "capability": "mediaInputSource",
+            "attribute": "inputSource",
+            "value": "HDMI1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fridge",
+    "name": "냉장고 (표준 프로토타입)",
+    "icon": "🧊",
+    "description": "SmartThings 표준 VIRTUAL_REFRIGERATOR 프로토타입",
+    "prototype": "VIRTUAL_REFRIGERATOR",
+    "presets": []
+  }
+]
