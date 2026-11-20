@@ -57,6 +57,7 @@ npm run mock
 | `ST_CLI` | `smartthings` | CLI 실행 파일 경로. `.js` 로 끝나면 `node` 로 실행 |
 | `ST_PROFILE` | `default` | CLI 설정 프로필 (`~/.config/@smartthings/cli/config.yaml`). UI 상단에서도 바꿀 수 있음 |
 | `SMARTTHINGS_TOKEN` | – | PAT. 지정하면 브라우저 로그인 없이 사용 |
+| `ST_NO_OPEN` | – | 값이 있으면 시작할 때 브라우저를 자동으로 열지 않음 (`--no-open` 인자도 동일) |
 | `ST_CLI_TIMEOUT_MS` | `120000` | CLI 명령 하나의 최대 실행 시간 |
 
 ## 기능

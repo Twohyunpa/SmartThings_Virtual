@@ -13,6 +13,7 @@ const { spawn } = require('child_process');
 
 const PORT = Number(process.env.PORT || 3700);
 const HOST = process.env.HOST || '127.0.0.1';
+const NO_OPEN = process.argv.includes('--no-open') || !!process.env.ST_NO_OPEN;
 const USE_MOCK = process.argv.includes('--mock'); // Windows 에서도 되도록 환경변수 대신 인자로 모의 CLI 선택
 const CLI = USE_MOCK ? path.join(__dirname, 'mock', 'smartthings-mock.js') : (process.env.ST_CLI || 'smartthings');
 const CLI_TIMEOUT_MS = Number(process.env.ST_CLI_TIMEOUT_MS || 120000);
@@ -334,8 +335,20 @@ const server = http.createServer(async (req, res) => {
   send(res, 404, { error: 'not found' });
 });
 
+function openBrowser(url) {
+  const [cmd, args] = process.platform === 'darwin' ? ['open', [url]]
+    : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]]
+      : ['xdg-open', [url]];
+  try {
+    const child = spawn(cmd, args, { stdio: 'ignore', detached: true });
+    child.on('error', () => {}); // 브라우저를 못 열어도 서버는 계속 동작
+    child.unref();
+  } catch { /* ignore */ }
+}
+
 server.listen(PORT, HOST, async () => {
   await detectCli();
   console.log(`\n  SmartThings 가상 기기 GUI 실행 중:  http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
   console.log(`  CLI: ${CLI} (${cliInfo?.version || '실행 불가: ' + cliInfo?.error})   프로필: ${currentProfile}${process.env.SMARTTHINGS_TOKEN ? '   (SMARTTHINGS_TOKEN 사용)' : ''}\n`);
+  if (!NO_OPEN) openBrowser(`http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
 });
