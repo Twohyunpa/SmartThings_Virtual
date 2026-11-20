@@ -98,3 +98,7 @@ npm run mock
 - 삼성 가전 템플릿은 SmartThings 표준 capability만 씁니다. 실제 삼성 가전이 쓰는 `samsungce.*` 같은 전용 capability가 필요하면 템플릿 JSON에 추가해 보세요. 계정 권한에 따라 가상 기기에서 거부될 수 있습니다.
 - 가상 기기는 실제 SmartThings 계정의 선택한 위치에 만들어지고, SmartThings 앱과 자동화(루틴)에도 그대로 보입니다.
 - 이벤트 주입은 클라우드 가상 기기 기준입니다. 허브에서 로컬 실행하는 가상 기기(`--local`)는 이 UI에서 만들지 않습니다.
+
+## 라이선스
+
+MIT. 자세한 내용은 [LICENSE](LICENSE) 참고.

@@ -18,10 +18,12 @@
     "public",
     "mock",
     "templates",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Twohyunpa/SmartThings_Virtual.git"
-  }
+  },
+  "license": "MIT"
 }
