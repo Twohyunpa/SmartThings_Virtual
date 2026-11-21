@@ -1,30 +1,30 @@
 'use strict';
 
-// ================= 상태 =================
+// ================= State =================
 const state = {
   locations: [],
   devices: [],
   templates: [],
   selectedId: null,
-  device: null,       // devices <id> 결과
-  status: null,       // devices:status 결과
-  caps: {},           // capabilityId -> 정의
+  device: null,       // result of `devices <id>`
+  status: null,       // result of `devices:status`
+  caps: {},           // capabilityId -> definition
   tab: 'control',
   autoRefresh: false,
   autoTimer: null,
-  draft: [],          // 시나리오 작성 중인 단계
+  draft: [],          // steps of the scenario being edited
 };
 
 const PROTOTYPES = [
-  ['VIRTUAL_SWITCH', '스위치'], ['VIRTUAL_DIMMER_SWITCH', '디머 스위치'], ['VIRTUAL_BUTTON', '버튼'],
-  ['VIRTUAL_CAMERA', '카메라'], ['VIRTUAL_COLOR_BULB', '컬러 전구'], ['VIRTUAL_CONTACT_SENSOR', '문열림 센서'],
-  ['VIRTUAL_DIMMER', '디머(스위치 없음)'], ['VIRTUAL_GARAGE_DOOR_OPENER', '차고문'], ['VIRTUAL_LOCK', '도어락'],
-  ['VIRTUAL_METERED_SWITCH', '전력측정 스위치'], ['VIRTUAL_MOTION_SENSOR', '모션 센서'], ['VIRTUAL_MULTI_SENSOR', '멀티 센서'],
-  ['VIRTUAL_PRESENCE_SENSOR', '재실 센서'], ['VIRTUAL_REFRIGERATOR', '냉장고'], ['VIRTUAL_RGBW_BULB', 'RGBW 전구'],
-  ['VIRTUAL_SIREN', '사이렌'], ['VIRTUAL_THERMOSTAT', '온도조절기'],
+  ['VIRTUAL_SWITCH', 'Switch'], ['VIRTUAL_DIMMER_SWITCH', 'Dimmer switch'], ['VIRTUAL_BUTTON', 'Button'],
+  ['VIRTUAL_CAMERA', 'Camera'], ['VIRTUAL_COLOR_BULB', 'Color bulb'], ['VIRTUAL_CONTACT_SENSOR', 'Contact sensor'],
+  ['VIRTUAL_DIMMER', 'Dimmer (no switch)'], ['VIRTUAL_GARAGE_DOOR_OPENER', 'Garage door opener'], ['VIRTUAL_LOCK', 'Lock'],
+  ['VIRTUAL_METERED_SWITCH', 'Metered switch'], ['VIRTUAL_MOTION_SENSOR', 'Motion sensor'], ['VIRTUAL_MULTI_SENSOR', 'Multi-sensor'],
+  ['VIRTUAL_PRESENCE_SENSOR', 'Presence sensor'], ['VIRTUAL_REFRIGERATOR', 'Refrigerator'], ['VIRTUAL_RGBW_BULB', 'RGBW bulb'],
+  ['VIRTUAL_SIREN', 'Siren'], ['VIRTUAL_THERMOSTAT', 'Thermostat'],
 ];
 
-// ================= 유틸 =================
+// ================= Utilities =================
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -66,8 +66,8 @@ function store(key, val) {
 
 function convertValue(raw, type) {
   switch (type) {
-    case 'integer': { const n = parseInt(raw, 10); if (Number.isNaN(n)) throw new Error('정수를 입력하세요'); return n; }
-    case 'number': { const n = parseFloat(raw); if (Number.isNaN(n)) throw new Error('숫자를 입력하세요'); return n; }
+    case 'integer': { const n = parseInt(raw, 10); if (Number.isNaN(n)) throw new Error('Enter an integer'); return n; }
+    case 'number': { const n = parseFloat(raw); if (Number.isNaN(n)) throw new Error('Enter a number'); return n; }
     case 'boolean': return raw === true || raw === 'true';
     case 'array': case 'object': return typeof raw === 'string' ? JSON.parse(raw) : raw;
     default: return raw;
@@ -94,7 +94,7 @@ function valueSchema(capId, attrName) {
   };
 }
 
-// ================= 상단 / 로그 =================
+// ================= Top bar / log =================
 async function loadInfo() {
   const badge = $('#cliBadge');
   try {
@@ -103,17 +103,17 @@ async function loadInfo() {
     $('#profileInput').value = info.profile;
     if (info.version) {
       badge.className = 'badge ok';
-      badge.textContent = 'CLI ' + info.version.split(' ')[0].replace('@smartthings/cli/', '') + (info.tokenFromEnv ? ' · 토큰' : '');
+      badge.textContent = 'CLI ' + info.version.split(' ')[0].replace('@smartthings/cli/', '') + (info.tokenFromEnv ? ' · token' : '');
       badge.title = info.version;
     } else {
       badge.className = 'badge err';
-      badge.textContent = 'CLI 없음';
+      badge.textContent = 'CLI not found';
       badge.title = info.error || '';
-      toast(info.error || 'SmartThings CLI를 실행할 수 없습니다', 'err');
+      toast(info.error || 'Cannot run the SmartThings CLI', 'err');
     }
   } catch (e) {
     badge.className = 'badge err';
-    badge.textContent = '서버 연결 실패';
+    badge.textContent = 'Cannot reach server';
   }
 }
 
@@ -126,22 +126,22 @@ async function refreshLog() {
       <div class="log-entry">
         <span class="muted">${esc(new Date(e.at).toLocaleTimeString())}</span>
         <span class="${e.ok ? 'ok' : 'bad'}">${e.ok ? '✓' : '✕'}</span>
-        <span class="cmd" title="클릭하면 복사">${esc(e.command)}</span>
+        <span class="cmd" title="Click to copy">${esc(e.command)}</span>
         <span class="muted">${e.ms}ms</span>
         ${e.input !== undefined ? `<details class="inp"><summary class="muted small">input.json</summary><pre class="json">${esc(JSON.stringify(e.input, null, 2))}</pre></details>` : ''}
         ${e.error ? `<span class="err">${esc(e.error)}</span>` : ''}
-      </div>`).join('') || '<div class="muted pad">아직 실행한 명령이 없습니다.</div>';
+      </div>`).join('') || '<div class="muted pad">No commands have been run yet.</div>';
   } catch { /* ignore */ }
 }
 
 $('#logBody').addEventListener('click', (e) => {
   const cmd = e.target.closest('.cmd');
-  if (cmd) navigator.clipboard?.writeText(cmd.textContent).then(() => toast('명령을 복사했습니다'));
+  if (cmd) navigator.clipboard?.writeText(cmd.textContent).then(() => toast('Command copied'));
 });
 $('#logToggle').addEventListener('click', () => {
   const d = $('#logDrawer');
   d.classList.toggle('collapsed');
-  $('#logToggle').firstChild.textContent = d.classList.contains('collapsed') ? '▲ CLI 명령 로그 ' : '▼ CLI 명령 로그 ';
+  $('#logToggle').firstChild.textContent = d.classList.contains('collapsed') ? '▲ CLI command log ' : '▼ CLI command log ';
 });
 $('#logClear').addEventListener('click', async () => { await fetch('/api/log', { method: 'DELETE' }); refreshLog(); });
 
@@ -149,35 +149,35 @@ $('#profileApply').addEventListener('click', async () => {
   try {
     await api('POST', '/api/profile', { profile: $('#profileInput').value.trim() });
     state.caps = {};
-    toast(`프로필을 "${$('#profileInput').value.trim()}"(으)로 바꿨습니다`, 'ok');
+    toast(`Switched to profile "${$('#profileInput').value.trim()}"`, 'ok');
     await Promise.all([loadLocations(), loadDevices()]);
   } catch (e) { toast(e.message, 'err'); }
 });
 
-// ================= 위치 / 기기 목록 =================
+// ================= Locations / device list =================
 async function loadLocations() {
   try {
     state.locations = (await api('GET', '/api/locations')) || [];
   } catch (e) {
     state.locations = [];
-    toast(`위치를 불러오지 못했습니다\n${e.message}`, 'err');
+    toast(`Could not load locations\n${e.message}`, 'err');
   }
   const sel = $('#locationFilter');
   const cur = sel.value;
-  sel.innerHTML = '<option value="">모든 위치</option>' +
+  sel.innerHTML = '<option value="">All locations</option>' +
     state.locations.map((l) => `<option value="${esc(l.locationId)}">${esc(l.name)}</option>`).join('');
   sel.value = cur;
 }
 
 async function loadDevices() {
   const list = $('#deviceList');
-  list.innerHTML = '<div class="muted pad"><span class="spinner"></span> 불러오는 중…</div>';
+  list.innerHTML = '<div class="muted pad"><span class="spinner"></span> Loading…</div>';
   const loc = $('#locationFilter').value;
   try {
     state.devices = (await api('GET', '/api/devices' + (loc ? `?location=${encodeURIComponent(loc)}` : ''))) || [];
   } catch (e) {
     state.devices = [];
-    list.innerHTML = `<div class="muted pad">기기 목록을 불러오지 못했습니다.<br><span class="small">${esc(e.message)}</span></div>`;
+    list.innerHTML = `<div class="muted pad">Could not load the device list.<br><span class="small">${esc(e.message)}</span></div>`;
     return;
   }
   renderDeviceList();
@@ -186,7 +186,7 @@ async function loadDevices() {
 function renderDeviceList() {
   const list = $('#deviceList');
   if (!state.devices.length) {
-    list.innerHTML = '<div class="muted pad">가상 기기가 없습니다. 위 버튼으로 만들어 보세요.</div>';
+    list.innerHTML = '<div class="muted pad">No virtual devices yet. Create one with the button above.</div>';
     return;
   }
   const locName = (id) => state.locations.find((l) => l.locationId === id)?.name || '';
@@ -208,7 +208,7 @@ $('#refreshDevices').addEventListener('click', loadDevices);
 $('#locationFilter').addEventListener('change', loadDevices);
 $('#newDeviceBtn').addEventListener('click', () => { stopAuto(); state.selectedId = null; renderDeviceList(); renderCreate(); });
 
-// ================= 기기 만들기 =================
+// ================= Create device =================
 let createState = { mode: 'template', templateId: null };
 
 async function renderCreate() {
@@ -218,23 +218,23 @@ async function renderCreate() {
   const main = $('#main');
   const locOpts = state.locations.map((l) => `<option value="${esc(l.locationId)}">${esc(l.name)}</option>`).join('');
   main.innerHTML = `
-    <div class="dev-head"><div><h2>가상 기기 만들기</h2><div class="muted small">결과는 SmartThings 앱의 선택한 위치에 실제로 추가됩니다.</div></div></div>
+    <div class="dev-head"><div><h2>New virtual device</h2><div class="muted small">The device is created for real in the selected location of your SmartThings account.</div></div></div>
     <div class="tabs">
-      <button class="tab ${createState.mode === 'template' ? 'active' : ''}" data-mode="template">삼성 가전 템플릿</button>
-      <button class="tab ${createState.mode === 'standard' ? 'active' : ''}" data-mode="standard">표준 프로토타입</button>
-      <button class="tab ${createState.mode === 'profileId' ? 'active' : ''}" data-mode="profileId">디바이스 프로필 ID</button>
-      <button class="tab ${createState.mode === 'json' ? 'active' : ''}" data-mode="json">프로필 JSON 직접 입력</button>
+      <button class="tab ${createState.mode === 'template' ? 'active' : ''}" data-mode="template">Samsung appliance templates</button>
+      <button class="tab ${createState.mode === 'standard' ? 'active' : ''}" data-mode="standard">Standard prototype</button>
+      <button class="tab ${createState.mode === 'profileId' ? 'active' : ''}" data-mode="profileId">Device profile ID</button>
+      <button class="tab ${createState.mode === 'json' ? 'active' : ''}" data-mode="json">Profile JSON</button>
     </div>
     <div class="panel">
       <div id="modeArea"></div>
       <div class="form" style="margin-top:14px">
-        <label for="cName">기기 이름</label><input id="cName" placeholder="예: 테스트 세탁기 1" />
-        <label for="cLoc">위치</label><select id="cLoc">${locOpts || '<option value="">(위치 없음 — CLI 로그인 확인)</option>'}</select>
-        <label for="cRoom">방 (선택)</label><select id="cRoom"><option value="">선택 안 함</option></select>
+        <label for="cName">Device name</label><input id="cName" placeholder="e.g. Test Washer 1" />
+        <label for="cLoc">Location</label><select id="cLoc">${locOpts || '<option value="">(no locations — check the CLI login)</option>'}</select>
+        <label for="cRoom">Room (optional)</label><select id="cRoom"><option value="">None</option></select>
         <label></label>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button id="cSubmit" class="btn primary">만들기</button>
-          <button id="cDry" class="btn">dry-run (요청 JSON 미리보기)</button>
+          <button id="cSubmit" class="btn primary">Create</button>
+          <button id="cDry" class="btn">dry-run (preview request JSON)</button>
         </div>
       </div>
       <pre id="cResult" class="json" style="display:none;margin-top:14px"></pre>
@@ -248,12 +248,12 @@ async function renderCreate() {
   if (fav && state.locations.some((l) => l.locationId === fav)) locSel.value = fav;
   const loadRooms = async () => {
     const roomSel = $('#cRoom');
-    roomSel.innerHTML = '<option value="">선택 안 함</option>';
+    roomSel.innerHTML = '<option value="">None</option>';
     if (!locSel.value) return;
     try {
       const rooms = (await api('GET', `/api/locations/${locSel.value}/rooms`)) || [];
       roomSel.innerHTML += rooms.map((r) => `<option value="${esc(r.roomId)}">${esc(r.name)}</option>`).join('');
-    } catch { /* 방 없이도 생성 가능 */ }
+    } catch { /* creating without a room is fine */ }
   };
   locSel.addEventListener('change', loadRooms);
   loadRooms();
@@ -273,29 +273,29 @@ function renderModeArea() {
         <button class="tpl ${x.id === createState.templateId ? 'active' : ''}" data-id="${esc(x.id)}">
           <span class="ic">${esc(x.icon || '▢')}</span><span class="nm">${esc(x.name)}</span><span class="ds">${esc(x.description)}</span>
         </button>`).join('')}</div>
-      ${t?.deviceProfile ? `<details><summary class="muted small">프로필 정의 보기/수정 (capability 추가·삭제 가능)</summary>
+      ${t?.deviceProfile ? `<details><summary class="muted small">View / edit the profile definition (add or remove capabilities)</summary>
         <textarea id="tplJson" rows="12" style="margin-top:8px">${esc(JSON.stringify(t.deviceProfile, null, 2))}</textarea></details>`
-        : t ? `<div class="muted small">표준 프로토타입 <code>${esc(t.prototype)}</code> 로 생성합니다.</div>` : ''}`;
+        : t ? `<div class="muted small">Created from the standard prototype <code>${esc(t.prototype)}</code>.</div>` : ''}`;
     area.querySelectorAll('.tpl').forEach((b) => b.addEventListener('click', () => {
       createState.templateId = b.dataset.id;
       renderModeArea();
       const tt = state.templates.find((x) => x.id === b.dataset.id);
       const nameEl = $('#cName');
-      if (nameEl && (!nameEl.value || nameEl.dataset.auto)) { nameEl.value = `가상 ${tt.name.replace(/\s*\(.*\)/, '')}`; nameEl.dataset.auto = '1'; }
+      if (nameEl && (!nameEl.value || nameEl.dataset.auto)) { nameEl.value = `Virtual ${tt.name.replace(/\s*\(.*\)/, '')}`; nameEl.dataset.auto = '1'; }
     }));
   } else if (m === 'standard') {
-    area.innerHTML = `<div class="form"><label for="cProto">프로토타입</label>
+    area.innerHTML = `<div class="form"><label for="cProto">Prototype</label>
       <select id="cProto">${PROTOTYPES.map(([id, nm]) => `<option value="${id}">${nm} — ${id}</option>`).join('')}</select></div>`;
   } else if (m === 'profileId') {
-    area.innerHTML = `<div class="form"><label for="cProfile">디바이스 프로필</label>
-      <div style="display:flex;gap:6px"><select id="cProfile"><option value="">불러오는 중…</option></select>
-      <input id="cProfileId" placeholder="또는 UUID 직접 입력" /></div></div>`;
+    area.innerHTML = `<div class="form"><label for="cProfile">Device profile</label>
+      <div style="display:flex;gap:6px"><select id="cProfile"><option value="">Loading…</option></select>
+      <input id="cProfileId" placeholder="or paste a UUID" /></div></div>`;
     api('GET', '/api/deviceprofiles').then((list) => {
-      $('#cProfile').innerHTML = '<option value="">선택…</option>' +
+      $('#cProfile').innerHTML = '<option value="">Select…</option>' +
         (list || []).map((p) => `<option value="${esc(p.id)}">${esc(p.name)} (${esc(p.status || '')})</option>`).join('');
-    }).catch((e) => { $('#cProfile').innerHTML = `<option value="">목록 실패: ${esc(e.message)}</option>`; });
+    }).catch((e) => { $('#cProfile').innerHTML = `<option value="">Failed to load: ${esc(e.message)}</option>`; });
   } else {
-    area.innerHTML = `<div class="muted small" style="margin-bottom:6px">virtualdevices:create 의 <code>deviceProfile</code> 필드에 들어갈 정의</div>
+    area.innerHTML = `<div class="muted small" style="margin-bottom:6px">Definition for the <code>deviceProfile</code> field of virtualdevices:create</div>
       <textarea id="cJson" rows="14">${esc(JSON.stringify({
         name: 'My Virtual Profile',
         components: [{ id: 'main', capabilities: [{ id: 'switch', version: 1 }, { id: 'temperatureMeasurement', version: 1 }], categories: [{ name: 'Switch' }] }],
@@ -307,8 +307,8 @@ async function submitCreate(dryRun) {
   const name = $('#cName').value.trim();
   const locationId = $('#cLoc').value;
   const roomId = $('#cRoom').value || undefined;
-  if (!name) return toast('기기 이름을 입력하세요', 'err');
-  if (!locationId) return toast('위치를 선택하세요', 'err');
+  if (!name) return toast('Enter a device name', 'err');
+  if (!locationId) return toast('Select a location', 'err');
   store('st.lastLocation', locationId);
 
   let url; let body;
@@ -316,7 +316,7 @@ async function submitCreate(dryRun) {
     const m = createState.mode;
     if (m === 'template') {
       const t = state.templates.find((x) => x.id === createState.templateId);
-      if (!t) throw new Error('템플릿을 선택하세요');
+      if (!t) throw new Error('Select a template');
       if (t.prototype) { url = '/api/devices/standard'; body = { name, locationId, roomId, prototype: t.prototype }; }
       else {
         const txt = $('#tplJson')?.value;
@@ -327,7 +327,7 @@ async function submitCreate(dryRun) {
       url = '/api/devices/standard'; body = { name, locationId, roomId, prototype: $('#cProto').value };
     } else if (m === 'profileId') {
       const id = $('#cProfileId').value.trim() || $('#cProfile').value;
-      if (!id) throw new Error('디바이스 프로필을 선택하거나 UUID를 입력하세요');
+      if (!id) throw new Error('Select a device profile or enter a UUID');
       url = '/api/devices/profile'; body = { name, locationId, roomId, deviceProfileId: id };
     } else {
       url = '/api/devices/profile'; body = { name, locationId, roomId, deviceProfile: JSON.parse($('#cJson').value) };
@@ -338,27 +338,27 @@ async function submitCreate(dryRun) {
   const btn = dryRun ? $('#cDry') : $('#cSubmit');
   btn.disabled = true;
   const label = btn.textContent;
-  btn.innerHTML = '<span class="spinner"></span> 실행 중…';
+  btn.innerHTML = '<span class="spinner"></span> Running…';
   try {
     const out = await api('POST', url, body);
     const pre = $('#cResult');
     pre.style.display = 'block';
     pre.textContent = typeof out === 'string' ? out : JSON.stringify(out, null, 2);
     if (!dryRun) {
-      toast(`"${name}" 을(를) 만들었습니다`, 'ok');
+      toast(`Created "${name}"`, 'ok');
       await loadDevices();
       const id = out?.deviceId;
       if (id) selectDevice(id);
     }
   } catch (e) {
-    toast(`생성 실패\n${e.message}`, 'err');
+    toast(`Creation failed\n${e.message}`, 'err');
   } finally {
     btn.disabled = false;
     btn.textContent = label;
   }
 }
 
-// ================= 기기 상세 =================
+// ================= Device detail =================
 async function selectDevice(id) {
   stopAuto();
   if (state.selectedId !== id) state.tab = 'control';
@@ -367,7 +367,7 @@ async function selectDevice(id) {
   state.status = null;
   state.draft = store(`st.draft.${id}`) || [];
   renderDeviceList();
-  $('#main').innerHTML = '<div class="muted"><span class="spinner"></span> 기기 정보를 불러오는 중…</div>';
+  $('#main').innerHTML = '<div class="muted"><span class="spinner"></span> Loading device…</div>';
   try {
     const [device, status] = await Promise.all([api('GET', `/api/devices/${id}`), api('GET', `/api/devices/${id}/status`)]);
     if (state.selectedId !== id) return;
@@ -382,7 +382,7 @@ async function selectDevice(id) {
     if (state.selectedId !== id) return;
     renderDevice();
   } catch (e) {
-    $('#main').innerHTML = `<div class="panel"><h3>기기를 불러오지 못했습니다</h3><pre class="json">${esc(e.message)}</pre></div>`;
+    $('#main').innerHTML = `<div class="panel"><h3>Could not load the device</h3><pre class="json">${esc(e.message)}</pre></div>`;
   }
 }
 
@@ -391,7 +391,7 @@ async function refreshStatus(flash = true) {
   const before = JSON.stringify(state.status);
   try {
     state.status = await api('GET', `/api/devices/${state.selectedId}/status`);
-  } catch (e) { toast(`상태 조회 실패\n${e.message}`, 'err'); return; }
+  } catch (e) { toast(`Could not read status\n${e.message}`, 'err'); return; }
   if (state.tab === 'control') updateCurrentValues(flash && before !== JSON.stringify(state.status));
   if (state.tab === 'raw') renderTabBody();
 }
@@ -412,19 +412,19 @@ function renderDevice() {
         <div class="ids">${esc(d.deviceId)} · ${esc(locName)}${d.deviceTypeName ? ' · ' + esc(d.deviceTypeName) : ''}</div>
       </div>
       <div class="actions">
-        <button class="btn small" id="copyId">ID 복사</button>
-        <button class="btn small" id="renameBtn">이름 변경</button>
-        <button class="btn small danger" id="deleteBtn">삭제</button>
+        <button class="btn small" id="copyId">Copy ID</button>
+        <button class="btn small" id="renameBtn">Rename</button>
+        <button class="btn small danger" id="deleteBtn">Delete</button>
       </div>
     </div>
     <div class="tabs">
-      <button class="tab" data-tab="control">상태 &amp; 주입</button>
-      <button class="tab" data-tab="scenario">프리셋 &amp; 시나리오</button>
-      <button class="tab" data-tab="raw">원본 JSON</button>
+      <button class="tab" data-tab="control">State &amp; inject</button>
+      <button class="tab" data-tab="scenario">Presets &amp; scenarios</button>
+      <button class="tab" data-tab="raw">Raw JSON</button>
     </div>
     <div id="tabBody"></div>`;
 
-  $('#copyId').addEventListener('click', () => navigator.clipboard?.writeText(d.deviceId).then(() => toast('ID를 복사했습니다')));
+  $('#copyId').addEventListener('click', () => navigator.clipboard?.writeText(d.deviceId).then(() => toast('ID copied')));
   $('#renameBtn').addEventListener('click', renameDevice);
   $('#deleteBtn').addEventListener('click', deleteDevice);
   document.querySelectorAll('#main .tabs .tab').forEach((t) => t.addEventListener('click', () => { state.tab = t.dataset.tab; renderTabBody(); }));
@@ -442,31 +442,31 @@ function renderTabBody() {
 }
 
 async function renameDevice() {
-  const label = prompt('새 기기 이름', state.device.label || state.device.name);
+  const label = prompt('New device name', state.device.label || state.device.name);
   if (!label) return;
   try {
     await api('PATCH', `/api/devices/${state.selectedId}`, { label });
     state.device.label = label;
     $('#devLabel').textContent = label;
-    toast('이름을 바꿨습니다', 'ok');
+    toast('Renamed', 'ok');
     loadDevices();
-  } catch (e) { toast(`이름 변경 실패\n${e.message}`, 'err'); }
+  } catch (e) { toast(`Rename failed\n${e.message}`, 'err'); }
 }
 
 async function deleteDevice() {
   const nm = state.device.label || state.device.name;
-  if (!confirm(`"${nm}" 가상 기기를 삭제할까요? 되돌릴 수 없습니다.`)) return;
+  if (!confirm(`Delete virtual device "${nm}"? This cannot be undone.`)) return;
   try {
     await api('DELETE', `/api/devices/${state.selectedId}`);
-    toast(`"${nm}" 을(를) 삭제했습니다`, 'ok');
+    toast(`Deleted "${nm}"`, 'ok');
     state.selectedId = null;
     $('#main').innerHTML = '';
     $('#main').appendChild($('#welcomeTpl').content.cloneNode(true));
     loadDevices();
-  } catch (e) { toast(`삭제 실패\n${e.message}`, 'err'); }
+  } catch (e) { toast(`Delete failed\n${e.message}`, 'err'); }
 }
 
-// ---------- 상태 & 주입 ----------
+// ---------- State & inject ----------
 function currentAttr(comp, cap, attr) {
   return state.status?.components?.[comp]?.[cap]?.[attr];
 }
@@ -476,24 +476,24 @@ function renderControl(body) {
   const comps = d.components || [];
   body.innerHTML = `
     <div class="toolbar">
-      <button class="btn small" id="reloadStatus">↻ 상태 새로고침</button>
-      <label class="small"><input type="checkbox" id="autoChk" ${state.autoRefresh ? 'checked' : ''}/> 5초마다 자동 새로고침</label>
-      <span class="muted small">값을 고르면 바로 주입하거나(칩), 입력 후 <b>주입</b>을 누르세요. <b>＋</b>는 시나리오에 단계로 추가합니다.</span>
+      <button class="btn small" id="reloadStatus">↻ Refresh state</button>
+      <label class="small"><input type="checkbox" id="autoChk" ${state.autoRefresh ? 'checked' : ''}/> Auto-refresh every 5 s</label>
+      <span class="muted small">Click a value chip to inject it right away, or type a value and press <b>Inject</b>. <b>＋</b> adds it as a scenario step.</span>
     </div>
     <div class="cap-grid">
       ${comps.flatMap((c) => (c.capabilities || []).map((cap) => capCard(c.id, cap.id))).join('')}
     </div>
     <div class="panel" style="margin-top:14px">
-      <h3>직접 입력</h3>
+      <h3>Custom event</h3>
       <div class="attr-ctrl">
         <input id="mComp" value="main" style="width:90px" placeholder="component" />
         <input id="mCap" placeholder="capability" style="width:180px" />
         <input id="mAttr" placeholder="attribute" style="width:150px" />
-        <input id="mVal" placeholder="value (JSON 가능)" type="text" />
+        <input id="mVal" placeholder="value (JSON allowed)" type="text" />
         <input id="mUnit" placeholder="unit" style="width:70px" />
-        <button class="btn primary small" id="mSend">주입</button>
+        <button class="btn primary small" id="mSend">Inject</button>
       </div>
-      <div class="muted small" style="margin-top:6px">값은 JSON으로 해석을 시도하고(숫자, true, {...}), 실패하면 문자열로 보냅니다.</div>
+      <div class="muted small" style="margin-top:6px">The value is parsed as JSON first (number, true, {...}); if that fails it is sent as a string.</div>
     </div>`;
 
   $('#reloadStatus').addEventListener('click', () => refreshStatus());
@@ -509,7 +509,7 @@ function renderControl(body) {
     const ev = { component: $('#mComp').value.trim() || 'main', capability: $('#mCap').value.trim(), attribute: $('#mAttr').value.trim(), value };
     const unit = $('#mUnit').value.trim();
     if (unit) ev.unit = unit;
-    if (!ev.capability || !ev.attribute) return toast('capability 와 attribute 를 입력하세요', 'err');
+    if (!ev.capability || !ev.attribute) return toast('Enter a capability and an attribute', 'err');
     sendEvents([ev]);
   });
 
@@ -522,7 +522,7 @@ function capCard(comp, capId) {
   return `
     <div class="cap">
       <div class="cap-head"><b>${esc(capId)}</b><span class="comp">${esc(comp)}${cap.name && cap.name !== capId ? ' · ' + esc(cap.name) : ''}</span></div>
-      ${attrs.length ? attrs.map((a) => attrRow(comp, capId, a)).join('') : '<div class="attr-empty muted small">속성이 없는 capability (명령 전용)</div>'}
+      ${attrs.length ? attrs.map((a) => attrRow(comp, capId, a)).join('') : '<div class="attr-empty muted small">Capability without attributes (commands only)</div>'}
     </div>`;
 }
 
@@ -543,30 +543,30 @@ function attrRow(comp, capId, attrName) {
       ${useRange ? `<input type="range" class="rng" min="${s.min}" max="${s.max}" step="${s.type === 'integer' ? 1 : (s.max - s.min) / 200}" value="${curVal ?? s.min}" style="flex:1;min-width:100px" />` : ''}
       <input type="number" class="inp" step="${step}" ${s.min !== undefined ? `min="${s.min}"` : ''} ${s.max !== undefined ? `max="${s.max}"` : ''} value="${esc(curVal ?? '')}" />
       ${s.units ? `<select class="unit">${s.units.map((u) => `<option ${u === (curUnit || s.unitDefault) ? 'selected' : ''}>${esc(u)}</option>`).join('')}</select>` : ''}
-      <button class="btn primary small send">주입</button>`;
+      <button class="btn primary small send">Inject</button>`;
   } else if (s.type === 'array' || s.type === 'object') {
     ctrl = `<textarea class="inp" rows="2">${esc(curVal !== undefined ? JSON.stringify(curVal) : (s.type === 'array' ? '[]' : '{}'))}</textarea>
-      <button class="btn primary small send">주입</button>`;
+      <button class="btn primary small send">Inject</button>`;
   } else {
     ctrl = `<input type="text" class="inp" value="${esc(curVal ?? '')}" />
       ${s.units ? `<select class="unit">${s.units.map((u) => `<option>${esc(u)}</option>`).join('')}</select>` : ''}
-      <button class="btn primary small send">주입</button>`;
+      <button class="btn primary small send">Inject</button>`;
   }
   const hint = [s.type, s.min !== undefined ? `min ${s.min}` : '', s.max !== undefined ? `max ${s.max}` : ''].filter(Boolean).join(' · ');
   return `
     <div class="attr" data-comp="${esc(comp)}" data-cap="${esc(capId)}" data-attr="${esc(attrName)}" data-type="${esc(s.type)}">
       <div class="attr-top">
         <span class="attr-name">${esc(attrName)} <span class="range-hint">${esc(hint)}</span></span>
-        <span class="attr-cur"><span class="muted">현재</span> <span class="val">${esc(fmtVal(curVal))}${curUnit ? ' ' + esc(curUnit) : ''}</span></span>
+        <span class="attr-cur"><span class="muted">current</span> <span class="val">${esc(fmtVal(curVal))}${curUnit ? ' ' + esc(curUnit) : ''}</span></span>
       </div>
-      <div class="attr-ctrl">${ctrl}<button class="btn small addStep" title="시나리오에 추가">＋</button></div>
+      <div class="attr-ctrl">${ctrl}<button class="btn small addStep" title="Add to scenario">＋</button></div>
     </div>`;
 }
 
 function readAttrEvent(row, chipValue) {
   const { comp, cap, attr, type } = row.dataset;
   const raw = chipValue !== undefined ? chipValue : row.querySelector('.inp')?.value;
-  if (raw === undefined || raw === '') throw new Error(`${attr}: 값을 입력하세요`);
+  if (raw === undefined || raw === '') throw new Error(`${attr}: enter a value`);
   const ev = { component: comp, capability: cap, attribute: attr, value: convertValue(raw, type) };
   const unit = row.querySelector('select.unit')?.value;
   if (unit) ev.unit = unit;
@@ -590,7 +590,7 @@ function wireAttr(row) {
   row.querySelector('.addStep').addEventListener('click', () => {
     let ev;
     if (row.querySelector('.chip')) {
-      const v = prompt(`시나리오에 추가할 ${row.dataset.attr} 값`, row.querySelector('.chip.current')?.dataset.v || row.querySelector('.chip').dataset.v);
+      const v = prompt(`Value of ${row.dataset.attr} to add to the scenario`, row.querySelector('.chip.current')?.dataset.v || row.querySelector('.chip').dataset.v);
       if (v === null) return;
       try { ev = readAttrEvent(row, v); } catch (e) { return toast(e.message, 'err'); }
     } else {
@@ -598,7 +598,7 @@ function wireAttr(row) {
     }
     state.draft.push({ events: [ev], delayMs: 1000 });
     store(`st.draft.${state.selectedId}`, state.draft);
-    toast(`시나리오에 단계 추가: ${ev.capability}.${ev.attribute} = ${fmtVal(ev.value)} (총 ${state.draft.length}단계)`, 'ok');
+    toast(`Added step: ${ev.capability}.${ev.attribute} = ${fmtVal(ev.value)} (${state.draft.length} steps total)`, 'ok');
   });
 }
 
@@ -626,17 +626,17 @@ async function sendEvents(events, { quiet = false } = {}) {
     if (!quiet) {
       const changes = out?.output?.stateChanges;
       const summary = events.map((e) => `${e.capability}.${e.attribute} = ${fmtVal(e.value)}${e.unit ? ' ' + e.unit : ''}`).join('\n');
-      toast(`주입 완료${changes ? ` (상태변경: ${changes.join(', ')})` : ''}\n${summary}`, 'ok');
+      toast(`Injected${changes ? ` (state changed: ${changes.join(', ')})` : ''}\n${summary}`, 'ok');
     }
     if (state.selectedId === id) await refreshStatus();
     return true;
   } catch (e) {
-    toast(`주입 실패\n${e.message}`, 'err');
+    toast(`Injection failed\n${e.message}`, 'err');
     return false;
   }
 }
 
-// ---------- 프리셋 & 시나리오 ----------
+// ---------- Presets & scenarios ----------
 function deviceCapSet() {
   const set = new Set();
   (state.device?.components || []).forEach((c) => (c.capabilities || []).forEach((x) => set.add(`${c.id}/${x.id}`)));
@@ -660,35 +660,35 @@ function renderScenario(body) {
 
   body.innerHTML = `
     <div class="panel">
-      <h3>빠른 프리셋 <span class="muted small">이 기기의 capability와 맞는 템플릿 프리셋</span></h3>
+      <h3>Quick presets <span class="muted small">template presets that match this device's capabilities</span></h3>
       ${presets.length ? `<div class="preset-row">${presets.map((p, i) => `<button class="btn small preset" data-i="${i}" title="${esc(p.from + '\n' + p.events.map(evText).join('\n'))}">${esc(p.label)}</button>`).join('')}</div>`
-        : '<div class="muted small">맞는 프리셋이 없습니다. 아래 시나리오를 직접 만들어 보세요.</div>'}
+        : '<div class="muted small">No matching presets. Build a scenario below.</div>'}
     </div>
 
     <div class="panel">
-      <h3>시나리오 작성 <span class="muted small">상태 &amp; 주입 탭의 ＋ 버튼으로 단계를 추가합니다</span></h3>
+      <h3>Scenario builder <span class="muted small">add steps with the ＋ buttons on the State &amp; inject tab</span></h3>
       <div id="draftSteps">${renderSteps(state.draft, true)}</div>
       <div class="toolbar" style="margin:10px 0 0">
-        <button class="btn primary small" id="runDraft" ${state.draft.length ? '' : 'disabled'}>▶ 실행</button>
-        <label class="small"><input type="checkbox" id="loopChk" /> 반복</label>
-        <button class="btn small" id="stopRun" disabled>■ 정지</button>
-        <input id="scName" placeholder="시나리오 이름" style="width:180px" />
-        <button class="btn small" id="saveDraft" ${state.draft.length ? '' : 'disabled'}>저장</button>
-        <button class="btn small" id="clearDraft" ${state.draft.length ? '' : 'disabled'}>비우기</button>
-        <button class="btn small" id="importBtn">JSON 가져오기/내보내기</button>
+        <button class="btn primary small" id="runDraft" ${state.draft.length ? '' : 'disabled'}>▶ Run</button>
+        <label class="small"><input type="checkbox" id="loopChk" /> Loop</label>
+        <button class="btn small" id="stopRun" disabled>■ Stop</button>
+        <input id="scName" placeholder="Scenario name" style="width:180px" />
+        <button class="btn small" id="saveDraft" ${state.draft.length ? '' : 'disabled'}>Save</button>
+        <button class="btn small" id="clearDraft" ${state.draft.length ? '' : 'disabled'}>Clear</button>
+        <button class="btn small" id="importBtn">Import / export JSON</button>
       </div>
     </div>
 
     <div class="panel">
-      <h3>저장된 시나리오</h3>
+      <h3>Saved scenarios</h3>
       ${saved.length ? saved.map((s) => `
         <div class="scenario">
           <div class="scenario-head"><b>${esc(s.name)}</b>
-            <span><button class="btn small runSaved" data-idx="${s.idx}">▶ 실행</button>
-            <button class="btn small editSaved" data-idx="${s.idx}">편집</button>
-            <button class="btn small danger delSaved" data-idx="${s.idx}">삭제</button></span></div>
-          <div class="muted small">${s.steps.length}단계 · ${esc(s.steps.map((st) => st.events.map(evText).join(', ')).join(' → '))}</div>
-        </div>`).join('') : '<div class="muted small">저장된 시나리오가 없습니다. (브라우저에 저장됩니다)</div>'}
+            <span><button class="btn small runSaved" data-idx="${s.idx}">▶ Run</button>
+            <button class="btn small editSaved" data-idx="${s.idx}">Edit</button>
+            <button class="btn small danger delSaved" data-idx="${s.idx}">Delete</button></span></div>
+          <div class="muted small">${s.steps.length} steps · ${esc(s.steps.map((st) => st.events.map(evText).join(', ')).join(' → '))}</div>
+        </div>`).join('') : '<div class="muted small">No saved scenarios. (They are stored in your browser.)</div>'}
     </div>`;
 
   body.querySelectorAll('.preset').forEach((b) => b.addEventListener('click', () => sendEvents(presets[b.dataset.i].events)));
@@ -705,20 +705,20 @@ function renderScenario(body) {
   });
   $('#stopRun').addEventListener('click', () => { stopFlag.stop = true; });
   $('#saveDraft').addEventListener('click', () => {
-    const name = $('#scName').value.trim() || `시나리오 ${new Date().toLocaleString()}`;
+    const name = $('#scName').value.trim() || `Scenario ${new Date().toLocaleString()}`;
     const all = savedScenarios();
     all.push({ name, steps: JSON.parse(JSON.stringify(state.draft)) });
     store('st.scenarios', all);
-    toast(`"${name}" 저장됨`, 'ok');
+    toast(`Saved "${name}"`, 'ok');
     renderTabBody();
   });
   $('#clearDraft').addEventListener('click', () => { state.draft = []; store(`st.draft.${state.selectedId}`, []); renderTabBody(); });
   $('#importBtn').addEventListener('click', () => {
-    const txt = prompt('시나리오 단계 JSON (현재 작성 중인 내용이 들어 있습니다. 붙여넣고 확인하면 교체됩니다)', JSON.stringify(state.draft));
+    const txt = prompt('Scenario steps JSON (the current draft is pre-filled; paste and confirm to replace it)', JSON.stringify(state.draft));
     if (txt === null) return;
     try {
       const steps = JSON.parse(txt);
-      if (!Array.isArray(steps) || !steps.every((s) => Array.isArray(s.events))) throw new Error('[{ "events": [...], "delayMs": 1000 }] 형식이어야 합니다');
+      if (!Array.isArray(steps) || !steps.every((s) => Array.isArray(s.events))) throw new Error('Expected the format [{ "events": [...], "delayMs": 1000 }]');
       state.draft = steps; store(`st.draft.${state.selectedId}`, steps); renderTabBody();
     } catch (e) { toast(e.message, 'err'); }
   });
@@ -737,7 +737,7 @@ function renderScenario(body) {
   }));
   body.querySelectorAll('.delSaved').forEach((b) => b.addEventListener('click', () => {
     const all = savedScenarios();
-    if (!confirm(`"${all[b.dataset.idx].name}" 시나리오를 삭제할까요?`)) return;
+    if (!confirm(`Delete scenario "${all[b.dataset.idx].name}"?`)) return;
     all.splice(b.dataset.idx, 1);
     store('st.scenarios', all);
     renderTabBody();
@@ -745,13 +745,13 @@ function renderScenario(body) {
 }
 
 function renderSteps(steps, editable) {
-  if (!steps.length) return '<div class="muted small">단계가 없습니다.</div>';
+  if (!steps.length) return '<div class="muted small">No steps.</div>';
   return steps.map((s, i) => `
     <div class="step" data-i="${i}">
       <span class="muted">${i + 1}</span>
       <span class="ev">${esc(s.events.map(evText).join(', '))}</span>
-      ${editable ? `<input type="number" class="delay" min="0" step="100" value="${s.delayMs ?? 1000}" title="이 단계 후 대기(ms)" />` : `<span class="muted small">${s.delayMs ?? 0}ms</span>`}
-      ${editable ? '<button class="btn small ghost rm" title="삭제">✕</button>' : '<span></span>'}
+      ${editable ? `<input type="number" class="delay" min="0" step="100" value="${s.delayMs ?? 1000}" title="Wait after this step (ms)" />` : `<span class="muted small">${s.delayMs ?? 0}ms</span>`}
+      ${editable ? '<button class="btn small ghost rm" title="Remove">✕</button>' : '<span></span>'}
     </div>`).join('');
 }
 
@@ -783,10 +783,10 @@ async function runSteps(steps, container, flag) {
     const delay = steps[i].delayMs ?? 0;
     if (delay && i < steps.length - 1) await sleep(delay);
   }
-  toast(flag.stop ? '시나리오를 멈췄습니다' : '시나리오 실행 완료', flag.stop ? '' : 'ok');
+  toast(flag.stop ? 'Scenario stopped' : 'Scenario finished', flag.stop ? '' : 'ok');
 }
 
-// ================= 시작 =================
+// ================= Start =================
 (async function init() {
   $('#main').appendChild($('#welcomeTpl').content.cloneNode(true));
   await loadInfo();

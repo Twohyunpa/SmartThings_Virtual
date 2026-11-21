@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// SmartThings CLI 모의 구현 (UI 확인용). 실제 SmartThings 계정 없이 GUI를 체험할 수 있다.
-// 사용법: ST_CLI=./mock/smartthings-mock.js node server.js   (또는 npm run mock)
-// 상태는 OS 임시 폴더의 st-mock-state.json 에 저장된다.
+// Mock of the SmartThings CLI (for trying the UI). Lets you explore the GUI without a real SmartThings account.
+// Usage: node server.js --mock   (or npm run mock)
+// State is stored in st-mock-state.json in the OS temp folder.
 'use strict';
 const fs = require('fs');
 const os = require('os');
@@ -118,10 +118,10 @@ function makeDevice(name, owner, roomId, components, typeName) {
 
 switch (cmd) {
   case 'locations':
-    out([{ locationId: LOC, name: '모의 우리집 (mock)' }]);
+    out([{ locationId: LOC, name: 'Mock Home (mock)' }]);
     break;
   case 'locations:rooms':
-    out([{ roomId: '6f3a2c1e-0000-4000-8000-0000000000a1', locationId: LOC, name: '거실' }, { roomId: '6f3a2c1e-0000-4000-8000-0000000000a2', locationId: LOC, name: '다용도실' }]);
+    out([{ roomId: '6f3a2c1e-0000-4000-8000-0000000000a1', locationId: LOC, name: 'Living Room' }, { roomId: '6f3a2c1e-0000-4000-8000-0000000000a2', locationId: LOC, name: 'Utility Room' }]);
     break;
   case 'deviceprofiles':
     out([{ id: '6f3a2c1e-0000-4000-8000-0000000000f1', name: 'Mock Washer Profile', status: 'PUBLISHED' }]);

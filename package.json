@@ -1,7 +1,7 @@
 {
   "name": "smartthings-virtual-gui",
   "version": "0.1.0",
-  "description": "SmartThings CLI로 가상 기기를 만들고 상태를 주입하는 로컬 GUI",
+  "description": "Local GUI to create SmartThings virtual devices and inject states, powered by the SmartThings CLI",
   "private": true,
   "bin": {
     "st-virtual-gui": "server.js"

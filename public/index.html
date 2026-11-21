@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SmartThings 가상 기기 콘솔</title>
+  <title>SmartThings Virtual Device Console</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -11,28 +11,28 @@
     <div class="brand">
       <span class="logo">◎</span>
       <div>
-        <h1>SmartThings 가상 기기 콘솔</h1>
-        <p class="sub">SmartThings CLI로 가상 기기를 만들고 상태를 주입합니다</p>
+        <h1>SmartThings Virtual Device Console</h1>
+        <p class="sub">Create virtual devices and inject states with the SmartThings CLI</p>
       </div>
     </div>
     <div class="top-actions">
-      <span id="cliBadge" class="badge">CLI 확인 중…</span>
+      <span id="cliBadge" class="badge">Checking CLI…</span>
       <label class="profile">
-        프로필
+        Profile
         <input id="profileInput" value="default" size="10" />
       </label>
-      <button id="profileApply" class="btn ghost small">적용</button>
+      <button id="profileApply" class="btn ghost small">Apply</button>
     </div>
   </header>
 
   <div class="layout">
     <aside class="sidebar">
       <div class="side-head">
-        <select id="locationFilter" title="위치 필터"><option value="">모든 위치</option></select>
-        <button id="refreshDevices" class="btn ghost small" title="새로고침">↻</button>
+        <select id="locationFilter" title="Filter by location"><option value="">All locations</option></select>
+        <button id="refreshDevices" class="btn ghost small" title="Refresh">↻</button>
       </div>
-      <button id="newDeviceBtn" class="btn primary full">＋ 가상 기기 만들기</button>
-      <div id="deviceList" class="device-list"><div class="muted pad">불러오는 중…</div></div>
+      <button id="newDeviceBtn" class="btn primary full">＋ New virtual device</button>
+      <div id="deviceList" class="device-list"><div class="muted pad">Loading…</div></div>
     </aside>
 
     <main id="main" class="main"></main>
@@ -40,9 +40,9 @@
 
   <section id="logDrawer" class="log-drawer collapsed">
     <div class="log-head">
-      <button id="logToggle" class="link">▲ CLI 명령 로그 <span id="logCount" class="count">0</span></button>
-      <span class="muted small">UI가 실행한 명령을 그대로 보여줍니다. 스크립트로 옮길 때 복사해서 쓰세요.</span>
-      <button id="logClear" class="btn ghost small">지우기</button>
+      <button id="logToggle" class="link">▲ CLI command log <span id="logCount" class="count">0</span></button>
+      <span class="muted small">Shows the exact commands the UI runs. Click one to copy it into your own scripts.</span>
+      <button id="logClear" class="btn ghost small">Clear</button>
     </div>
     <div id="logBody" class="log-body"></div>
   </section>
@@ -51,14 +51,14 @@
 
   <template id="welcomeTpl">
     <div class="welcome">
-      <h2>시작하기</h2>
+      <h2>Getting started</h2>
       <ol>
-        <li>왼쪽 <b>＋ 가상 기기 만들기</b>로 표준 프로토타입이나 삼성 가전 템플릿으로 기기를 만듭니다.</li>
-        <li>목록에서 기기를 고르면 capability별 현재 상태와 입력 컨트롤이 나옵니다.</li>
-        <li>값을 바꾸고 <b>주입</b>을 누르면 <code>smartthings virtualdevices:events</code>로 이벤트가 전송됩니다.</li>
-        <li><b>시나리오</b> 탭에서 여러 이벤트를 순서대로(지연 포함) 재생할 수 있습니다.</li>
+        <li>Click <b>＋ New virtual device</b> on the left and create a device from a standard prototype or a Samsung appliance template.</li>
+        <li>Pick a device from the list to see its current state and input controls for each capability.</li>
+        <li>Change a value and press <b>Inject</b> to send an event with <code>smartthings virtualdevices:events</code>.</li>
+        <li>Use the <b>Presets &amp; scenarios</b> tab to replay several events in order, with delays.</li>
       </ol>
-      <p class="muted">CLI 로그인이 안 되어 있으면 첫 요청 때 CLI가 브라우저 로그인 창을 엽니다.</p>
+      <p class="muted">If you are not logged in, the CLI opens a browser login window on the first request.</p>
     </div>
   </template>
 

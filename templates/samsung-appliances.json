@@ -1,9 +1,9 @@
 [
   {
     "id": "washer",
-    "name": "세탁기",
+    "name": "Washer",
     "icon": "🧺",
-    "description": "전원, 세탁기 동작 상태/코스, 원격제어, 전력",
+    "description": "Power, washer operating state / cycle, remote control, power meter",
     "deviceProfile": {
       "name": "Virtual Samsung Washer",
       "components": [
@@ -49,7 +49,7 @@
     },
     "presets": [
       {
-        "label": "세탁 시작",
+        "label": "Start wash",
         "events": [
           {
             "component": "main",
@@ -79,7 +79,7 @@
         ]
       },
       {
-        "label": "헹굼",
+        "label": "Rinse",
         "events": [
           {
             "component": "main",
@@ -90,7 +90,7 @@
         ]
       },
       {
-        "label": "탈수",
+        "label": "Spin",
         "events": [
           {
             "component": "main",
@@ -108,7 +108,7 @@
         ]
       },
       {
-        "label": "일시정지",
+        "label": "Pause",
         "events": [
           {
             "component": "main",
@@ -119,7 +119,7 @@
         ]
       },
       {
-        "label": "세탁 완료",
+        "label": "Wash finished",
         "events": [
           {
             "component": "main",
@@ -146,9 +146,9 @@
   },
   {
     "id": "dryer",
-    "name": "건조기",
+    "name": "Dryer",
     "icon": "🌀",
-    "description": "전원, 건조기 동작 상태/모드, 원격제어",
+    "description": "Power, dryer operating state / mode, remote control",
     "deviceProfile": {
       "name": "Virtual Samsung Dryer",
       "components": [
@@ -190,7 +190,7 @@
     },
     "presets": [
       {
-        "label": "건조 시작",
+        "label": "Start drying",
         "events": [
           {
             "component": "main",
@@ -213,7 +213,7 @@
         ]
       },
       {
-        "label": "냉각",
+        "label": "Cooling",
         "events": [
           {
             "component": "main",
@@ -224,7 +224,7 @@
         ]
       },
       {
-        "label": "건조 완료",
+        "label": "Drying finished",
         "events": [
           {
             "component": "main",
@@ -244,9 +244,9 @@
   },
   {
     "id": "aircon",
-    "name": "에어컨",
+    "name": "Air conditioner",
     "icon": "❄️",
-    "description": "전원, 운전 모드, 풍량, 희망/현재 온도, 습도",
+    "description": "Power, mode, fan mode, cooling setpoint, temperature, humidity",
     "deviceProfile": {
       "name": "Virtual Samsung Air Conditioner",
       "components": [
@@ -296,7 +296,7 @@
     },
     "presets": [
       {
-        "label": "냉방 24℃",
+        "label": "Cool 24°C",
         "events": [
           {
             "component": "main",
@@ -320,7 +320,7 @@
         ]
       },
       {
-        "label": "제습",
+        "label": "Dry mode",
         "events": [
           {
             "component": "main",
@@ -337,7 +337,7 @@
         ]
       },
       {
-        "label": "실내 30℃ / 70%",
+        "label": "Room 30°C / 70%",
         "events": [
           {
             "component": "main",
@@ -356,7 +356,7 @@
         ]
       },
       {
-        "label": "전원 끄기",
+        "label": "Power off",
         "events": [
           {
             "component": "main",
@@ -370,9 +370,9 @@
   },
   {
     "id": "purifier",
-    "name": "공기청정기",
+    "name": "Air purifier",
     "icon": "🍃",
-    "description": "전원, 팬 모드, 미세먼지/초미세먼지, 공기질",
+    "description": "Power, fan mode, dust / fine dust, air quality",
     "deviceProfile": {
       "name": "Virtual Samsung Air Purifier",
       "components": [
@@ -414,7 +414,7 @@
     },
     "presets": [
       {
-        "label": "공기 나쁨",
+        "label": "Poor air",
         "events": [
           {
             "component": "main",
@@ -440,7 +440,7 @@
         ]
       },
       {
-        "label": "공기 좋음",
+        "label": "Good air",
         "events": [
           {
             "component": "main",
@@ -466,7 +466,7 @@
         ]
       },
       {
-        "label": "자동 운전",
+        "label": "Auto mode",
         "events": [
           {
             "component": "main",
@@ -486,9 +486,9 @@
   },
   {
     "id": "robot",
-    "name": "로봇청소기",
+    "name": "Robot vacuum",
     "icon": "🤖",
-    "description": "전원, 이동 상태, 청소 모드, 배터리",
+    "description": "Power, movement state, cleaning mode, battery",
     "deviceProfile": {
       "name": "Virtual Samsung Robot Cleaner",
       "components": [
@@ -526,7 +526,7 @@
     },
     "presets": [
       {
-        "label": "청소 시작",
+        "label": "Start cleaning",
         "events": [
           {
             "component": "main",
@@ -549,7 +549,7 @@
         ]
       },
       {
-        "label": "복귀/충전",
+        "label": "Return to dock",
         "events": [
           {
             "component": "main",
@@ -560,7 +560,7 @@
         ]
       },
       {
-        "label": "충전 중",
+        "label": "Charging",
         "events": [
           {
             "component": "main",
@@ -571,7 +571,7 @@
         ]
       },
       {
-        "label": "배터리 15%",
+        "label": "Battery 15%",
         "events": [
           {
             "component": "main",
@@ -586,9 +586,9 @@
   },
   {
     "id": "dishwasher",
-    "name": "식기세척기",
+    "name": "Dishwasher",
     "icon": "🍽️",
-    "description": "전원, 동작 상태, 세척 모드",
+    "description": "Power, operating state, wash mode",
     "deviceProfile": {
       "name": "Virtual Samsung Dishwasher",
       "components": [
@@ -626,7 +626,7 @@
     },
     "presets": [
       {
-        "label": "세척 시작",
+        "label": "Start wash",
         "events": [
           {
             "component": "main",
@@ -649,7 +649,7 @@
         ]
       },
       {
-        "label": "건조",
+        "label": "Drying",
         "events": [
           {
             "component": "main",
@@ -660,7 +660,7 @@
         ]
       },
       {
-        "label": "완료",
+        "label": "Finished",
         "events": [
           {
             "component": "main",
@@ -682,7 +682,7 @@
     "id": "tv",
     "name": "TV",
     "icon": "📺",
-    "description": "전원, 볼륨, 음소거, 입력 소스, 채널",
+    "description": "Power, volume, mute, input source, channel",
     "deviceProfile": {
       "name": "Virtual Samsung TV",
       "components": [
@@ -724,7 +724,7 @@
     },
     "presets": [
       {
-        "label": "켜기 + 볼륨 20",
+        "label": "Power on + volume 20",
         "events": [
           {
             "component": "main",
@@ -742,7 +742,7 @@
         ]
       },
       {
-        "label": "음소거",
+        "label": "Mute",
         "events": [
           {
             "component": "main",
@@ -767,9 +767,9 @@
   },
   {
     "id": "fridge",
-    "name": "냉장고 (표준 프로토타입)",
+    "name": "Refrigerator (standard prototype)",
     "icon": "🧊",
-    "description": "SmartThings 표준 VIRTUAL_REFRIGERATOR 프로토타입",
+    "description": "SmartThings standard VIRTUAL_REFRIGERATOR prototype",
     "prototype": "VIRTUAL_REFRIGERATOR",
     "presets": []
   }

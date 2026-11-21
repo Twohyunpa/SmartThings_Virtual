@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// SmartThings 가상 기기 GUI - 로컬 서버
-// SmartThings CLI(`smartthings`)를 감싸서 브라우저 UI에서 가상 기기를 만들고 상태(이벤트)를 주입한다.
-// 외부 의존성 없음. Node 18+.
+// SmartThings Virtual Device GUI - local server
+// Wraps the SmartThings CLI (`smartthings`) so you can create virtual devices and inject states (events) from a browser UI.
+// No external dependencies. Node 18+.
 
 'use strict';
 
@@ -14,18 +14,18 @@ const { spawn } = require('child_process');
 const PORT = Number(process.env.PORT || 3700);
 const HOST = process.env.HOST || '127.0.0.1';
 const NO_OPEN = process.argv.includes('--no-open') || !!process.env.ST_NO_OPEN;
-const USE_MOCK = process.argv.includes('--mock'); // Windows 에서도 되도록 환경변수 대신 인자로 모의 CLI 선택
+const USE_MOCK = process.argv.includes('--mock'); // select the mock CLI with an argument (works on Windows too)
 const CLI = USE_MOCK ? path.join(__dirname, 'mock', 'smartthings-mock.js') : (process.env.ST_CLI || 'smartthings');
 const CLI_TIMEOUT_MS = Number(process.env.ST_CLI_TIMEOUT_MS || 120000);
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const TEMPLATES_FILE = path.join(__dirname, 'templates', 'samsung-appliances.json');
 
 let currentProfile = process.env.ST_PROFILE || 'default';
-let cliMajor = null; // 감지된 CLI 메이저 버전 (1.x 는 oclif, 2.x 이상은 yargs 기반으로 일부 인자가 다름)
-const commandLog = []; // 최근 실행한 CLI 명령 기록
+let cliMajor = null; // detected CLI major version (1.x is oclif-based; 2.x+ is yargs-based and some arguments differ)
+const commandLog = []; // recently executed CLI commands
 const capabilityCache = new Map();
 
-// ---------- CLI 실행 ----------
+// ---------- CLI execution ----------
 
 function quoteForDisplay(arg) {
   return /^[\w@%+=:,./-]+$/.test(arg) ? arg : `'${String(arg).replace(/'/g, `'\\''`)}'`;
@@ -39,8 +39,8 @@ function runCli(args, { json = true, api = true, input, inputFile } = {}) {
   const fullArgs = [...args];
   if (json) fullArgs.push('--json');
   if (api && currentProfile && currentProfile !== 'default') fullArgs.push('--profile', currentProfile);
-  // 토큰은 화면/로그에 노출하지 않는다.
-  // CLI 2.x 이상은 SMARTTHINGS_TOKEN 환경변수를 직접 읽으므로 1.x 에서만 --token 으로 넘긴다.
+  // The token is never shown in the UI or the log.
+  // CLI 2.x+ reads SMARTTHINGS_TOKEN itself, so only pass --token to 1.x.
   const tokenArgs = api && process.env.SMARTTHINGS_TOKEN && cliMajor === 1 ? ['--token', process.env.SMARTTHINGS_TOKEN] : [];
 
   let cmd = CLI;
@@ -74,7 +74,7 @@ function runCli(args, { json = true, api = true, input, inputFile } = {}) {
     child.on('error', (err) => {
       clearTimeout(timer);
       const msg = err.code === 'ENOENT'
-        ? `SmartThings CLI를 찾을 수 없습니다 ("${CLI}"). npm i -g @smartthings/cli 로 설치하거나 ST_CLI 환경변수로 경로를 지정하세요.`
+        ? `SmartThings CLI not found ("${CLI}"). Install it with npm i -g @smartthings/cli or set the ST_CLI environment variable to its path.`
         : err.message;
       pushLog({ command: display, input, ok: false, ms: Date.now() - started, error: msg, at: new Date().toISOString() });
       resolve({ ok: false, error: msg, command: display });
@@ -83,7 +83,7 @@ function runCli(args, { json = true, api = true, input, inputFile } = {}) {
       clearTimeout(timer);
       const ms = Date.now() - started;
       if (code !== 0) {
-        const msg = cleanError(stderr || stdout) || `종료 코드 ${code}`;
+        const msg = cleanError(stderr || stdout) || `exit code ${code}`;
         pushLog({ command: display, input, ok: false, ms, error: msg, at: new Date().toISOString() });
         return resolve({ ok: false, error: msg, command: display });
       }
@@ -93,7 +93,7 @@ function runCli(args, { json = true, api = true, input, inputFile } = {}) {
         try {
           data = trimmed ? JSON.parse(trimmed) : null;
         } catch {
-          // JSON 앞에 경고 문구가 붙는 경우를 대비
+          // in case a warning is printed before the JSON
           const i = trimmed.search(/[[{]/);
           try { data = i >= 0 ? JSON.parse(trimmed.slice(i)) : trimmed; } catch { data = trimmed; }
         }
@@ -120,7 +120,7 @@ function pushLog(entry) {
   if (commandLog.length > 200) commandLog.length = 200;
 }
 
-// 입력 JSON 을 임시 파일로 써서 `--input <file>` 로 넘긴다. 로그에는 input.json 과 그 내용이 표시된다.
+// Write the input JSON to a temp file and pass it as `--input <file>`. The log shows it as input.json with its contents.
 async function runWithInput(args, obj, opts = {}) {
   const file = path.join(os.tmpdir(), `st-gui-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}.json`);
   fs.writeFileSync(file, JSON.stringify(obj, null, 2));
@@ -131,7 +131,7 @@ async function runWithInput(args, obj, opts = {}) {
   }
 }
 
-// ---------- HTTP 유틸 ----------
+// ---------- HTTP helpers ----------
 
 function send(res, status, body) {
   const json = JSON.stringify(body);
@@ -149,11 +149,11 @@ function readBody(req) {
     let raw = '';
     req.on('data', (c) => {
       raw += c;
-      if (raw.length > 2e6) reject(new Error('요청 본문이 너무 큽니다'));
+      if (raw.length > 2e6) reject(new Error('Request body too large'));
     });
     req.on('end', () => {
       if (!raw) return resolve({});
-      try { resolve(JSON.parse(raw)); } catch { reject(new Error('JSON 형식이 올바르지 않습니다')); }
+      try { resolve(JSON.parse(raw)); } catch { reject(new Error('Invalid JSON')); }
     });
     req.on('error', reject);
   });
@@ -162,7 +162,7 @@ function readBody(req) {
 const UUID = /^[0-9a-fA-F-]{8,64}$/;
 const SAFE_ID = /^[\w.\-]{1,128}$/;
 function assertId(v, name = 'id') {
-  if (!v || !UUID.test(v)) throw httpError(400, `${name} 값이 올바르지 않습니다`);
+  if (!v || !UUID.test(v)) throw httpError(400, `Invalid ${name}`);
 }
 function httpError(status, message) {
   const e = new Error(message);
@@ -212,14 +212,14 @@ async function getCapability(id, version = 1) {
   return r;
 }
 
-// 안전장치: 쓰기 작업(이벤트 주입/수정/삭제)은 가상 기기에만 허용한다. 확인된 id 는 캐시.
+// Safety guard: write operations (inject events / update / delete) are only allowed on virtual devices. Verified ids are cached.
 const verifiedVirtual = new Set();
 async function assertVirtual(id) {
   if (verifiedVirtual.has(id)) return;
   const r = await runCli(['devices', id]);
   if (!r.ok) throw httpError(502, r.error);
   const d = r.data || {};
-  if (!(d.type === 'VIRTUAL' || d.virtual)) throw httpError(403, '가상 기기가 아니어서 변경할 수 없습니다');
+  if (!(d.type === 'VIRTUAL' || d.virtual)) throw httpError(403, 'Not a virtual device; refusing to modify it');
   verifiedVirtual.add(id);
 }
 
@@ -230,7 +230,7 @@ const routes = [
   }],
   ['POST', /^\/api\/profile$/, async (req) => {
     const { profile } = await readBody(req);
-    if (!profile || !SAFE_ID.test(profile)) throw httpError(400, '프로필 이름이 올바르지 않습니다');
+    if (!profile || !SAFE_ID.test(profile)) throw httpError(400, 'Invalid profile name');
     currentProfile = profile;
     capabilityCache.clear();
     return { status: 200, body: { profile } };
@@ -266,12 +266,12 @@ const routes = [
     return runWithInput(['virtualdevices:update', m[1], '--input', '@INPUT'], update);
   }],
 
-  // 표준 프로토타입으로 생성
+  // create from a standard prototype
   ['POST', /^\/api\/devices\/standard$/, async (req) => {
     const b = await readBody(req);
-    if (!b.name || !b.prototype || !b.locationId) throw httpError(400, 'name, prototype, locationId 가 필요합니다');
+    if (!b.name || !b.prototype || !b.locationId) throw httpError(400, 'name, prototype and locationId are required');
     assertId(b.locationId, 'locationId');
-    if (!SAFE_ID.test(b.prototype)) throw httpError(400, 'prototype 값이 올바르지 않습니다');
+    if (!SAFE_ID.test(b.prototype)) throw httpError(400, 'Invalid prototype');
     const input = {
       name: String(b.name),
       prototype: b.prototype,
@@ -283,11 +283,11 @@ const routes = [
     return runWithInput(['virtualdevices:create-standard', '--input', '@INPUT', ...extra], input);
   }],
 
-  // 디바이스 프로필 ID 또는 인라인 프로필 정의로 생성
+  // create from a device profile ID or an inline profile definition
   ['POST', /^\/api\/devices\/profile$/, async (req) => {
     const b = await readBody(req);
     if (!b.name || !b.locationId || !(b.deviceProfileId || b.deviceProfile)) {
-      throw httpError(400, 'name, locationId, 그리고 deviceProfileId 또는 deviceProfile 이 필요합니다');
+      throw httpError(400, 'name, locationId and either deviceProfileId or deviceProfile are required');
     }
     assertId(b.locationId, 'locationId');
     const input = {
@@ -302,14 +302,14 @@ const routes = [
     return runWithInput(['virtualdevices:create', '--input', '@INPUT', ...extra], input);
   }],
 
-  // 이벤트(상태) 주입: body = { events: [{component, capability, attribute, value, unit?}] }
+  // inject events (state): body = { events: [{component, capability, attribute, value, unit?}] }
   ['POST', /^\/api\/devices\/([^/]+)\/events$/, async (req, m) => {
     assertId(m[1]);
     await assertVirtual(m[1]);
     const { events } = await readBody(req);
-    if (!Array.isArray(events) || events.length === 0) throw httpError(400, 'events 배열이 필요합니다');
+    if (!Array.isArray(events) || events.length === 0) throw httpError(400, 'An events array is required');
     const clean = events.map((e) => {
-      if (!e.capability || !e.attribute || e.value === undefined) throw httpError(400, '각 이벤트에 capability, attribute, value 가 필요합니다');
+      if (!e.capability || !e.attribute || e.value === undefined) throw httpError(400, 'Each event needs capability, attribute and value');
       const ev = { component: e.component || 'main', capability: e.capability, attribute: e.attribute, value: e.value };
       if (e.unit) ev.unit = e.unit;
       if (e.data) ev.data = e.data;
@@ -319,7 +319,7 @@ const routes = [
   }],
 
   ['GET', /^\/api\/capabilities\/([^/]+)(?:\/(\d+))?$/, async (req, m) => {
-    if (!SAFE_ID.test(m[1])) throw httpError(400, 'capability id 가 올바르지 않습니다');
+    if (!SAFE_ID.test(m[1])) throw httpError(400, 'Invalid capability id');
     return getCapability(m[1], m[2] || 1);
   }],
 ];
@@ -330,7 +330,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method !== 'GET') return send(res, 405, { error: 'method not allowed' });
     return serveStatic(req, res, url.pathname);
   }
-  // 다른 사이트에서 로컬 서버로 요청을 보내는 것을 막기 위해 Origin 확인
+  // Check Origin so other websites cannot send requests to this local server
   const origin = req.headers.origin;
   if (origin && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
     return send(res, 403, { error: 'forbidden origin' });
@@ -355,14 +355,14 @@ function openBrowser(url) {
       : ['xdg-open', [url]];
   try {
     const child = spawn(cmd, args, { stdio: 'ignore', detached: true });
-    child.on('error', () => {}); // 브라우저를 못 열어도 서버는 계속 동작
+    child.on('error', () => {}); // the server keeps running even if the browser cannot be opened
     child.unref();
   } catch { /* ignore */ }
 }
 
 server.listen(PORT, HOST, async () => {
   await detectCli();
-  console.log(`\n  SmartThings 가상 기기 GUI 실행 중:  http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
-  console.log(`  CLI: ${CLI} (${cliInfo?.version || '실행 불가: ' + cliInfo?.error})   프로필: ${currentProfile}${process.env.SMARTTHINGS_TOKEN ? '   (SMARTTHINGS_TOKEN 사용)' : ''}\n`);
+  console.log(`\n  SmartThings Virtual Device GUI running at:  http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
+  console.log(`  CLI: ${CLI} (${cliInfo?.version || 'cannot run: ' + cliInfo?.error})   profile: ${currentProfile}${process.env.SMARTTHINGS_TOKEN ? '   (using SMARTTHINGS_TOKEN)' : ''}\n`);
   if (!NO_OPEN) openBrowser(`http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
 });
