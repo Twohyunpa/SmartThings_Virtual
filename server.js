@@ -241,6 +241,7 @@ function serveStatic(req, res, pathname) {
   } catch {
     return send(res, 400, { error: 'bad request' });
   }
+  if (decoded.includes('\0')) return send(res, 400, { error: 'bad request' });
   const rel = decoded === '/' ? 'index.html' : decoded.replace(/^\/+/, '');
   const file = path.resolve(PUBLIC_DIR, rel);
   if (file !== PUBLIC_DIR && !file.startsWith(PUBLIC_DIR + path.sep)) {

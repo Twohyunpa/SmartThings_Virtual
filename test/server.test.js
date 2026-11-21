@@ -94,6 +94,9 @@ describe('server.js integration (mock CLI)', () => {
 
     const traversal = await request('GET', '/..%2fpackage.json');
     assert.equal(traversal.status, 403);
+
+    const nullByte = await request('GET', '/%00');
+    assert.equal(nullByte.status, 400);
   });
 
   it('rejects malformed JSON with 400 and oversized payload with 413', async () => {
