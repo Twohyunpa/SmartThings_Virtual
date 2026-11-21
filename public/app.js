@@ -727,10 +727,18 @@ function initCapMaster(body, comps) {
     : (entries.find((e) => Object.keys(state.caps[e.id]?.attributes || {}).length && e.id !== 'refresh') || entries[0] || {}).key || null;
 
   const box = $('#capItems');
-  const paint = () => { box.innerHTML = entries.map(capItemHtml).join(''); applySearch(); };
+  // Pinned capabilities go to the top (in pin order) under a "Pinned" heading; the rest keep their normal order.
+  const paint = () => {
+    const pinned = capMaster.pins.map((k) => entries.find((e) => e.key === k)).filter(Boolean);
+    const rest = entries.filter((e) => !capMaster.pins.includes(e.key));
+    box.innerHTML = (pinned.length ? `<div class="cap-group">Pinned</div>${pinned.map(capItemHtml).join('')}<div class="cap-group">All capabilities</div>` : '')
+      + rest.map(capItemHtml).join('');
+    applySearch();
+  };
   const applySearch = () => {
     const q = ($('#capSearch').value || '').trim().toLowerCase();
     box.querySelectorAll('.cap-item').forEach((it) => { it.hidden = !!q && !it.dataset.search.includes(q); });
+    box.querySelectorAll('.cap-group').forEach((g) => { g.hidden = !!q; }); // hide headings while searching
   };
   const select = (key) => {
     capMaster.sel = key;
@@ -750,9 +758,8 @@ function initCapMaster(body, comps) {
       const k = item.dataset.key;
       capMaster.pins = capMaster.pins.includes(k) ? capMaster.pins.filter((x) => x !== k) : [...capMaster.pins, k];
       store(`st.pin.${id}`, capMaster.pins);
-      const pin = item.querySelector('.pin');
-      const on = capMaster.pins.includes(k);
-      pin.classList.toggle('on', on); pin.textContent = on ? '★' : '☆';
+      paint();
+      updateCapList();
       renderCapPane(body);
       return;
     }
