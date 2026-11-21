@@ -1,0 +1,3 @@
+{
+  "install": "node --version && node --check server.js tools/check-capabilities.js mock/smartthings-mock.js"
+}
