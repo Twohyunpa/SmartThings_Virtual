@@ -228,3 +228,4 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
 .tpl[hidden] { display: none; }
 
 .mode-intro { background: var(--accent-weak); border-radius: 8px; padding: 9px 12px; margin-bottom: 12px; font-size: 13px; line-height: 1.5; }
+.checks .add-item { display: inline-flex; align-items: center; gap: 4px; }

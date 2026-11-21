@@ -687,7 +687,7 @@ function attrRow(comp, capId, attrName) {
     const cur = Array.isArray(curVal) ? curVal : [];
     ctrl = `<div class="checks">
         ${lOpts.map((v) => `<label class="check ${cur.some((c) => c === v) ? 'on' : ''}"><input type="checkbox" data-j="${esc(JSON.stringify(v))}" ${cur.some((c) => c === v) ? 'checked' : ''}/>${esc(v)}</label>`).join('')}
-        <span class="add-item"><input type="text" class="newItem" placeholder="+ add value" /></span>
+        <span class="add-item"><input type="text" class="newItem" placeholder="new value…" title="Type a value, then press Enter or click Add" /><button class="btn small addNew" title="Add this value to the list">Add</button></span>
       </div>
       <div class="check-actions">
         <button class="btn small selAll">All</button><button class="btn small selNone">None</button>
@@ -731,6 +731,7 @@ function readAttrEvent(row, chipValue) {
   const pick = row.querySelector('select.pick');
   if (chipValue === undefined && pick && pick.value !== '__custom__') raw = pick.value;
   const checks = row.querySelector('.checks');
+  if (chipValue === undefined && checks) row._commitNew?.(); // a typed-but-not-added value counts too
   if (chipValue === undefined && checks && !row.querySelector('details.json-edit')?.open) {
     raw = [...checks.querySelectorAll('input[type=checkbox]:checked')].map((c) => JSON.parse(c.dataset.j));
   }
@@ -771,18 +772,25 @@ function wireAttr(row) {
     row.querySelector('.selAll').addEventListener('click', () => { checks.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = true; }); sync(); });
     row.querySelector('.selNone').addEventListener('click', () => { checks.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = false; }); sync(); });
     const add = row.querySelector('.newItem');
-    add.addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' || !add.value.trim()) return;
+    // Add the typed value as a checked item. Returns true if something was added.
+    const commitNew = () => {
       const v = add.value.trim();
+      if (!v) return false;
       add.value = '';
       const exists = [...checks.querySelectorAll('input[type=checkbox]')].find((c) => JSON.parse(c.dataset.j) === v);
-      if (exists) { exists.checked = true; sync(); return; }
+      if (exists) { exists.checked = true; sync(); return true; }
       const lbl = document.createElement('label');
       lbl.className = 'check on';
       lbl.innerHTML = `<input type="checkbox" data-j="${esc(JSON.stringify(v))}" checked/>${esc(v)}`;
-      add.parentElement.before(lbl);
+      checks.insertBefore(lbl, add.parentElement);
       sync();
-    });
+      return true;
+    };
+    row._commitNew = commitNew;
+    add.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commitNew(); } });
+    add.addEventListener('blur', commitNew);
+    row.querySelector('.addNew').addEventListener('mousedown', (e) => e.preventDefault()); // keep focus so blur does not double-fire
+    row.querySelector('.addNew').addEventListener('click', () => { if (!commitNew()) add.focus(); });
   }
   row.querySelector('.addStep').addEventListener('click', () => {
     let ev;
