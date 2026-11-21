@@ -226,3 +226,5 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
 
 .tpl-grid { max-height: 300px; overflow-y: auto; }
 .tpl[hidden] { display: none; }
+
+.mode-intro { background: var(--accent-weak); border-radius: 8px; padding: 9px 12px; margin-bottom: 12px; font-size: 13px; line-height: 1.5; }

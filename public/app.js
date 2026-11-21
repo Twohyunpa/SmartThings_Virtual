@@ -320,7 +320,7 @@ async function renderCreate() {
   main.innerHTML = `
     <div class="dev-head"><div><h2>New virtual device</h2><div class="muted small">The device is created for real in the selected location of your SmartThings account.</div></div></div>
     <div class="tabs">
-      <button class="tab ${createState.mode === 'template' ? 'active' : ''}" data-mode="template">Samsung appliance templates</button>
+      <button class="tab ${createState.mode === 'template' ? 'active' : ''}" data-mode="template">Appliance templates</button>
       <button class="tab ${createState.mode === 'standard' ? 'active' : ''}" data-mode="standard">Standard prototype</button>
       <button class="tab ${createState.mode === 'profileId' ? 'active' : ''}" data-mode="profileId">Device profile ID</button>
       <button class="tab ${createState.mode === 'json' ? 'active' : ''}" data-mode="json">Profile JSON</button>
@@ -361,6 +361,13 @@ async function renderCreate() {
   $('#cSubmit').addEventListener('click', () => submitCreate(false));
   $('#cDry').addEventListener('click', () => submitCreate(true));
 }
+
+const MODE_INTROS = {
+  template: '<b>Appliance templates</b> — pick a real appliance model (washer, oven, TV …) and get a virtual device with the same <em>standard</em> SmartThings capabilities. Best for trying an app or automation against Samsung-like devices. These are not official Samsung profiles: the capability lists and sample values were taken from real devices (Home Assistant test data), and Samsung-specific capabilities are left out.',
+  standard: '<b>Standard prototype</b> — one of SmartThings\' built-in virtual device types (switch, dimmer, motion sensor, lock, thermostat …). The quickest way to get a simple generic device; the capabilities are fixed by SmartThings.',
+  profileId: '<b>Device profile ID</b> — reuse a device profile that already exists in your SmartThings account (for example one you made earlier with <code>smartthings deviceprofiles:create</code>). The list only shows profiles from your own account, so it is empty if you have not created any. In that case use another tab, or paste a profile UUID.',
+  json: '<b>Profile JSON</b> — write your own profile and choose exactly which components and capabilities the device has. Use it for custom combinations or devices with several components. Find capability IDs with <code>smartthings capabilities</code>.',
+};
 
 function renderModeArea() {
   const area = $('#modeArea');
@@ -420,6 +427,7 @@ function renderModeArea() {
         components: [{ id: 'main', capabilities: [{ id: 'switch', version: 1 }, { id: 'temperatureMeasurement', version: 1 }], categories: [{ name: 'Switch' }] }],
       }, null, 2))}</textarea>`;
   }
+  area.insertAdjacentHTML('afterbegin', `<div class="mode-intro">${MODE_INTROS[m] || ''}</div>`);
 }
 
 async function submitCreate(dryRun) {

@@ -67,7 +67,7 @@ npm run mock
 ## Features
 
 **Create virtual devices**
-- Samsung appliance templates: 35 real models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, a cooktop, a range hood, a TV, a soundbar ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
+- Appliance templates: 35 real models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, a cooktop, a range hood, a TV, a soundbar ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
 - Standard prototypes such as `VIRTUAL_SWITCH` and `VIRTUAL_MOTION_SENSOR` (17 in total, `virtualdevices:create-standard`).
 - Create from one of your own device profile IDs, or paste a profile JSON (`virtualdevices:create`).
 - The dry-run button shows the request JSON without creating anything.
