@@ -36,7 +36,7 @@ SmartThings CLI(`smartthings`)를 감싼 로컬 GUI입니다. 브라우저에서
 
 ```bash
 # 설치 없이 바로 실행
-npx github:Twohyunpa/SmartThings_Virtual
+npx --yes github:Twohyunpa/SmartThings_Virtual
 
 # 또는 저장소를 받아서 실행 (Windows/macOS/Linux 공통)
 git clone https://github.com/Twohyunpa/SmartThings_Virtual.git
@@ -74,16 +74,23 @@ npm test
 ## 기능
 
 **가상 기기 만들기**
-- 삼성 가전 템플릿: 세탁기, 건조기, 에어컨, 공기청정기, 로봇청소기, 식기세척기, TV, 냉장고. 프로필 정의(JSON)를 열어서 capability를 더하거나 뺄 수 있습니다. 템플릿은 `templates/samsung-appliances.json` 에서 고치면 됩니다.
+**New virtual device** 패널의 탭 4개에는 각각 무엇을 하는 탭이고 언제 쓰는지 짧은 설명이 붙어 있습니다.
+
+- Appliance templates: 세탁기, 건조기, 식기세척기, 에어컨, 공기청정기, 냉장고, 로봇청소기, 오븐, TV 등 실제 모델 35종. 프로필 정의(JSON)를 열어서 capability를 더하거나 뺄 수 있습니다.
 - 표준 프로토타입: `VIRTUAL_SWITCH`, `VIRTUAL_MOTION_SENSOR` 등 17종 (`virtualdevices:create-standard`)
 - 내 디바이스 프로필 ID로 만들기, 또는 프로필 JSON 직접 입력 (`virtualdevices:create`)
 - dry-run 버튼으로 실제 생성 없이 요청 JSON을 확인할 수 있습니다.
 
 **상태 & 주입**
+- 왼쪽은 capability 목록(현재 값 표시, 필터), 오른쪽은 선택한 capability의 상세입니다. 맨 위에는 한 줄 상태 요약 바가 있고, 누르면 해당 capability로 이동합니다.
+- **Custom event**(component/capability/attribute/value/unit 직접 입력)는 오른쪽 맨 위에 항상 있습니다.
+- 자주 쓰는 capability는 별표(☆/★)로 고정하세요. 목록 맨 위 *Pinned* 그룹으로 올라가고, Custom event 바로 아래에 항상 펼쳐집니다. 마지막 선택과 고정 목록은 기기별로 기억됩니다.
 - 기기의 component/capability 별로 속성과 현재 값이 표시됩니다.
 - capability 정의를 읽어 컨트롤을 자동으로 만듭니다: enum은 칩(누르면 바로 주입), 숫자는 슬라이더/입력 + 단위, 배열/객체는 JSON 입력.
 - 짝이 되는 `supported*` / `available*` 목록이 있는 값(예: `fanMode` ↔ `supportedAcFanModes` / `availableAcFanModes`)은 기기의 **현재** 목록으로 채운 드롭다운이 되고, 목록 자체는 체크박스로 고릅니다. 옵션은 기기 상태를 따라가므로 supported 목록을 새로 주입하면 드롭다운도 바뀝니다. 목록에 없는 값을 일부러 넣으려면 **Custom value…**(또는 **Edit as JSON**)을 쓰세요. `available*`에 없는 값은 ⚠ 로 표시됩니다.
-- 5초 자동 새로고침, 직접 입력(component/capability/attribute/value/unit)도 지원합니다.
+- `supported*` / `available*` 목록은 체크박스 목록으로 편집합니다. 새 값은 입력 후 **Enter** 또는 **Add**, 그리고 **Inject**. 입력창에 남아 있는 값도 주입할 때 포함됩니다.
+- `supported*` / `available*` 속성 옆 **ⓘ** 버튼이 차이를 설명합니다: `supported*`는 기기가 할 수 있는 전체, `available*`는 지금(현재 모드에서) 고를 수 있는 부분집합입니다.
+- 5초 자동 새로고침.
 
 **프리셋 & 시나리오**
 - 템플릿 프리셋(예: 세탁 시작 → 헹굼 → 탈수 → 완료)이 기기 capability와 맞으면 자동으로 보입니다.
@@ -91,6 +98,8 @@ npm test
 - 시나리오는 브라우저(localStorage)에 저장되고 JSON으로 가져오기/내보내기가 됩니다.
 
 **기타**: 이름 변경, 삭제, 원본 JSON(`devices`, `devices:status`) 보기, CLI 명령 로그(클릭하면 복사).
+
+**오류 처리**: CLI 명령이 실패하면 UI에 알기 쉬운 메시지가 뜨고 터미널에도 `[cli failed] ...`로 출력됩니다. 예상치 못한 오류가 나도 서버는 계속 돌아가고, 3700 포트가 이미 쓰이고 있으면 알려 줍니다(`PORT=3800 npm start`로 다른 포트에서 실행).
 
 ## 템플릿 출처
 
