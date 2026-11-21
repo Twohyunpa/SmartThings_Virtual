@@ -232,3 +232,15 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
 
 .info { background: none; border: 0; padding: 0 2px; cursor: pointer; color: var(--accent); font-size: 13px; line-height: 1; }
 .attr-hint { background: var(--accent-weak); border-radius: 6px; padding: 6px 9px; font-size: 12px; line-height: 1.45; }
+
+.cap-filter { padding: 10px 14px; margin-bottom: 12px; }
+.cap-filter summary { cursor: pointer; }
+.cap-filter-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.cap-checks { max-height: 190px; overflow-y: auto; }
+.cap[hidden] { display: none; }
+.cap-head { cursor: pointer; user-select: none; gap: 8px; justify-content: flex-start; }
+.cap-head .comp { margin-left: auto; }
+.cap-head .chev { color: var(--muted); font-size: 12px; transition: transform .15s; }
+.cap.collapsed .chev { transform: rotate(-90deg); }
+.cap.collapsed .attr, .cap.collapsed .attr-empty { display: none; }
+.cap.collapsed .cap-head { border-bottom: 0; }

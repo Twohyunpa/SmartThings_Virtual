@@ -614,6 +614,7 @@ function renderControl(body) {
       <label class="small"><input type="checkbox" id="autoChk" ${state.autoRefresh ? 'checked' : ''}/> Auto-refresh every 5 s</label>
       <span class="muted small">Click a value chip to inject it right away, or type a value and press <b>Inject</b>. <b>＋</b> adds it as a scenario step.</span>
     </div>
+    ${capFilterPanel(comps)}
     <div class="cap-grid">
       ${comps.flatMap((c) => (c.capabilities || []).map((cap) => capCard(c.id, cap.id))).join('')}
     </div>
@@ -630,6 +631,7 @@ function renderControl(body) {
       <div class="muted small" style="margin-top:6px">The value is parsed as JSON first (number, true, {...}); if that fails it is sent as a string.</div>
     </div>`;
 
+  wireCapFilter(body, comps);
   $('#reloadStatus').addEventListener('click', () => refreshStatus());
   $('#autoChk').addEventListener('change', (e) => {
     state.autoRefresh = e.target.checked;
@@ -650,12 +652,70 @@ function renderControl(body) {
   body.querySelectorAll('.attr[data-attr]').forEach(wireAttr);
 }
 
+// ---------- Capability filter (which cards to show) and collapsing ----------
+const capKey = (comp, capId) => `${comp}/${capId}`;
+function visibleSet() { const v = store(`st.visible.${state.selectedId}`); return Array.isArray(v) ? new Set(v) : null; } // null = show all
+function collapsedSet() { return new Set(store(`st.collapsed.${state.selectedId}`) || []); }
+const isCapVisible = (comp, capId) => { const v = visibleSet(); return !v || v.has(capKey(comp, capId)); };
+const isCollapsed = (comp, capId) => collapsedSet().has(capKey(comp, capId));
+
+function capFilterPanel(comps) {
+  const all = comps.flatMap((c) => (c.capabilities || []).map((cap) => ({ comp: c.id, id: cap.id })));
+  if (all.length < 2) return '';
+  const v = visibleSet();
+  const shown = all.filter((c) => !v || v.has(capKey(c.comp, c.id))).length;
+  return `
+    <details class="panel cap-filter" open>
+      <summary><b>Capabilities</b> <span class="muted small" id="capCount">${shown} of ${all.length} shown</span></summary>
+      <div class="muted small" style="margin:6px 0">Tick the capabilities you want to work with; the others are hidden. Your choice is remembered for this device.</div>
+      <div class="cap-filter-actions">
+        <button class="btn small" id="capAll">All</button><button class="btn small" id="capNone">None</button>
+        <button class="btn small" id="capCollapse">Collapse shown</button><button class="btn small" id="capExpand">Expand shown</button>
+      </div>
+      <div class="checks cap-checks">${all.map((c) => {
+        const on = !v || v.has(capKey(c.comp, c.id));
+        return `<label class="check ${on ? 'on' : ''}"><input type="checkbox" data-key="${esc(capKey(c.comp, c.id))}" ${on ? 'checked' : ''}/>${c.comp === 'main' ? '' : `<span class="muted">${esc(c.comp)}:</span>`}${esc(c.id)}</label>`;
+      }).join('')}</div>
+    </details>`;
+}
+
+function wireCapFilter(body, comps) {
+  const total = comps.reduce((n, c) => n + (c.capabilities || []).length, 0);
+  const boxes = [...body.querySelectorAll('.cap-checks input[type=checkbox]')];
+  const apply = () => {
+    const on = new Set(boxes.filter((b) => b.checked).map((b) => b.dataset.key));
+    body.querySelectorAll('.cap[data-key]').forEach((card) => { card.hidden = !on.has(card.dataset.key); });
+    boxes.forEach((b) => b.closest('label').classList.toggle('on', b.checked));
+    store(`st.visible.${state.selectedId}`, on.size === total ? null : [...on]);
+    const cnt = $('#capCount'); if (cnt) cnt.textContent = `${on.size} of ${total} shown`;
+  };
+  body.querySelector('.cap-checks')?.addEventListener('change', apply);
+  $('#capAll')?.addEventListener('click', () => { boxes.forEach((b) => { b.checked = true; }); apply(); });
+  $('#capNone')?.addEventListener('click', () => { boxes.forEach((b) => { b.checked = false; }); apply(); });
+  const setCollapsed = (collapse) => {
+    body.querySelectorAll('.cap[data-key]:not([hidden])').forEach((card) => card.classList.toggle('collapsed', collapse));
+    persistCollapsed(body);
+  };
+  $('#capCollapse')?.addEventListener('click', () => setCollapsed(true));
+  $('#capExpand')?.addEventListener('click', () => setCollapsed(false));
+  // clicking a card header collapses / expands that card
+  body.querySelectorAll('.cap-head').forEach((head) => {
+    const toggle = () => { head.parentElement.classList.toggle('collapsed'); persistCollapsed(body); };
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+  });
+}
+
+function persistCollapsed(body) {
+  store(`st.collapsed.${state.selectedId}`, [...body.querySelectorAll('.cap.collapsed')].map((c) => c.dataset.key));
+}
+
 function capCard(comp, capId) {
   const cap = state.caps[capId] || {};
   const attrs = Object.keys(cap.attributes || {});
   return `
-    <div class="cap">
-      <div class="cap-head"><b>${esc(capId)}</b><span class="comp">${esc(comp)}${cap.name && cap.name !== capId ? ' · ' + esc(cap.name) : ''}</span></div>
+    <div class="cap ${isCollapsed(comp, capId) ? 'collapsed' : ''}" data-key="${esc(capKey(comp, capId))}" ${isCapVisible(comp, capId) ? '' : 'hidden'}>
+      <div class="cap-head" role="button" tabindex="0" title="Click to collapse / expand"><span class="chev">▾</span><b>${esc(capId)}</b><span class="comp">${esc(comp)}${cap.name && cap.name !== capId ? ' · ' + esc(cap.name) : ''}</span></div>
       ${attrs.length ? attrs.map((a) => attrRow(comp, capId, a)).join('') : '<div class="attr-empty muted small">Capability without attributes (commands only)</div>'}
     </div>`;
 }
