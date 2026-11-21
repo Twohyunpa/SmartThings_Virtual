@@ -1,0 +1,469 @@
+[
+ {
+  "label": "Washer: start wash",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "washerOperatingState",
+    "attribute": "machineState",
+    "value": "run"
+   },
+   {
+    "component": "main",
+    "capability": "washerOperatingState",
+    "attribute": "washerJobState",
+    "value": "wash"
+   }
+  ]
+ },
+ {
+  "label": "Washer: rinse",
+  "events": [
+   {
+    "component": "main",
+    "capability": "washerOperatingState",
+    "attribute": "washerJobState",
+    "value": "rinse"
+   }
+  ]
+ },
+ {
+  "label": "Washer: spin",
+  "events": [
+   {
+    "component": "main",
+    "capability": "washerOperatingState",
+    "attribute": "washerJobState",
+    "value": "spin"
+   }
+  ]
+ },
+ {
+  "label": "Washer: pause",
+  "events": [
+   {
+    "component": "main",
+    "capability": "washerOperatingState",
+    "attribute": "machineState",
+    "value": "pause"
+   }
+  ]
+ },
+ {
+  "label": "Washer: finished",
+  "events": [
+   {
+    "component": "main",
+    "capability": "washerOperatingState",
+    "attribute": "machineState",
+    "value": "stop"
+   },
+   {
+    "component": "main",
+    "capability": "washerOperatingState",
+    "attribute": "washerJobState",
+    "value": "finish"
+   }
+  ]
+ },
+ {
+  "label": "Dryer: start drying",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "dryerOperatingState",
+    "attribute": "machineState",
+    "value": "run"
+   },
+   {
+    "component": "main",
+    "capability": "dryerOperatingState",
+    "attribute": "dryerJobState",
+    "value": "drying"
+   }
+  ]
+ },
+ {
+  "label": "Dryer: cooling",
+  "events": [
+   {
+    "component": "main",
+    "capability": "dryerOperatingState",
+    "attribute": "dryerJobState",
+    "value": "cooling"
+   }
+  ]
+ },
+ {
+  "label": "Dryer: finished",
+  "events": [
+   {
+    "component": "main",
+    "capability": "dryerOperatingState",
+    "attribute": "machineState",
+    "value": "stop"
+   },
+   {
+    "component": "main",
+    "capability": "dryerOperatingState",
+    "attribute": "dryerJobState",
+    "value": "finished"
+   }
+  ]
+ },
+ {
+  "label": "Dishwasher: start wash",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "dishwasherOperatingState",
+    "attribute": "machineState",
+    "value": "run"
+   },
+   {
+    "component": "main",
+    "capability": "dishwasherOperatingState",
+    "attribute": "dishwasherJobState",
+    "value": "wash"
+   }
+  ]
+ },
+ {
+  "label": "Dishwasher: drying",
+  "events": [
+   {
+    "component": "main",
+    "capability": "dishwasherOperatingState",
+    "attribute": "dishwasherJobState",
+    "value": "drying"
+   }
+  ]
+ },
+ {
+  "label": "Dishwasher: finished",
+  "events": [
+   {
+    "component": "main",
+    "capability": "dishwasherOperatingState",
+    "attribute": "machineState",
+    "value": "stop"
+   },
+   {
+    "component": "main",
+    "capability": "dishwasherOperatingState",
+    "attribute": "dishwasherJobState",
+    "value": "finish"
+   }
+  ]
+ },
+ {
+  "label": "Aircon: cool 24°C",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "airConditionerMode",
+    "attribute": "airConditionerMode",
+    "value": "cool"
+   },
+   {
+    "component": "main",
+    "capability": "thermostatCoolingSetpoint",
+    "attribute": "coolingSetpoint",
+    "value": 24,
+    "unit": "C"
+   }
+  ]
+ },
+ {
+  "label": "Aircon: room 30°C / 70%",
+  "events": [
+   {
+    "component": "main",
+    "capability": "temperatureMeasurement",
+    "attribute": "temperature",
+    "value": 30,
+    "unit": "C"
+   },
+   {
+    "component": "main",
+    "capability": "relativeHumidityMeasurement",
+    "attribute": "humidity",
+    "value": 70,
+    "unit": "%"
+   }
+  ]
+ },
+ {
+  "label": "Power off",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "off"
+   }
+  ]
+ },
+ {
+  "label": "Power on",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   }
+  ]
+ },
+ {
+  "label": "Air: poor",
+  "events": [
+   {
+    "component": "main",
+    "capability": "dustSensor",
+    "attribute": "dustLevel",
+    "value": 120,
+    "unit": "μg/m^3"
+   },
+   {
+    "component": "main",
+    "capability": "dustSensor",
+    "attribute": "fineDustLevel",
+    "value": 80,
+    "unit": "μg/m^3"
+   },
+   {
+    "component": "main",
+    "capability": "airQualitySensor",
+    "attribute": "airQuality",
+    "value": 4,
+    "unit": "CAQI"
+   }
+  ]
+ },
+ {
+  "label": "Air: good",
+  "events": [
+   {
+    "component": "main",
+    "capability": "dustSensor",
+    "attribute": "dustLevel",
+    "value": 15,
+    "unit": "μg/m^3"
+   },
+   {
+    "component": "main",
+    "capability": "dustSensor",
+    "attribute": "fineDustLevel",
+    "value": 8,
+    "unit": "μg/m^3"
+   },
+   {
+    "component": "main",
+    "capability": "airQualitySensor",
+    "attribute": "airQuality",
+    "value": 1,
+    "unit": "CAQI"
+   }
+  ]
+ },
+ {
+  "label": "Robot: start cleaning",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "robotCleanerMovement",
+    "attribute": "robotCleanerMovement",
+    "value": "cleaning"
+   }
+  ]
+ },
+ {
+  "label": "Robot: return to dock",
+  "events": [
+   {
+    "component": "main",
+    "capability": "robotCleanerMovement",
+    "attribute": "robotCleanerMovement",
+    "value": "homing"
+   }
+  ]
+ },
+ {
+  "label": "Robot: charging",
+  "events": [
+   {
+    "component": "main",
+    "capability": "robotCleanerMovement",
+    "attribute": "robotCleanerMovement",
+    "value": "charging"
+   }
+  ]
+ },
+ {
+  "label": "Battery 15%",
+  "events": [
+   {
+    "component": "main",
+    "capability": "battery",
+    "attribute": "battery",
+    "value": 15,
+    "unit": "%"
+   }
+  ]
+ },
+ {
+  "label": "Fridge: door open",
+  "events": [
+   {
+    "component": "cooler",
+    "capability": "contactSensor",
+    "attribute": "contact",
+    "value": "open"
+   }
+  ]
+ },
+ {
+  "label": "Fridge: door closed",
+  "events": [
+   {
+    "component": "cooler",
+    "capability": "contactSensor",
+    "attribute": "contact",
+    "value": "closed"
+   }
+  ]
+ },
+ {
+  "label": "Freezer: door open",
+  "events": [
+   {
+    "component": "freezer",
+    "capability": "contactSensor",
+    "attribute": "contact",
+    "value": "open"
+   }
+  ]
+ },
+ {
+  "label": "Freezer: door closed",
+  "events": [
+   {
+    "component": "freezer",
+    "capability": "contactSensor",
+    "attribute": "contact",
+    "value": "closed"
+   }
+  ]
+ },
+ {
+  "label": "Oven: 180°C, running",
+  "events": [
+   {
+    "component": "main",
+    "capability": "ovenSetpoint",
+    "attribute": "ovenSetpoint",
+    "value": 180
+   },
+   {
+    "component": "main",
+    "capability": "ovenOperatingState",
+    "attribute": "machineState",
+    "value": "running"
+   },
+   {
+    "component": "main",
+    "capability": "ovenOperatingState",
+    "attribute": "ovenJobState",
+    "value": "cooking"
+   }
+  ]
+ },
+ {
+  "label": "Oven: ready",
+  "events": [
+   {
+    "component": "main",
+    "capability": "ovenOperatingState",
+    "attribute": "machineState",
+    "value": "ready"
+   },
+   {
+    "component": "main",
+    "capability": "ovenOperatingState",
+    "attribute": "ovenJobState",
+    "value": "ready"
+   }
+  ]
+ },
+ {
+  "label": "TV: on, volume 20",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "audioVolume",
+    "attribute": "volume",
+    "value": 20,
+    "unit": "%"
+   }
+  ]
+ },
+ {
+  "label": "TV: mute",
+  "events": [
+   {
+    "component": "main",
+    "capability": "audioMute",
+    "attribute": "mute",
+    "value": "muted"
+   }
+  ]
+ },
+ {
+  "label": "TV: HDMI1",
+  "events": [
+   {
+    "component": "main",
+    "capability": "mediaInputSource",
+    "attribute": "inputSource",
+    "value": "HDMI1"
+   }
+  ]
+ }
+]

@@ -137,8 +137,7 @@ switch (cmd) {
     break;
   case 'capabilities': {
     const id = pos[0];
-    if (!CAPS[id]) fail(`capability ${id} not found`);
-    out({ id, version: Number(pos[1] || 1), status: 'live', name: id, attributes: CAPS[id], commands: {} });
+    out({ id, version: Number(pos[1] || 1), status: 'live', name: id, attributes: CAPS[id] || {}, commands: {} }); // unknown capabilities: empty definition
     break;
   }
   case 'virtualdevices:create-standard': {
@@ -157,7 +156,6 @@ switch (cmd) {
     let comps = inp.deviceProfile?.components;
     if (!comps && inp.deviceProfileId) comps = [{ id: 'main', capabilities: ['switch', 'washerOperatingState'].map((id) => ({ id, version: 1 })) }];
     if (!comps) fail('deviceProfile or deviceProfileId required');
-    for (const c of comps) for (const cap of c.capabilities) if (!CAPS[cap.id]) fail(`capability ${cap.id} not supported by mock`);
     const { dev, status } = makeDevice(inp.name, inp.owner, inp.roomId, comps, inp.deviceProfile?.name || 'profile');
     s.devices[dev.deviceId] = { dev, status };
     save(s); out(dev);
@@ -167,8 +165,12 @@ switch (cmd) {
     const d = getDev(pos[0]);
     const events = readInput();
     const changes = events.map((e) => {
-      const slot = d.status?.[e.component || 'main']?.[e.capability];
-      if (!slot || !(e.attribute in slot)) fail(`attribute ${e.capability}.${e.attribute} not on device`);
+      const comp = e.component || 'main';
+      if (!d.dev.components.some((c) => c.id === comp && c.capabilities.some((x) => x.id === e.capability))) fail(`capability ${comp}:${e.capability} not on device`);
+      d.status[comp] = d.status[comp] || {};
+      d.status[comp][e.capability] = d.status[comp][e.capability] || {};
+      const slot = d.status[comp][e.capability];
+      if (!(e.attribute in slot)) slot[e.attribute] = { value: null }; // the mock does not know every capability's attributes
       const changed = JSON.stringify(slot[e.attribute].value) !== JSON.stringify(e.value);
       slot[e.attribute] = { value: e.value, ...(e.unit ? { unit: e.unit } : {}), timestamp: new Date().toISOString() };
       return changed;

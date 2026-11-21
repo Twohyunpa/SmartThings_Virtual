@@ -19,6 +19,7 @@ const CLI = USE_MOCK ? path.join(__dirname, 'mock', 'smartthings-mock.js') : (pr
 const CLI_TIMEOUT_MS = Number(process.env.ST_CLI_TIMEOUT_MS || 120000);
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const TEMPLATES_FILE = path.join(__dirname, 'templates', 'samsung-appliances.json');
+const PRESETS_FILE = path.join(__dirname, 'templates', 'presets.json');
 
 let currentProfile = process.env.ST_PROFILE || 'default';
 let cliMajor = null; // detected CLI major version (1.x is oclif-based; 2.x+ is yargs-based and some arguments differ)
@@ -238,6 +239,7 @@ const routes = [
   ['GET', /^\/api\/log$/, async () => ({ status: 200, body: { data: commandLog } })],
   ['DELETE', /^\/api\/log$/, async () => { commandLog.length = 0; return { status: 200, body: { ok: true } }; }],
   ['GET', /^\/api\/templates$/, async () => ({ status: 200, body: { data: JSON.parse(fs.readFileSync(TEMPLATES_FILE, 'utf8')) } })],
+  ['GET', /^\/api\/presets$/, async () => ({ status: 200, body: { data: JSON.parse(fs.readFileSync(PRESETS_FILE, 'utf8')) } })],
 
   ['GET', /^\/api\/locations$/, async () => runCli(['locations'])],
   ['GET', /^\/api\/locations\/([^/]+)\/rooms$/, async (req, m) => { assertId(m[1], 'locationId'); return runCli(['locations:rooms', '--location', m[1]]); }],

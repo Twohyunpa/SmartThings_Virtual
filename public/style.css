@@ -211,3 +211,6 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
   .form { grid-template-columns: 1fr; }
   .main { padding: 14px 16px 120px; }
 }
+
+.tpl-grid { max-height: 300px; overflow-y: auto; }
+.tpl[hidden] { display: none; }

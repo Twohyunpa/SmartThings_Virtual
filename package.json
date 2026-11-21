@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "mock": "node server.js --mock"
+    "mock": "node server.js --mock",
+    "check-capabilities": "node tools/check-capabilities.js"
   },
   "engines": {
     "node": ">=18"
@@ -18,8 +19,11 @@
     "public",
     "mock",
     "templates",
+    "tools",
     "README.md",
-    "LICENSE"
+    "README.ko.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "repository": {
     "type": "git",

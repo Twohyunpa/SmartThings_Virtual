@@ -1,0 +1,15 @@
+SmartThings Virtual Device Console
+Copyright (c) 2026 Twohyunpa. Licensed under the MIT License (see LICENSE).
+
+templates/samsung-appliances.json is derived from the SmartThings integration test
+fixtures of Home Assistant (https://github.com/home-assistant/core, path
+tests/components/smartthings/fixtures), which is licensed under the Apache License 2.0
+(https://www.apache.org/licenses/LICENSE-2.0).
+
+Copyright (c) Home Assistant contributors.
+
+Changes: only the component / capability lists and sample attribute values of the
+Samsung appliance fixtures were extracted and reshaped into device profile definitions
+by tools/build-templates.py (device-specific identifiers such as device, location and
+owner ids are not included). The exact upstream commit is recorded in the
+"generatedFrom" field of the template file.

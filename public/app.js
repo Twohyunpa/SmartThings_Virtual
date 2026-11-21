@@ -5,6 +5,8 @@ const state = {
   locations: [],
   devices: [],
   templates: [],
+  templatesMeta: null, // where the templates were derived from
+  presets: [],
   selectedId: null,
   device: null,       // result of `devices <id>`
   status: null,       // result of `devices:status`
@@ -208,12 +210,21 @@ $('#refreshDevices').addEventListener('click', loadDevices);
 $('#locationFilter').addEventListener('change', loadDevices);
 $('#newDeviceBtn').addEventListener('click', () => { stopAuto(); state.selectedId = null; renderDeviceList(); renderCreate(); });
 
+async function loadTemplates() {
+  try {
+    const r = await api('GET', '/api/templates');
+    state.templates = r.templates || [];
+    state.templatesMeta = r.generatedFrom || null;
+  } catch { state.templates = []; }
+  try { state.presets = (await api('GET', '/api/presets')) || []; } catch { state.presets = []; }
+}
+
 // ================= Create device =================
 let createState = { mode: 'template', templateId: null };
 
 async function renderCreate() {
   if (!state.templates.length) {
-    try { state.templates = await api('GET', '/api/templates'); } catch { state.templates = []; }
+    await loadTemplates();
   }
   const main = $('#main');
   const locOpts = state.locations.map((l) => `<option value="${esc(l.locationId)}">${esc(l.name)}</option>`).join('');
@@ -268,14 +279,35 @@ function renderModeArea() {
   if (m === 'template') {
     if (!createState.templateId && state.templates[0]) createState.templateId = state.templates[0].id;
     const t = state.templates.find((x) => x.id === createState.templateId);
+    const full = !!createState.full;
+    const profile = t ? (full && t.deviceProfileFull ? t.deviceProfileFull : t.deviceProfile) : null;
+    const src = state.templatesMeta;
     area.innerHTML = `
+      <div class="muted small" style="margin-bottom:8px">Capability lists and sample values come from real Samsung appliances
+        (<a href="${esc(src?.repository || '#')}" target="_blank" rel="noopener">Home Assistant SmartThings test fixtures</a>, ${esc(src?.license || '')}).</div>
+      <input id="tplFilter" placeholder="Filter templates (e.g. washer, oven, tv)" style="width:100%;margin-bottom:8px" />
       <div class="tpl-grid">${state.templates.map((x) => `
-        <button class="tpl ${x.id === createState.templateId ? 'active' : ''}" data-id="${esc(x.id)}">
+        <button class="tpl ${x.id === createState.templateId ? 'active' : ''}" data-id="${esc(x.id)}" data-search="${esc((x.name + ' ' + x.description).toLowerCase())}">
           <span class="ic">${esc(x.icon || '▢')}</span><span class="nm">${esc(x.name)}</span><span class="ds">${esc(x.description)}</span>
         </button>`).join('')}</div>
-      ${t?.deviceProfile ? `<details><summary class="muted small">View / edit the profile definition (add or remove capabilities)</summary>
-        <textarea id="tplJson" rows="12" style="margin-top:8px">${esc(JSON.stringify(t.deviceProfile, null, 2))}</textarea></details>`
+      <label class="small" style="display:block;margin:4px 0"><input type="checkbox" id="tplFull" ${full ? 'checked' : ''}/>
+        Include Samsung-specific capabilities (<code>custom.*</code>, <code>samsungce.*</code>, <code>hca.*</code> …).
+        <span class="muted">These are what the real device has, but SmartThings may reject them for virtual devices. If creation fails, untick this.</span></label>
+      <label class="small" style="display:block;margin:4px 0"><input type="checkbox" id="tplSample" ${createState.sample === false ? '' : 'checked'}/>
+        Load the real device's sample state after creating</label>
+      ${profile ? `<details><summary class="muted small">View / edit the profile definition (add or remove capabilities)</summary>
+        <textarea id="tplJson" rows="12" style="margin-top:8px">${esc(JSON.stringify(profile, null, 2))}</textarea></details>`
         : t ? `<div class="muted small">Created from the standard prototype <code>${esc(t.prototype)}</code>.</div>` : ''}`;
+    $('#tplFilter').value = createState.filter || '';
+    const applyFilter = () => {
+      const q = ($('#tplFilter').value || '').trim().toLowerCase();
+      createState.filter = q;
+      area.querySelectorAll('.tpl').forEach((b) => { b.hidden = !!q && !b.dataset.search.includes(q); });
+    };
+    $('#tplFilter').addEventListener('input', applyFilter);
+    applyFilter();
+    $('#tplFull').addEventListener('change', (e) => { createState.full = e.target.checked; renderModeArea(); });
+    $('#tplSample').addEventListener('change', (e) => { createState.sample = e.target.checked; });
     area.querySelectorAll('.tpl').forEach((b) => b.addEventListener('click', () => {
       createState.templateId = b.dataset.id;
       renderModeArea();
@@ -311,7 +343,7 @@ async function submitCreate(dryRun) {
   if (!locationId) return toast('Select a location', 'err');
   store('st.lastLocation', locationId);
 
-  let url; let body;
+  let url; let body; let tplUsed = null;
   try {
     const m = createState.mode;
     if (m === 'template') {
@@ -321,7 +353,8 @@ async function submitCreate(dryRun) {
       else {
         const txt = $('#tplJson')?.value;
         url = '/api/devices/profile';
-        body = { name, locationId, roomId, deviceProfile: txt ? JSON.parse(txt) : t.deviceProfile };
+        body = { name, locationId, roomId, deviceProfile: txt ? JSON.parse(txt) : (createState.full && t.deviceProfileFull ? t.deviceProfileFull : t.deviceProfile) };
+        tplUsed = t;
       }
     } else if (m === 'standard') {
       url = '/api/devices/standard'; body = { name, locationId, roomId, prototype: $('#cProto').value };
@@ -348,7 +381,11 @@ async function submitCreate(dryRun) {
       toast(`Created "${name}"`, 'ok');
       await loadDevices();
       const id = out?.deviceId;
-      if (id) selectDevice(id);
+      if (id) {
+        if (tplUsed) store(`st.tpl.${id}`, tplUsed.id);
+        await selectDevice(id);
+        if (tplUsed && $('#tplSample')?.checked !== false && createState.sample !== false) await applySampleState(tplUsed);
+      }
     }
   } catch (e) {
     toast(`Creation failed\n${e.message}`, 'err');
@@ -412,6 +449,7 @@ function renderDevice() {
         <div class="ids">${esc(d.deviceId)} · ${esc(locName)}${d.deviceTypeName ? ' · ' + esc(d.deviceTypeName) : ''}</div>
       </div>
       <div class="actions">
+        ${store(`st.tpl.${d.deviceId}`) ? '<button class="btn small" id="sampleBtn" title="Inject the values recorded from the real appliance">Load sample state</button>' : ''}
         <button class="btn small" id="copyId">Copy ID</button>
         <button class="btn small" id="renameBtn">Rename</button>
         <button class="btn small danger" id="deleteBtn">Delete</button>
@@ -425,6 +463,7 @@ function renderDevice() {
     <div id="tabBody"></div>`;
 
   $('#copyId').addEventListener('click', () => navigator.clipboard?.writeText(d.deviceId).then(() => toast('ID copied')));
+  $('#sampleBtn')?.addEventListener('click', () => applySampleState(state.templates.find((x) => x.id === store(`st.tpl.${d.deviceId}`))));
   $('#renameBtn').addEventListener('click', renameDevice);
   $('#deleteBtn').addEventListener('click', deleteDevice);
   document.querySelectorAll('#main .tabs .tab').forEach((t) => t.addEventListener('click', () => { state.tab = t.dataset.tab; renderTabBody(); }));
@@ -636,6 +675,27 @@ async function sendEvents(events, { quiet = false } = {}) {
   }
 }
 
+// Inject the sample attribute values recorded from the real appliance (only for capabilities this device has).
+async function applySampleState(t) {
+  if (!t?.sampleState || !state.device) return;
+  const have = deviceCapSet();
+  const events = [];
+  for (const [comp, caps] of Object.entries(t.sampleState)) {
+    for (const [cap, attrs] of Object.entries(caps)) {
+      if (!have.has(`${comp}/${cap}`)) continue;
+      for (const [attr, v] of Object.entries(attrs)) {
+        events.push({ component: comp, capability: cap, attribute: attr, value: v.value, ...(v.unit ? { unit: v.unit } : {}) });
+      }
+    }
+  }
+  if (!events.length) return toast('No sample state for this device');
+  let ok = 0;
+  for (let i = 0; i < events.length; i += 25) {
+    if (await sendEvents(events.slice(i, i + 25), { quiet: true })) ok += Math.min(25, events.length - i); else break;
+  }
+  toast(ok === events.length ? `Loaded sample state (${ok} attributes)` : `Loaded ${ok} of ${events.length} attributes`, ok === events.length ? 'ok' : 'err');
+}
+
 // ---------- Presets & scenarios ----------
 function deviceCapSet() {
   const set = new Set();
@@ -655,12 +715,12 @@ function evText(e) {
 function savedScenarios() { return store('st.scenarios') || []; }
 
 function renderScenario(body) {
-  const presets = state.templates.flatMap((t) => (t.presets || []).map((p) => ({ ...p, from: t.name }))).filter((p) => applicable(p.events));
+  const presets = state.presets.map((p) => ({ ...p, from: 'built-in preset' })).filter((p) => applicable(p.events));
   const saved = savedScenarios().map((s, i) => ({ ...s, idx: i })).filter((s) => s.steps.every((st) => applicable(st.events)));
 
   body.innerHTML = `
     <div class="panel">
-      <h3>Quick presets <span class="muted small">template presets that match this device's capabilities</span></h3>
+      <h3>Quick presets <span class="muted small">built-in presets that match this device's capabilities</span></h3>
       ${presets.length ? `<div class="preset-row">${presets.map((p, i) => `<button class="btn small preset" data-i="${i}" title="${esc(p.from + '\n' + p.events.map(evText).join('\n'))}">${esc(p.label)}</button>`).join('')}</div>`
         : '<div class="muted small">No matching presets. Build a scenario below.</div>'}
     </div>
@@ -791,7 +851,7 @@ async function runSteps(steps, container, flag) {
   $('#main').appendChild($('#welcomeTpl').content.cloneNode(true));
   await loadInfo();
   refreshLog();
-  api('GET', '/api/templates').then((t) => { state.templates = t; }).catch(() => {});
+  loadTemplates();
   await loadLocations();
   await loadDevices();
 })();

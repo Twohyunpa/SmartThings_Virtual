@@ -84,6 +84,10 @@ npm run mock
 
 **기타**: 이름 변경, 삭제, 원본 JSON(`devices`, `devices:status`) 보기, CLI 명령 로그(클릭하면 복사).
 
+## 템플릿 출처
+
+삼성 가전 템플릿은 임의로 만든 것이 아니라 [Home Assistant](https://github.com/home-assistant/core)의 SmartThings 테스트 데이터(`tests/components/smartthings/fixtures`, Apache-2.0, [NOTICE](NOTICE) 참고)에서 생성합니다. 실제 삼성 가전에서 덤프한 데이터이고, `tools/build-templates.py`가 모델별 capability 목록과 샘플 속성 값을 추출합니다. 기본은 표준 capability만 쓰고, `custom.*`/`samsungce.*` 같은 삼성 전용 capability는 옵션입니다(가상 기기에서 거부될 수 있음). 자세한 내용은 영어 [README](README.md) 참고.
+
 ## 사용하는 CLI 명령
 
 | 동작 | 명령 |

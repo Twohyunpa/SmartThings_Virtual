@@ -67,7 +67,7 @@ npm run mock
 ## Features
 
 **Create virtual devices**
-- Samsung appliance templates: washer, dryer, air conditioner, air purifier, robot vacuum, dishwasher, TV, refrigerator. You can open the profile JSON and add or remove capabilities. Edit `templates/samsung-appliances.json` to change the templates.
+- Samsung appliance templates: 38 real models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, cooktops, range hoods, TVs, soundbars ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
 - Standard prototypes such as `VIRTUAL_SWITCH` and `VIRTUAL_MOTION_SENSOR` (17 in total, `virtualdevices:create-standard`).
 - Create from one of your own device profile IDs, or paste a profile JSON (`virtualdevices:create`).
 - The dry-run button shows the request JSON without creating anything.
@@ -83,6 +83,17 @@ npm run mock
 - Scenarios are stored in your browser (localStorage) and can be imported / exported as JSON.
 
 **Also**: rename, delete, raw JSON view (`devices`, `devices:status`), and the CLI command log (click an entry to copy it).
+
+## Where the templates come from
+
+The templates are not hand-picked. They are generated from the SmartThings test fixtures of [Home Assistant](https://github.com/home-assistant/core) (`tests/components/smartthings/fixtures`, Apache-2.0, see [NOTICE](NOTICE)), which are dumps of real Samsung appliances. `tools/build-templates.py` extracts each model's components, capabilities and sample attribute values; the upstream commit is recorded in `templates/samsung-appliances.json`.
+
+Each template has two profiles:
+
+- **Standard capabilities only** (default): `switch`, `washerOperatingState`, `ovenMode`, `temperatureMeasurement` ... These are public SmartThings capabilities and work for any virtual device.
+- **Full**: additionally includes the Samsung-specific capabilities the real device has (`custom.*`, `samsungce.*`, `hca.*`). Whether SmartThings accepts these in a virtual device profile depends on your account, and I could not verify it, so it is opt-in. If creation fails, use the standard profile. Run `npm run check-capabilities` to list which capabilities your account can see.
+
+Plumbing capabilities of the real devices' cloud connection (`ocf`, `execute`, `logTrigger`, `demandResponseLoadControl`, `sec.*`) are always left out. After creating a device, **Load sample state** injects the values recorded from the real appliance. To regenerate the templates from a newer Home Assistant checkout, see the header of `tools/build-templates.py`.
 
 ## CLI commands used
 
@@ -100,7 +111,6 @@ All commands are run with `--json` and parsed. The server detects the CLI versio
 
 ## Notes
 
-- The Samsung appliance templates only use standard SmartThings capabilities. If you need Samsung-specific ones such as `samsungce.*`, add them to the template JSON; your account may reject them for virtual devices.
 - Virtual devices are created in the selected location of your real SmartThings account, so they also show up in the SmartThings app and in routines.
 - Event injection targets cloud virtual devices. Hub-local virtual devices (`--local`) are not created by this UI.
 - Reading status (`devices`, `devices:status`) works for any device id; all changes are restricted to virtual devices.
