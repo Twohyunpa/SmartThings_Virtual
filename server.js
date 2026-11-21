@@ -117,6 +117,7 @@ function cleanError(text) {
 }
 
 function pushLog(entry) {
+  if (entry.ok === false) console.error(`[cli failed] ${entry.command}\n  ${String(entry.error || '').split('\n').join('\n  ')}`);
   commandLog.unshift(entry);
   if (commandLog.length > 200) commandLog.length = 200;
 }
@@ -326,6 +327,10 @@ const routes = [
   }],
 ];
 
+// Never let a stray error take the whole server down; print it to the terminal instead.
+process.on('uncaughtException', (err) => console.error('[server] uncaught exception:', err));
+process.on('unhandledRejection', (err) => console.error('[server] unhandled rejection:', err));
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   if (!url.pathname.startsWith('/api/')) {
@@ -361,6 +366,15 @@ function openBrowser(url) {
     child.unref();
   } catch { /* ignore */ }
 }
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\n  Port ${PORT} is already in use. Another copy of this app is probably still running.\n  Close it (Ctrl+C in its terminal) or start this one on another port, e.g.  PORT=3800 npm start\n`);
+  } else {
+    console.error('[server] error:', err);
+  }
+  process.exit(1);
+});
 
 server.listen(PORT, HOST, async () => {
   await detectCli();

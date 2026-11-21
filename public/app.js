@@ -33,11 +33,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fmtVal = (v) => (v === undefined ? '—' : v === null ? 'null' : typeof v === 'object' ? JSON.stringify(v) : String(v));
 
 async function api(method, url, body) {
-  const res = await fetch(url, {
-    method,
-    headers: body ? { 'Content-Type': 'application/json' } : {},
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res;
+  try {
+    res = await fetch(url, {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : {},
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    // fetch only throws when the connection itself fails: the local server is not running (any more).
+    throw new Error('Cannot reach the local server. Is the terminal that started it still open? Restart it, then reload this page.');
+  }
   let data = {};
   try { data = await res.json(); } catch { /* ignore */ }
   refreshLog();
@@ -403,7 +409,10 @@ function renderModeArea() {
     api('GET', '/api/deviceprofiles').then((list) => {
       $('#cProfile').innerHTML = '<option value="">Select…</option>' +
         (list || []).map((p) => `<option value="${esc(p.id)}">${esc(p.name)} (${esc(p.status || '')})</option>`).join('');
-    }).catch((e) => { $('#cProfile').innerHTML = `<option value="">Failed to load: ${esc(e.message)}</option>`; });
+    }).catch((e) => {
+      $('#cProfile').innerHTML = '<option value="">Could not load the list (paste a UUID instead)</option>';
+      toast(`Could not load device profiles\n${e.message}`, 'err');
+    });
   } else {
     area.innerHTML = `<div class="muted small" style="margin-bottom:6px">Definition for the <code>deviceProfile</code> field of virtualdevices:create</div>
       <textarea id="cJson" rows="14">${esc(JSON.stringify({
