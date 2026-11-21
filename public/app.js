@@ -614,11 +614,7 @@ function renderControl(body) {
       <label class="small"><input type="checkbox" id="autoChk" ${state.autoRefresh ? 'checked' : ''}/> Auto-refresh every 5 s</label>
       <span class="muted small">Click a value chip to inject it right away, or type a value and press <b>Inject</b>. <b>＋</b> adds it as a scenario step.</span>
     </div>
-    ${capFilterPanel(comps)}
-    <div class="cap-grid">
-      ${comps.flatMap((c) => (c.capabilities || []).map((cap) => capCard(c.id, cap.id))).join('')}
-    </div>
-    <div class="panel" style="margin-top:14px">
+    <div class="panel custom-event">
       <h3>Custom event</h3>
       <div class="attr-ctrl">
         <input id="mComp" value="main" style="width:90px" placeholder="component" />
@@ -629,6 +625,10 @@ function renderControl(body) {
         <button class="btn primary small" id="mSend">Inject</button>
       </div>
       <div class="muted small" style="margin-top:6px">The value is parsed as JSON first (number, true, {...}); if that fails it is sent as a string.</div>
+    </div>
+    ${capFilterPanel(comps)}
+    <div class="cap-grid">
+      ${comps.flatMap((c) => (c.capabilities || []).map((cap) => capCard(c.id, cap.id))).join('')}
     </div>`;
 
   wireCapFilter(body, comps);
