@@ -718,11 +718,21 @@ function attrRow(comp, capId, attrName) {
   return `
     <div class="attr" data-comp="${esc(comp)}" data-cap="${esc(capId)}" data-attr="${esc(attrName)}" data-type="${esc(s.type)}" data-opts="${esc(optsKey)}">
       <div class="attr-top">
-        <span class="attr-name">${esc(attrName)} <span class="range-hint">${esc(hint)}</span></span>
+        <span class="attr-name">${esc(attrName)} <span class="range-hint">${esc(hint)}</span>${listHint(attrName) ? ' <button type="button" class="info" title="What is this?" aria-label="What is this?">ⓘ</button>' : ''}</span>
         <span class="attr-cur"><span class="muted">current</span> <span class="val">${esc(fmtVal(curVal))}${curUnit ? ' ' + esc(curUnit) : ''}</span></span>
       </div>
+      ${listHint(attrName) ? `<div class="attr-hint" hidden>${listHint(attrName)}</div>` : ''}
       <div class="attr-ctrl">${ctrl}<button class="btn small addStep" title="Add to scenario">＋</button></div>
     </div>`;
+}
+
+// Short explanation shown (via the ⓘ button) for every supportedX / availableX attribute, whatever the capability.
+function listHint(attrName) {
+  const m = LIST_PREFIX.exec(attrName);
+  if (!m) return '';
+  return m[1] === 'supported'
+    ? '<b>supported…</b> = everything this device can do at all. It rarely changes.'
+    : '<b>available…</b> = what can be chosen <em>right now</em>: a subset of the matching <code>supported…</code> list that changes with the current mode (for example, in dry mode a high fan speed may be unavailable). <b>Test tip:</b> inject a shorter list here to check that your app hides or blocks the rest.';
 }
 
 function readAttrEvent(row, chipValue) {
@@ -743,6 +753,7 @@ function readAttrEvent(row, chipValue) {
 }
 
 function wireAttr(row) {
+  row.querySelector('.info')?.addEventListener('click', () => { const h = row.querySelector('.attr-hint'); if (h) h.hidden = !h.hidden; });
   const rng = row.querySelector('.rng');
   const inp = row.querySelector('.inp');
   if (rng && inp) {

@@ -229,3 +229,6 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
 
 .mode-intro { background: var(--accent-weak); border-radius: 8px; padding: 9px 12px; margin-bottom: 12px; font-size: 13px; line-height: 1.5; }
 .checks .add-item { display: inline-flex; align-items: center; gap: 4px; }
+
+.info { background: none; border: 0; padding: 0 2px; cursor: pointer; color: var(--accent); font-size: 13px; line-height: 1; }
+.attr-hint { background: var(--accent-weak); border-radius: 6px; padding: 6px 9px; font-size: 12px; line-height: 1.45; }
