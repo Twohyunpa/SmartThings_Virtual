@@ -75,6 +75,7 @@ npm run mock
 **State & inject**
 - Shows the attributes of every component / capability with their current values.
 - Controls are generated from the capability definitions: enums become chips (click to inject immediately), numbers get a slider / input plus a unit, arrays and objects take JSON.
+- Values that have a matching `supported*` / `available*` list (e.g. `fanMode` ↔ `supportedAcFanModes` / `availableAcFanModes`) become a dropdown filled from the device's **current** list, and the lists themselves become checkboxes. The options follow the device state, so after you inject a new supported list the dropdown updates. Pick **Custom value…** (or **Edit as JSON**) to inject a value outside the list, e.g. to test how an app handles invalid input. Values outside `available*` are marked ⚠.
 - Optional 5-second auto-refresh, and a custom event form (component / capability / attribute / value / unit).
 
 **Presets & scenarios**

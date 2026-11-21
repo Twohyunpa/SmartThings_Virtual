@@ -75,6 +75,7 @@ npm run mock
 **상태 & 주입**
 - 기기의 component/capability 별로 속성과 현재 값이 표시됩니다.
 - capability 정의를 읽어 컨트롤을 자동으로 만듭니다: enum은 칩(누르면 바로 주입), 숫자는 슬라이더/입력 + 단위, 배열/객체는 JSON 입력.
+- 짝이 되는 `supported*` / `available*` 목록이 있는 값(예: `fanMode` ↔ `supportedAcFanModes` / `availableAcFanModes`)은 기기의 **현재** 목록으로 채운 드롭다운이 되고, 목록 자체는 체크박스로 고릅니다. 옵션은 기기 상태를 따라가므로 supported 목록을 새로 주입하면 드롭다운도 바뀝니다. 목록에 없는 값을 일부러 넣으려면 **Custom value…**(또는 **Edit as JSON**)을 쓰세요. `available*`에 없는 값은 ⚠ 로 표시됩니다.
 - 5초 자동 새로고침, 직접 입력(component/capability/attribute/value/unit)도 지원합니다.
 
 **프리셋 & 시나리오**

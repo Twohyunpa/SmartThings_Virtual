@@ -93,7 +93,90 @@ function valueSchema(capId, attrName) {
     units: unit.enum || (unit.default ? [unit.default] : null),
     unitDefault: unit.default,
     required: attr?.schema?.required,
+    itemsEnum: v.items?.enum,
   };
+}
+
+// ---------- supported* / available* option lists ----------
+// Many capabilities describe what a device can do with a list attribute next to the value attribute,
+// e.g. airConditionerFanMode.fanMode <-> supportedAcFanModes / availableAcFanModes, or
+// washerOperatingState.machineState <-> supportedMachineStates. The lists are device state, so options
+// are always read from the latest device status (they change when you inject a new supported list).
+const LIST_PREFIX = /^(supported|available)(?=[A-Z])/;
+const camelWords = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase().split(' ');
+const listBase = (name) => name.replace(LIST_PREFIX, '').toLowerCase().replace(/s$/, '');
+
+function pairScore(listName, attrName) {
+  const base = listBase(listName);
+  const a = attrName.toLowerCase();
+  if (base === a || base === a.replace(/s$/, '')) return 3;
+  if (base.endsWith(a) || a.endsWith(base)) return 2;
+  const lw = camelWords(listName.replace(LIST_PREFIX, '')).pop().replace(/s$/, '');
+  return camelWords(attrName).pop() === lw ? 1 : 0;
+}
+
+// capId -> { attrName: { supported, available } } and { listName: valueAttrName }
+const pairCache = {};
+function capPairs(capId) {
+  if (pairCache[capId]) return pairCache[capId];
+  const attrs = Object.keys(state.caps[capId]?.attributes || {});
+  const lists = attrs.filter((a) => LIST_PREFIX.test(a) && valueSchema(capId, a).type === 'array');
+  const values = attrs.filter((a) => !LIST_PREFIX.test(a) && valueSchema(capId, a).type === 'string');
+  const byValue = {};
+  const byList = {};
+  for (const l of lists) {
+    // Give each list to the value attribute that matches it best (ties are ambiguous -> no pairing).
+    const scored = values.map((v) => [v, pairScore(l, v)]).filter(([, sc]) => sc > 0).sort((x, y) => y[1] - x[1]);
+    if (!scored.length || (scored[1] && scored[1][1] === scored[0][1])) continue;
+    const v = scored[0][0];
+    const kind = l.startsWith('available') ? 'available' : 'supported';
+    byValue[v] = byValue[v] || {};
+    if (!byValue[v][kind]) byValue[v][kind] = l;
+    byList[l] = v;
+  }
+  return (pairCache[capId] = { byValue, byList });
+}
+
+const listValue = (comp, capId, attr) => {
+  const v = attr ? currentAttr(comp, capId, attr)?.value : undefined;
+  return Array.isArray(v) ? v.filter((x) => x !== null && typeof x !== 'object') : [];
+};
+const uniq = (arr) => { const seen = new Set(); return arr.filter((x) => { const k = JSON.stringify(x); if (seen.has(k)) return false; seen.add(k); return true; }); };
+
+// Options for a single string value: groups of [label, values]. null = no device-provided list.
+function valueOptions(comp, capId, attrName) {
+  const pair = capPairs(capId).byValue[attrName];
+  if (!pair) return null;
+  const supported = listValue(comp, capId, pair.supported);
+  const available = listValue(comp, capId, pair.available);
+  const main = pair.available && available.length ? available : supported;
+  if (!main.length) return null;
+  const s = valueSchema(capId, attrName);
+  const groups = [[pair.available && available.length ? pair.available : pair.supported, main]];
+  const notAvail = supported.filter((v) => !main.includes(v));
+  if (notAvail.length) groups.push([`in ${pair.supported}, not ${pair.available}`, notAvail]);
+  const others = (s.enum || []).filter((v) => !main.includes(v) && !notAvail.includes(v));
+  if (others.length) groups.push(['other values from the capability', others]);
+  return groups;
+}
+
+// Options for a list attribute (supportedX / availableX / any array with items.enum). null = keep JSON box.
+function listOptions(comp, capId, attrName) {
+  const s = valueSchema(capId, attrName);
+  const { byValue, byList } = capPairs(capId);
+  const valueAttr = byList[attrName];
+  const own = listValue(comp, capId, attrName);
+  let opts = [...(s.itemsEnum || [])];
+  if (valueAttr) {
+    const pair = byValue[valueAttr] || {};
+    if (attrName === pair.available) opts.push(...listValue(comp, capId, pair.supported));
+    opts.push(...(valueSchema(capId, valueAttr).enum || []));
+  }
+  const cur = currentAttr(comp, capId, attrName)?.value;
+  if (!valueAttr && !s.itemsEnum) return null;
+  if (cur !== undefined && cur !== null && !Array.isArray(cur)) return null;
+  if (Array.isArray(cur) && cur.some((x) => x !== null && typeof x === 'object')) return null; // lists of objects stay JSON
+  return uniq([...opts, ...own]);
 }
 
 // ================= Top bar / log =================
@@ -566,7 +649,35 @@ function attrRow(comp, capId, attrName) {
   const curVal = cur?.value;
   const curUnit = cur?.unit;
   let ctrl = '';
-  if (s.enum) {
+  const vOpts = s.type === 'string' ? valueOptions(comp, capId, attrName) : null;
+  const lOpts = s.type === 'array' ? listOptions(comp, capId, attrName) : null;
+  let optsKey = '';
+  if (vOpts) {
+    optsKey = JSON.stringify(vOpts);
+    const all = vOpts.flatMap(([, vs]) => vs);
+    const isCustom = curVal !== undefined && curVal !== null && curVal !== '' && !all.includes(curVal);
+    const hasMatch = all.some((v) => String(curVal) === String(v));
+    ctrl = `<select class="pick" title="Options come from the device's current ${esc(vOpts[0][0])}">
+        ${!hasMatch && !isCustom ? '<option value="" selected disabled>— choose a value —</option>' : ''}
+        ${vOpts.map(([label, vs], i) => `<optgroup label="${esc(label)}">${vs.map((v) => `<option value="${esc(v)}" ${String(curVal) === String(v) ? 'selected' : ''}>${esc(v)}${i ? ' ⚠' : ''}</option>`).join('')}</optgroup>`).join('')}
+        <option value="__custom__" ${isCustom ? 'selected' : ''}>Custom value…</option>
+      </select>
+      <input type="text" class="inp custom" placeholder="any string" value="${esc(isCustom ? curVal : '')}" ${isCustom ? '' : 'hidden'} />
+      ${s.units ? `<select class="unit">${s.units.map((u) => `<option>${esc(u)}</option>`).join('')}</select>` : ''}
+      <button class="btn primary small send">Inject</button>`;
+  } else if (lOpts) {
+    optsKey = JSON.stringify(lOpts);
+    const cur = Array.isArray(curVal) ? curVal : [];
+    ctrl = `<div class="checks">
+        ${lOpts.map((v) => `<label class="check ${cur.some((c) => c === v) ? 'on' : ''}"><input type="checkbox" data-j="${esc(JSON.stringify(v))}" ${cur.some((c) => c === v) ? 'checked' : ''}/>${esc(v)}</label>`).join('')}
+        <span class="add-item"><input type="text" class="newItem" placeholder="+ add value" /></span>
+      </div>
+      <div class="check-actions">
+        <button class="btn small selAll">All</button><button class="btn small selNone">None</button>
+        <details class="json-edit"><summary class="muted small">Edit as JSON</summary><textarea class="inp" rows="2">${esc(JSON.stringify(cur))}</textarea></details>
+        <button class="btn primary small send">Inject</button>
+      </div>`;
+  } else if (s.enum) {
     ctrl = `<div class="chips">${s.enum.map((v) => `<button class="chip ${String(curVal) === String(v) ? 'current' : ''}" data-v="${esc(v)}">${esc(v)}</button>`).join('')}</div>`;
   } else if (s.type === 'boolean') {
     ctrl = `<div class="chips">${['true', 'false'].map((v) => `<button class="chip ${String(curVal) === v ? 'current' : ''}" data-v="${v}">${v}</button>`).join('')}</div>`;
@@ -588,7 +699,7 @@ function attrRow(comp, capId, attrName) {
   }
   const hint = [s.type, s.min !== undefined ? `min ${s.min}` : '', s.max !== undefined ? `max ${s.max}` : ''].filter(Boolean).join(' · ');
   return `
-    <div class="attr" data-comp="${esc(comp)}" data-cap="${esc(capId)}" data-attr="${esc(attrName)}" data-type="${esc(s.type)}">
+    <div class="attr" data-comp="${esc(comp)}" data-cap="${esc(capId)}" data-attr="${esc(attrName)}" data-type="${esc(s.type)}" data-opts="${esc(optsKey)}">
       <div class="attr-top">
         <span class="attr-name">${esc(attrName)} <span class="range-hint">${esc(hint)}</span></span>
         <span class="attr-cur"><span class="muted">current</span> <span class="val">${esc(fmtVal(curVal))}${curUnit ? ' ' + esc(curUnit) : ''}</span></span>
@@ -599,7 +710,13 @@ function attrRow(comp, capId, attrName) {
 
 function readAttrEvent(row, chipValue) {
   const { comp, cap, attr, type } = row.dataset;
-  const raw = chipValue !== undefined ? chipValue : row.querySelector('.inp')?.value;
+  let raw = chipValue !== undefined ? chipValue : row.querySelector('.inp')?.value;
+  const pick = row.querySelector('select.pick');
+  if (chipValue === undefined && pick && pick.value !== '__custom__') raw = pick.value;
+  const checks = row.querySelector('.checks');
+  if (chipValue === undefined && checks && !row.querySelector('details.json-edit')?.open) {
+    raw = [...checks.querySelectorAll('input[type=checkbox]:checked')].map((c) => JSON.parse(c.dataset.j));
+  }
   if (raw === undefined || raw === '') throw new Error(`${attr}: enter a value`);
   const ev = { component: comp, capability: cap, attribute: attr, value: convertValue(raw, type) };
   const unit = row.querySelector('select.unit')?.value;
@@ -621,6 +738,35 @@ function wireAttr(row) {
     try { sendEvents([readAttrEvent(row)]); } catch (e) { toast(e.message, 'err'); }
   });
   inp?.addEventListener('keydown', (e) => { if (e.key === 'Enter' && inp.tagName === 'INPUT') row.querySelector('.send')?.click(); });
+  const pick = row.querySelector('select.pick');
+  pick?.addEventListener('change', () => {
+    inp.hidden = pick.value !== '__custom__';
+    if (!inp.hidden) inp.focus();
+  });
+  const checks = row.querySelector('.checks');
+  if (checks) {
+    const json = row.querySelector('details.json-edit textarea');
+    const sync = () => {
+      checks.querySelectorAll('label.check').forEach((l) => l.classList.toggle('on', l.querySelector('input').checked));
+      json.value = JSON.stringify([...checks.querySelectorAll('input[type=checkbox]:checked')].map((c) => JSON.parse(c.dataset.j)));
+    };
+    checks.addEventListener('change', sync);
+    row.querySelector('.selAll').addEventListener('click', () => { checks.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = true; }); sync(); });
+    row.querySelector('.selNone').addEventListener('click', () => { checks.querySelectorAll('input[type=checkbox]').forEach((c) => { c.checked = false; }); sync(); });
+    const add = row.querySelector('.newItem');
+    add.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || !add.value.trim()) return;
+      const v = add.value.trim();
+      add.value = '';
+      const exists = [...checks.querySelectorAll('input[type=checkbox]')].find((c) => JSON.parse(c.dataset.j) === v);
+      if (exists) { exists.checked = true; sync(); return; }
+      const lbl = document.createElement('label');
+      lbl.className = 'check on';
+      lbl.innerHTML = `<input type="checkbox" data-j="${esc(JSON.stringify(v))}" checked/>${esc(v)}`;
+      add.parentElement.before(lbl);
+      sync();
+    });
+  }
   row.querySelector('.addStep').addEventListener('click', () => {
     let ev;
     if (row.querySelector('.chip')) {
@@ -638,6 +784,16 @@ function wireAttr(row) {
 
 function updateCurrentValues(flash) {
   document.querySelectorAll('#tabBody .attr[data-attr]').forEach((row) => {
+    // Rebuild a row whose option list changed (e.g. a new supported* list was just injected).
+    const { comp, cap, attr } = row.dataset;
+    const fresh = document.createElement('div');
+    fresh.innerHTML = attrRow(comp, cap, attr).trim();
+    const next = fresh.firstElementChild;
+    if (next.dataset.opts !== row.dataset.opts) {
+      row.replaceWith(next);
+      wireAttr(next);
+      row = next;
+    }
     const cur = currentAttr(row.dataset.comp, row.dataset.cap, row.dataset.attr);
     const el = row.querySelector('.attr-cur .val');
     if (!el) return;

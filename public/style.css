@@ -149,6 +149,18 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); ou
 .chip:hover { border-color: var(--accent); }
 .chip.current { background: var(--accent-weak); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 .range-hint { font-size: 11px; color: var(--muted); }
+.attr-ctrl select.pick { flex: 1; min-width: 140px; }
+.checks { display: flex; gap: 4px; flex-wrap: wrap; width: 100%; }
+.check {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 12px; cursor: pointer;
+  padding: 2px 9px 2px 6px; border-radius: 999px; border: 1px solid var(--border); background: var(--panel);
+}
+.check input { margin: 0; }
+.check.on { background: var(--accent-weak); border-color: var(--accent); color: var(--accent); }
+.checks .add-item input { width: 110px; min-width: 0; flex: none; font-size: 12px; padding: 2px 8px; }
+.check-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; flex: 1 1 auto; }
+.check-actions .json-edit { flex: 1; min-width: 120px; }
+.check-actions .json-edit[open] { width: 100%; flex-basis: 100%; order: 5; }
 
 .form { display: grid; grid-template-columns: 140px 1fr; gap: 10px 14px; align-items: center; max-width: 720px; }
 .form label { color: var(--muted); font-size: 13px; }

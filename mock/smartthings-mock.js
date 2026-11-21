@@ -42,7 +42,7 @@ const CAPS = {
   dryerMode: { dryerMode: attr(str(['regular', 'lowHeat', 'highHeat'])) },
   remoteControlStatus: { remoteControlEnabled: attr(str(['false', 'true'])) },
   airConditionerMode: { airConditionerMode: attr(str(['auto', 'cool', 'dry', 'coolClean', 'dryClean', 'fanOnly', 'heat', 'heatClean'])), supportedAcModes: attr({ type: 'array' }) },
-  airConditionerFanMode: { fanMode: attr(str()), supportedAcFanModes: attr({ type: 'array' }) },
+  airConditionerFanMode: { fanMode: attr(str()), supportedAcFanModes: attr({ type: 'array' }), availableAcFanModes: attr({ type: 'array' }) },
   airPurifierFanMode: { airPurifierFanMode: attr(str(['auto', 'sleep', 'low', 'medium', 'high', 'quiet', 'windFree', 'off'])) },
   dustSensor: { dustLevel: intAttr(0, 999, ['μg/m^3']), fineDustLevel: intAttr(0, 999, ['μg/m^3']) },
   fineDustSensor: { fineDustLevel: intAttr(0, 999, ['μg/m^3']) },
