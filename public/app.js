@@ -627,6 +627,7 @@ function renderControl(body) {
       </div>
       <div class="muted small" style="margin-top:6px">The value is parsed as JSON first (number, true, {...}); if that fails it is sent as a string.</div>
     </div>
+    <div id="pinnedPane" class="pinned-pane"></div>
     <div class="md">
       <aside class="cap-list" aria-label="Capabilities">
         <input id="capSearch" placeholder="Filter capabilities…" />
@@ -652,8 +653,6 @@ function renderControl(body) {
     if (!ev.capability || !ev.attribute) return toast('Enter a capability and an attribute', 'err');
     sendEvents([ev]);
   });
-
-  body.querySelectorAll('.attr[data-attr]').forEach(wireAttr);
 }
 
 // ---------- Capability list (left) + detail pane (right) ----------
@@ -710,10 +709,18 @@ function updateCapList() {
 function renderCapPane(body) {
   const pane = $('#capPane');
   if (!pane) return;
-  const order = [capMaster.sel, ...capMaster.entries.map((e) => e.key).filter((k) => capMaster.pins.includes(k) && k !== capMaster.sel)].filter(Boolean);
-  pane.innerHTML = order.length
-    ? order.map((k) => { const e = capMaster.entries.find((x) => x.key === k); return e ? capCard(e.comp, e.id) : ''; }).join('')
-    : '<div class="muted pad">Select a capability on the left.</div>';
+  // Starred (frequently used) capabilities are always open right under the Custom event panel, in pin order.
+  const pp = $('#pinnedPane');
+  const card = (k) => { const e = capMaster.entries.find((x) => x.key === k); return e ? capCard(e.comp, e.id) : ''; };
+  pp.innerHTML = capMaster.pins.length
+    ? `<div class="pinned-title">★ Pinned</div>${capMaster.pins.map(card).join('')}`
+    : '';
+  pp.hidden = !capMaster.pins.length;
+  const sel = capMaster.sel;
+  pane.innerHTML = sel && capMaster.pins.includes(sel)
+    ? '<div class="muted pad">This capability is pinned and shown above. Select another one to see it here.</div>'
+    : sel ? card(sel) : '<div class="muted pad">Select a capability on the left.</div>';
+  pp.querySelectorAll('.attr[data-attr]').forEach(wireAttr);
   pane.querySelectorAll('.attr[data-attr]').forEach(wireAttr);
 }
 

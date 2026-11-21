@@ -264,3 +264,6 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
 }
 .cap-group { padding: 5px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--panel-2); border-top: 1px solid var(--border); }
 .cap-group[hidden] { display: none; }
+.pinned-pane { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+.pinned-pane[hidden] { display: none; }
+.pinned-title { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
