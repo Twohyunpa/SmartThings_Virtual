@@ -73,6 +73,7 @@ npm run mock
 - The dry-run button shows the request JSON without creating anything.
 
 **State & inject**
+- A capability list on the left (with each capability's current value, a filter box and pins) and the details of the selected capability on the right; a one-line state summary sits on top. Your last selection and pins are remembered per device.
 - Shows the attributes of every component / capability with their current values.
 - Controls are generated from the capability definitions: enums become chips (click to inject immediately), numbers get a slider / input plus a unit, arrays and objects take JSON.
 - Values that have a matching `supported*` / `available*` list (e.g. `fanMode` ↔ `supportedAcFanModes` / `availableAcFanModes`) become a dropdown filled from the device's **current** list, and the lists themselves become checkboxes. The options follow the device state, so after you inject a new supported list the dropdown updates. Pick **Custom value…** (or **Edit as JSON**) to inject a value outside the list, e.g. to test how an app handles invalid input. Values outside `available*` are marked ⚠.

@@ -614,6 +614,7 @@ function renderControl(body) {
       <label class="small"><input type="checkbox" id="autoChk" ${state.autoRefresh ? 'checked' : ''}/> Auto-refresh every 5 s</label>
       <span class="muted small">Click a value chip to inject it right away, or type a value and press <b>Inject</b>. <b>＋</b> adds it as a scenario step.</span>
     </div>
+    <div class="state-summary" id="stateSummary" title="Current state at a glance"></div>
     <div class="panel custom-event">
       <h3>Custom event</h3>
       <div class="attr-ctrl">
@@ -626,12 +627,15 @@ function renderControl(body) {
       </div>
       <div class="muted small" style="margin-top:6px">The value is parsed as JSON first (number, true, {...}); if that fails it is sent as a string.</div>
     </div>
-    ${capFilterPanel(comps)}
-    <div class="cap-grid">
-      ${comps.flatMap((c) => (c.capabilities || []).map((cap) => capCard(c.id, cap.id))).join('')}
+    <div class="md">
+      <aside class="cap-list" aria-label="Capabilities">
+        <input id="capSearch" placeholder="Filter capabilities…" />
+        <div id="capItems"></div>
+      </aside>
+      <section id="capPane" class="cap-pane"></section>
     </div>`;
 
-  wireCapFilter(body, comps);
+  initCapMaster(body, comps);
   $('#reloadStatus').addEventListener('click', () => refreshStatus());
   $('#autoChk').addEventListener('change', (e) => {
     state.autoRefresh = e.target.checked;
@@ -652,70 +656,132 @@ function renderControl(body) {
   body.querySelectorAll('.attr[data-attr]').forEach(wireAttr);
 }
 
-// ---------- Capability filter (which cards to show) and collapsing ----------
+// ---------- Capability list (left) + detail pane (right) ----------
 const capKey = (comp, capId) => `${comp}/${capId}`;
-function visibleSet() { const v = store(`st.visible.${state.selectedId}`); return Array.isArray(v) ? new Set(v) : null; } // null = show all
-function collapsedSet() { return new Set(store(`st.collapsed.${state.selectedId}`) || []); }
-const isCapVisible = (comp, capId) => { const v = visibleSet(); return !v || v.has(capKey(comp, capId)); };
-const isCollapsed = (comp, capId) => collapsedSet().has(capKey(comp, capId));
+const capName = (comp, capId) => (comp === 'main' ? '' : `${comp}: `) + capId;
+const capMaster = { entries: [], sel: null, pins: [] };
 
-function capFilterPanel(comps) {
-  const all = comps.flatMap((c) => (c.capabilities || []).map((cap) => ({ comp: c.id, id: cap.id })));
-  if (all.length < 2) return '';
-  const v = visibleSet();
-  const shown = all.filter((c) => !v || v.has(capKey(c.comp, c.id))).length;
-  return `
-    <details class="panel cap-filter" open>
-      <summary><b>Capabilities</b> <span class="muted small" id="capCount">${shown} of ${all.length} shown</span></summary>
-      <div class="muted small" style="margin:6px 0">Tick the capabilities you want to work with; the others are hidden. Your choice is remembered for this device.</div>
-      <div class="cap-filter-actions">
-        <button class="btn small" id="capAll">All</button><button class="btn small" id="capNone">None</button>
-        <button class="btn small" id="capCollapse">Collapse shown</button><button class="btn small" id="capExpand">Expand shown</button>
-      </div>
-      <div class="checks cap-checks">${all.map((c) => {
-        const on = !v || v.has(capKey(c.comp, c.id));
-        return `<label class="check ${on ? 'on' : ''}"><input type="checkbox" data-key="${esc(capKey(c.comp, c.id))}" ${on ? 'checked' : ''}/>${c.comp === 'main' ? '' : `<span class="muted">${esc(c.comp)}:</span>`}${esc(c.id)}</label>`;
-      }).join('')}</div>
-    </details>`;
+// One short value for a capability: its first scalar attribute (supported*/available* lists last).
+function briefOf(comp, capId) {
+  const names = Object.keys(state.caps[capId]?.attributes || {});
+  const ordered = [...names.filter((a) => !LIST_PREFIX.test(a)), ...names.filter((a) => LIST_PREFIX.test(a))];
+  for (const pass of [0, 1]) {
+    for (const a of ordered) {
+      const v = currentAttr(comp, capId, a);
+      if (!v || v.value === null || v.value === undefined) continue;
+      const isObj = typeof v.value === 'object';
+      if (pass === 0 && isObj) continue;
+      const text = Array.isArray(v.value) ? `${v.value.length} items` : isObj ? '{…}' : String(v.value) + (v.unit ? ' ' + v.unit : '');
+      return { attr: a, text };
+    }
+  }
+  return null;
 }
 
-function wireCapFilter(body, comps) {
-  const total = comps.reduce((n, c) => n + (c.capabilities || []).length, 0);
-  const boxes = [...body.querySelectorAll('.cap-checks input[type=checkbox]')];
-  const apply = () => {
-    const on = new Set(boxes.filter((b) => b.checked).map((b) => b.dataset.key));
-    body.querySelectorAll('.cap[data-key]').forEach((card) => { card.hidden = !on.has(card.dataset.key); });
-    boxes.forEach((b) => b.closest('label').classList.toggle('on', b.checked));
-    store(`st.visible.${state.selectedId}`, on.size === total ? null : [...on]);
-    const cnt = $('#capCount'); if (cnt) cnt.textContent = `${on.size} of ${total} shown`;
-  };
-  body.querySelector('.cap-checks')?.addEventListener('change', apply);
-  $('#capAll')?.addEventListener('click', () => { boxes.forEach((b) => { b.checked = true; }); apply(); });
-  $('#capNone')?.addEventListener('click', () => { boxes.forEach((b) => { b.checked = false; }); apply(); });
-  const setCollapsed = (collapse) => {
-    body.querySelectorAll('.cap[data-key]:not([hidden])').forEach((card) => card.classList.toggle('collapsed', collapse));
-    persistCollapsed(body);
-  };
-  $('#capCollapse')?.addEventListener('click', () => setCollapsed(true));
-  $('#capExpand')?.addEventListener('click', () => setCollapsed(false));
-  // clicking a card header collapses / expands that card
-  body.querySelectorAll('.cap-head').forEach((head) => {
-    const toggle = () => { head.parentElement.classList.toggle('collapsed'); persistCollapsed(body); };
-    head.addEventListener('click', toggle);
-    head.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+function capItemHtml(e) {
+  const b = briefOf(e.comp, e.id);
+  const pinned = capMaster.pins.includes(e.key);
+  return `<div class="cap-item ${e.key === capMaster.sel ? 'sel' : ''}" data-key="${esc(e.key)}" role="button" tabindex="0" data-search="${esc(capName(e.comp, e.id).toLowerCase())}">
+      <span class="ci-name">${esc(capName(e.comp, e.id))}</span>
+      <span class="ci-val" title="${esc(b ? b.attr : '')}">${esc(b ? b.text : '')}</span>
+      <button type="button" class="pin ${pinned ? 'on' : ''}" title="${pinned ? 'Unpin' : 'Pin: keep this capability open on the right'}" aria-label="Pin">${pinned ? '★' : '☆'}</button>
+    </div>`;
+}
+
+function updateCapList() {
+  const box = $('#capItems');
+  if (!box) return;
+  capMaster.entries.forEach((e) => {
+    const item = box.querySelector(`.cap-item[data-key="${CSS.escape(e.key)}"]`);
+    if (!item) return;
+    const b = briefOf(e.comp, e.id);
+    const val = item.querySelector('.ci-val');
+    if (val.textContent !== (b ? b.text : '')) { val.textContent = b ? b.text : ''; val.title = b ? b.attr : ''; }
   });
+  const sum = $('#stateSummary');
+  if (sum) {
+    const parts = capMaster.entries.map((e) => ({ e, b: briefOf(e.comp, e.id) })).filter((x) => x.b && !/^(refresh)$/.test(x.e.id)).slice(0, 6);
+    sum.innerHTML = parts.length
+      ? parts.map(({ e, b }) => `<span class="sum-item" data-key="${esc(e.key)}" title="Open ${esc(e.id)}"><span class="muted">${esc(b.attr)}</span> <b>${esc(b.text)}</b></span>`).join('')
+      : '<span class="muted small">No state reported yet.</span>';
+  }
 }
 
-function persistCollapsed(body) {
-  store(`st.collapsed.${state.selectedId}`, [...body.querySelectorAll('.cap.collapsed')].map((c) => c.dataset.key));
+function renderCapPane(body) {
+  const pane = $('#capPane');
+  if (!pane) return;
+  const order = [capMaster.sel, ...capMaster.entries.map((e) => e.key).filter((k) => capMaster.pins.includes(k) && k !== capMaster.sel)].filter(Boolean);
+  pane.innerHTML = order.length
+    ? order.map((k) => { const e = capMaster.entries.find((x) => x.key === k); return e ? capCard(e.comp, e.id) : ''; }).join('')
+    : '<div class="muted pad">Select a capability on the left.</div>';
+  pane.querySelectorAll('.attr[data-attr]').forEach(wireAttr);
+}
+
+function initCapMaster(body, comps) {
+  const entries = comps.flatMap((c) => (c.capabilities || []).map((cap) => ({ comp: c.id, id: cap.id, key: capKey(c.id, cap.id) })));
+  const id = state.selectedId;
+  capMaster.entries = entries;
+  capMaster.pins = (store(`st.pin.${id}`) || []).filter((k) => entries.some((e) => e.key === k));
+  const saved = store(`st.sel.${id}`);
+  capMaster.sel = entries.some((e) => e.key === saved) ? saved
+    : (entries.find((e) => Object.keys(state.caps[e.id]?.attributes || {}).length && e.id !== 'refresh') || entries[0] || {}).key || null;
+
+  const box = $('#capItems');
+  const paint = () => { box.innerHTML = entries.map(capItemHtml).join(''); applySearch(); };
+  const applySearch = () => {
+    const q = ($('#capSearch').value || '').trim().toLowerCase();
+    box.querySelectorAll('.cap-item').forEach((it) => { it.hidden = !!q && !it.dataset.search.includes(q); });
+  };
+  const select = (key) => {
+    capMaster.sel = key;
+    store(`st.sel.${id}`, key);
+    box.querySelectorAll('.cap-item').forEach((it) => it.classList.toggle('sel', it.dataset.key === key));
+    renderCapPane(body);
+  };
+  paint();
+  updateCapList();
+  renderCapPane(body);
+
+  $('#capSearch').addEventListener('input', applySearch);
+  box.addEventListener('click', (ev) => {
+    const item = ev.target.closest('.cap-item');
+    if (!item) return;
+    if (ev.target.closest('.pin')) {
+      const k = item.dataset.key;
+      capMaster.pins = capMaster.pins.includes(k) ? capMaster.pins.filter((x) => x !== k) : [...capMaster.pins, k];
+      store(`st.pin.${id}`, capMaster.pins);
+      const pin = item.querySelector('.pin');
+      const on = capMaster.pins.includes(k);
+      pin.classList.toggle('on', on); pin.textContent = on ? '★' : '☆';
+      renderCapPane(body);
+      return;
+    }
+    select(item.dataset.key);
+  });
+  box.addEventListener('keydown', (ev) => {
+    const item = ev.target.closest('.cap-item');
+    if (!item || ev.target.closest('.pin')) return;
+    if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); select(item.dataset.key); }
+    if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+      ev.preventDefault();
+      const vis = [...box.querySelectorAll('.cap-item:not([hidden])')];
+      const next = vis[vis.indexOf(item) + (ev.key === 'ArrowDown' ? 1 : -1)];
+      if (next) { next.focus(); select(next.dataset.key); }
+    }
+  });
+  // clicking an entry of the summary line opens that capability
+  $('#stateSummary').addEventListener('click', (ev) => {
+    const it = ev.target.closest('.sum-item');
+    if (it) { select(it.dataset.key); box.querySelector(`.cap-item[data-key="${CSS.escape(it.dataset.key)}"]`)?.scrollIntoView({ block: 'nearest' }); }
+  });
 }
 
 function capCard(comp, capId) {
   const cap = state.caps[capId] || {};
   const attrs = Object.keys(cap.attributes || {});
   return `
-    <div class="cap ${isCollapsed(comp, capId) ? 'collapsed' : ''}" data-key="${esc(capKey(comp, capId))}" ${isCapVisible(comp, capId) ? '' : 'hidden'}>
-      <div class="cap-head" role="button" tabindex="0" title="Click to collapse / expand"><span class="chev">▾</span><b>${esc(capId)}</b><span class="comp">${esc(comp)}${cap.name && cap.name !== capId ? ' · ' + esc(cap.name) : ''}</span></div>
+    <div class="cap" data-key="${esc(capKey(comp, capId))}">
+      <div class="cap-head"><b>${esc(capId)}</b><span class="comp">${esc(comp)}${cap.name && cap.name !== capId ? ' · ' + esc(cap.name) : ''}</span></div>
       ${attrs.length ? attrs.map((a) => attrRow(comp, capId, a)).join('') : '<div class="attr-empty muted small">Capability without attributes (commands only)</div>'}
     </div>`;
 }
@@ -903,6 +969,7 @@ function updateCurrentValues(flash) {
     }
     row.querySelectorAll('.chip').forEach((c) => c.classList.toggle('current', String(cur?.value) === c.dataset.v));
   });
+  updateCapList();
 }
 
 async function sendEvents(events, { quiet = false } = {}) {
