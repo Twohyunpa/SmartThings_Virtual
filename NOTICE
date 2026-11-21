@@ -8,7 +8,7 @@ tests/components/smartthings/fixtures), which is licensed under the Apache Licen
 
 Copyright (c) Home Assistant contributors.
 
-Changes: only the component / capability lists and sample attribute values of the
+Changes: only the standard component / capability lists and sample attribute values of the
 Samsung appliance fixtures were extracted and reshaped into device profile definitions
 by tools/build-templates.py (device-specific identifiers such as device, location and
 owner ids are not included). The exact upstream commit is recorded in the

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Checks which capabilities used by the templates your SmartThings account can actually see.
+// Checks that every capability used by the templates is visible to your SmartThings account.
 // Usage: npm run check-capabilities   (uses the same CLI / profile / SMARTTHINGS_TOKEN as the GUI)
-// A capability that this lists as "not found" cannot be used in a virtual device profile for your account.
+// Any capability listed as MISSING cannot be used in a virtual device profile for your account.
 'use strict';
 const { spawnSync } = require('child_process');
 const path = require('path');
@@ -19,7 +19,7 @@ const data = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'templates', 
 
 const caps = new Map();
 for (const t of data.templates) {
-  for (const c of t.deviceProfileFull.components) for (const x of c.capabilities) caps.set(`${x.id}@${x.version || 1}`, x);
+  for (const c of t.deviceProfile.components) for (const x of c.capabilities) caps.set(`${x.id}@${x.version || 1}`, x);
 }
 const list = [...caps.values()].sort((a, b) => a.id.localeCompare(b.id));
 console.log(`CLI ${ver || '(not found)'} - checking ${list.length} capabilities...\n`);

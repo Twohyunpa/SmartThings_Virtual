@@ -67,7 +67,7 @@ npm run mock
 ## Features
 
 **Create virtual devices**
-- Samsung appliance templates: 38 real models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, cooktops, range hoods, TVs, soundbars ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
+- Samsung appliance templates: 35 real models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, a cooktop, a range hood, a TV, a soundbar ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
 - Standard prototypes such as `VIRTUAL_SWITCH` and `VIRTUAL_MOTION_SENSOR` (17 in total, `virtualdevices:create-standard`).
 - Create from one of your own device profile IDs, or paste a profile JSON (`virtualdevices:create`).
 - The dry-run button shows the request JSON without creating anything.
@@ -89,12 +89,7 @@ npm run mock
 
 The templates are not hand-picked. They are generated from the SmartThings test fixtures of [Home Assistant](https://github.com/home-assistant/core) (`tests/components/smartthings/fixtures`, Apache-2.0, see [NOTICE](NOTICE)), which are dumps of real Samsung appliances. `tools/build-templates.py` extracts each model's components, capabilities and sample attribute values; the upstream commit is recorded in `templates/samsung-appliances.json`.
 
-Each template has two profiles:
-
-- **Standard capabilities only** (default): `switch`, `washerOperatingState`, `ovenMode`, `temperatureMeasurement` ... These are public SmartThings capabilities and work for any virtual device.
-- **Full**: additionally includes the Samsung-specific capabilities the real device has (`custom.*`, `samsungce.*`, `hca.*`). Whether SmartThings accepts these in a virtual device profile depends on your account, and I could not verify it, so it is opt-in. If creation fails, use the standard profile. Run `npm run check-capabilities` to list which capabilities your account can see.
-
-Plumbing capabilities of the real devices' cloud connection (`ocf`, `execute`, `logTrigger`, `demandResponseLoadControl`, `sec.*`) are always left out. After creating a device, **Load sample state** injects the values recorded from the real appliance. To regenerate the templates from a newer Home Assistant checkout, see the header of `tools/build-templates.py`.
+Only **standard SmartThings capabilities** (`switch`, `washerOperatingState`, `ovenMode`, `temperatureMeasurement` ...) are used, because they work for any virtual device. The Samsung-specific capabilities that the real devices also have (`custom.*`, `samsungce.*`, `hca.*`, `sec.*`) and the OCF/cloud plumbing ones (`ocf`, `execute`, `logTrigger`, `demandResponseLoadControl`) are deliberately left out, and models that end up with fewer than 4 standard capabilities are skipped. After creating a device, **Load sample state** injects the values recorded from the real appliance. To regenerate the templates from a newer Home Assistant checkout, see the header of `tools/build-templates.py`. `npm run check-capabilities` verifies that your account can see every capability the templates use.
 
 ## CLI commands used
 
