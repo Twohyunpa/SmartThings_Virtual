@@ -53,6 +53,12 @@ To try the UI without a SmartThings account, run it against the built-in mock CL
 npm run mock
 ```
 
+Run the automated tests (uses the mock CLI, no account needed):
+
+```bash
+npm test
+```
+
 ### Environment variables
 
 | Variable | Default | Description |
@@ -63,6 +69,7 @@ npm run mock
 | `SMARTTHINGS_TOKEN` | – | PAT. Skips the browser login |
 | `ST_NO_OPEN` | – | If set, do not open the browser on start (same as `--no-open`) |
 | `ST_CLI_TIMEOUT_MS` | `120000` | Maximum run time of a single CLI command |
+| `ST_CLI_CONCURRENCY` | `5` | Maximum number of CLI commands run at the same time |
 
 ## Features
 

@@ -53,6 +53,12 @@ SmartThings 계정 없이 UI만 먼저 보고 싶으면 모의 CLI로 실행하�
 npm run mock
 ```
 
+자동 테스트 실행 (가짜 CLI 사용, 계정 필요 없음):
+
+```bash
+npm test
+```
+
 ### 환경변수
 
 | 변수 | 기본값 | 설명 |
@@ -63,6 +69,7 @@ npm run mock
 | `SMARTTHINGS_TOKEN` | – | PAT. 지정하면 브라우저 로그인 없이 사용 |
 | `ST_NO_OPEN` | – | 값이 있으면 시작할 때 브라우저를 자동으로 열지 않음 (`--no-open` 인자도 동일) |
 | `ST_CLI_TIMEOUT_MS` | `120000` | CLI 명령 하나의 최대 실행 시간 |
+| `ST_CLI_CONCURRENCY` | `5` | 동시에 실행하는 CLI 명령 최대 개수 |
 
 ## 기능
 

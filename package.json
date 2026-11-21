@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node server.js",
     "mock": "node server.js --mock",
+    "test": "node --test",
     "check-capabilities": "node tools/check-capabilities.js"
   },
   "engines": {
