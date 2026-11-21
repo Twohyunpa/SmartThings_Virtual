@@ -3,7 +3,7 @@
 
 The fixtures (tests/components/smartthings/fixtures in https://github.com/home-assistant/core,
 Apache-2.0) are real device dumps from Samsung appliances: component / capability lists and
-attribute values. We keep only the capability lists and sample attribute values.
+attribute values. We keep only the standard capability lists and their sample attribute values.
 
 Usage:
   git clone --depth 1 --filter=blob:none --sparse https://github.com/home-assistant/core ha-core
@@ -16,9 +16,11 @@ ha = sys.argv[1] if len(sys.argv) > 1 else 'ha-core'
 fx = os.path.join(ha, 'tests/components/smartthings/fixtures')
 commit = subprocess.run(['git', '-C', ha, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
 
-# Plumbing capabilities of the OCF/cloud connection; meaningless on a virtual device.
-PLUMBING = {'ocf', 'execute', 'logTrigger', 'demandResponseLoadControl',
-            'sec.wifiConfiguration', 'sec.smartthingsHub', 'sec.diagnosticsInformation'}
+# Only standard (namespace-less) capabilities are kept: Samsung-specific ones (custom.*, samsungce.*,
+# hca.*, sec.* ...) are left out on purpose, and so are OCF/cloud plumbing capabilities that mean
+# nothing on a virtual device.
+PLUMBING = {'ocf', 'execute', 'logTrigger', 'demandResponseLoadControl'}
+MIN_CAPABILITIES = 4  # skip models that end up with too few standard capabilities to be useful
 MAX_ATTR_BYTES = 4000  # drop huge attribute values (e.g. cycle tables) from the sample state
 
 # fixture -> (display name, icon)
@@ -53,17 +55,16 @@ out = []
 for fixture, (name, icon) in MODELS.items():
     dev = json.load(open(f'{fx}/devices/{fixture}.json'))['items'][0]
     status = json.load(open(f'{fx}/device_status/{fixture}.json'))['components']
-    comps_all, comps_std, sample = [], [], {}
+    comps, sample, skipped = [], {}, 0
     for c in dev['components']:
         caps = [x for x in c['capabilities'] if x['id'] not in PLUMBING]
-        cat = [{'name': k['name']} for k in c.get('categories', [])][:1]
-        mk = lambda cs: {'id': c['id'], 'capabilities': [{'id': x['id'], 'version': x.get('version', 1)} for x in cs],
-                         **({'categories': cat} if cat else {})}
-        comps_all.append(mk(caps))
         std = [x for x in caps if standard(x['id'])]
+        skipped += len(caps) - len(std)
+        cat = [{'name': k['name']} for k in c.get('categories', [])][:1]
         if std:
-            comps_std.append(mk(std))
-        for x in caps:
+            comps.append({'id': c['id'], 'capabilities': [{'id': x['id'], 'version': x.get('version', 1)} for x in std],
+                          **({'categories': cat} if cat else {})})
+        for x in std:
             attrs = status.get(c['id'], {}).get(x['id'], {})
             keep = {}
             for a, v in attrs.items():
@@ -74,14 +75,15 @@ for fixture, (name, icon) in MODELS.items():
                 keep[a] = {'value': v['value'], **({'unit': v['unit']} if v.get('unit') else {})}
             if keep:
                 sample.setdefault(c['id'], {})[x['id']] = keep
-    n_all = sum(len(c['capabilities']) for c in comps_all)
-    n_std = sum(len(c['capabilities']) for c in comps_std)
+    n_std = sum(len(c['capabilities']) for c in comps)
+    if n_std < MIN_CAPABILITIES:
+        print('skip', fixture, n_std, 'standard capabilities')
+        continue
     out.append({
         'id': fixture, 'name': name, 'icon': icon,
-        'description': f"{dev.get('deviceTypeName')} · {dev.get('presentationId')} · {n_std} standard + {n_all - n_std} Samsung-specific capabilities",
+        'description': f"{dev.get('deviceTypeName')} · {dev.get('presentationId')} · {n_std} standard capabilities",
         'source': {'fixture': fixture, 'presentationId': dev.get('presentationId'), 'deviceTypeName': dev.get('deviceTypeName')},
-        'deviceProfile': {'name': f'Virtual {name}'[:40], 'components': comps_std},
-        'deviceProfileFull': {'name': f'Virtual {name} (full)'[:40], 'components': comps_all},
+        'deviceProfile': {'name': f'Virtual {name}'[:40], 'components': comps},
         'sampleState': sample,
     })
 

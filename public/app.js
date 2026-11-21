@@ -279,20 +279,16 @@ function renderModeArea() {
   if (m === 'template') {
     if (!createState.templateId && state.templates[0]) createState.templateId = state.templates[0].id;
     const t = state.templates.find((x) => x.id === createState.templateId);
-    const full = !!createState.full;
-    const profile = t ? (full && t.deviceProfileFull ? t.deviceProfileFull : t.deviceProfile) : null;
+    const profile = t ? t.deviceProfile : null;
     const src = state.templatesMeta;
     area.innerHTML = `
       <div class="muted small" style="margin-bottom:8px">Capability lists and sample values come from real Samsung appliances
-        (<a href="${esc(src?.repository || '#')}" target="_blank" rel="noopener">Home Assistant SmartThings test fixtures</a>, ${esc(src?.license || '')}).</div>
+        (<a href="${esc(src?.repository || '#')}" target="_blank" rel="noopener">Home Assistant SmartThings test fixtures</a>, ${esc(src?.license || '')}). Only standard SmartThings capabilities are used; Samsung-specific ones (<code>samsungce.*</code>, <code>custom.*</code> …) are left out.</div>
       <input id="tplFilter" placeholder="Filter templates (e.g. washer, oven, tv)" style="width:100%;margin-bottom:8px" />
       <div class="tpl-grid">${state.templates.map((x) => `
         <button class="tpl ${x.id === createState.templateId ? 'active' : ''}" data-id="${esc(x.id)}" data-search="${esc((x.name + ' ' + x.description).toLowerCase())}">
           <span class="ic">${esc(x.icon || '▢')}</span><span class="nm">${esc(x.name)}</span><span class="ds">${esc(x.description)}</span>
         </button>`).join('')}</div>
-      <label class="small" style="display:block;margin:4px 0"><input type="checkbox" id="tplFull" ${full ? 'checked' : ''}/>
-        Include Samsung-specific capabilities (<code>custom.*</code>, <code>samsungce.*</code>, <code>hca.*</code> …).
-        <span class="muted">These are what the real device has, but SmartThings may reject them for virtual devices. If creation fails, untick this.</span></label>
       <label class="small" style="display:block;margin:4px 0"><input type="checkbox" id="tplSample" ${createState.sample === false ? '' : 'checked'}/>
         Load the real device's sample state after creating</label>
       ${profile ? `<details><summary class="muted small">View / edit the profile definition (add or remove capabilities)</summary>
@@ -306,7 +302,6 @@ function renderModeArea() {
     };
     $('#tplFilter').addEventListener('input', applyFilter);
     applyFilter();
-    $('#tplFull').addEventListener('change', (e) => { createState.full = e.target.checked; renderModeArea(); });
     $('#tplSample').addEventListener('change', (e) => { createState.sample = e.target.checked; });
     area.querySelectorAll('.tpl').forEach((b) => b.addEventListener('click', () => {
       createState.templateId = b.dataset.id;
@@ -353,7 +348,7 @@ async function submitCreate(dryRun) {
       else {
         const txt = $('#tplJson')?.value;
         url = '/api/devices/profile';
-        body = { name, locationId, roomId, deviceProfile: txt ? JSON.parse(txt) : (createState.full && t.deviceProfileFull ? t.deviceProfileFull : t.deviceProfile) };
+        body = { name, locationId, roomId, deviceProfile: txt ? JSON.parse(txt) : t.deviceProfile };
         tplUsed = t;
       }
     } else if (m === 'standard') {
