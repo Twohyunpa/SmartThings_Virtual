@@ -10,6 +10,7 @@ A local GUI that wraps the [SmartThings CLI](https://github.com/SmartThingsCommu
 - The server listens on `127.0.0.1` only and rejects requests from other origins.
 - Every CLI command the UI runs is shown in the **CLI command log** at the bottom, so you can copy it into your own scripts.
 - Write operations (inject events, rename, delete) are only allowed on virtual devices.
+- Runs on macOS, Windows and Linux.
 
 ## Quick start
 
@@ -37,7 +38,7 @@ Run:
 
 ```bash
 # run without installing anything
-npx github:Twohyunpa/SmartThings_Virtual
+npx --yes github:Twohyunpa/SmartThings_Virtual
 
 # or clone and run (Windows / macOS / Linux)
 git clone https://github.com/Twohyunpa/SmartThings_Virtual.git
@@ -74,17 +75,25 @@ npm test
 ## Features
 
 **Create virtual devices**
+
+The **New virtual device** panel has four tabs, and each tab shows a short explanation of what it does and when to use it.
+
 - Appliance templates: 35 real models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, a cooktop, a range hood, a TV, a soundbar ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
 - Standard prototypes such as `VIRTUAL_SWITCH` and `VIRTUAL_MOTION_SENSOR` (17 in total, `virtualdevices:create-standard`).
 - Create from one of your own device profile IDs, or paste a profile JSON (`virtualdevices:create`).
 - The dry-run button shows the request JSON without creating anything.
 
 **State & inject**
-- A capability list on the left (with each capability's current value, a filter box and pins) and the details of the selected capability on the right; a one-line state summary sits on top. Your last selection and pins are remembered per device.
+- Two-pane layout: a capability list on the left (each entry shows its current value, with a filter box) and the details of the selected capability on the right.
+- A one-line **state summary** bar sits on top; click an item to jump to that capability.
+- **Custom event** (component / capability / attribute / value / unit) is always at the top of the right pane.
+- Star (☆/★) the capabilities you use often. Pinned capabilities move to a *Pinned* group at the top of the list and stay open right under Custom event, in pin order. Your last selection and pins are remembered per device.
 - Shows the attributes of every component / capability with their current values.
 - Controls are generated from the capability definitions: enums become chips (click to inject immediately), numbers get a slider / input plus a unit, arrays and objects take JSON.
 - Values that have a matching `supported*` / `available*` list (e.g. `fanMode` ↔ `supportedAcFanModes` / `availableAcFanModes`) become a dropdown filled from the device's **current** list, and the lists themselves become checkboxes. The options follow the device state, so after you inject a new supported list the dropdown updates. Pick **Custom value…** (or **Edit as JSON**) to inject a value outside the list, e.g. to test how an app handles invalid input. Values outside `available*` are marked ⚠.
-- Optional 5-second auto-refresh, and a custom event form (component / capability / attribute / value / unit).
+- `supported*` / `available*` lists are edited as a checkbox list: tick or untick values, type a new one and press **Enter** or click **Add**, then **Inject**. A value still in the text box is included when you inject.
+- An **ⓘ** button next to every `supported*` / `available*` attribute explains the difference: `supported*` is what the device model can ever do, `available*` is what can be chosen right now, a subset that changes with the current mode. Tip: inject a shorter `available*` list to check that your app hides or blocks the rest.
+- Optional 5-second auto-refresh.
 
 **Presets & scenarios**
 - Template presets (e.g. start wash → rinse → spin → finished) appear automatically when they match the device's capabilities.
@@ -92,6 +101,8 @@ npm test
 - Scenarios are stored in your browser (localStorage) and can be imported / exported as JSON.
 
 **Also**: rename, delete, raw JSON view (`devices`, `devices:status`), and the CLI command log (click an entry to copy it).
+
+**Error handling**: when a CLI command fails, the error is shown in the UI with a clearer message and also printed to the terminal (`[cli failed] ...`). The server keeps running after unexpected errors, and tells you if port 3700 is already in use (start on another port with `PORT=3800 npm start`).
 
 ## Where the templates come from
 
