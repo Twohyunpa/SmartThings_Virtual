@@ -15,6 +15,7 @@ export const state = {
   autoTimer: null,
   draft: [],          // steps of the scenario being edited
   activeRun: null,    // { deviceId, stop: boolean } for any running scenario
+  account: null,      // result of GET /api/account
 };
 
 // Shared view action hooks populated by main.js to avoid circular imports.
@@ -24,6 +25,9 @@ export const actions = {
   selectDevice: async () => {},
   refreshStatus: async () => {},
   renderTabBody: () => {},
+  onSignedOut: () => {},
+  onSigningIn: () => {},
+  onSignedIn: () => {},
 };
 
 export const PROTOTYPES = [

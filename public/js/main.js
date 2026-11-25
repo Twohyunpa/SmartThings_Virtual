@@ -7,6 +7,7 @@ import { $, esc, api, toast, refreshLog } from './api.js';
 import { renderCreate, applySampleState } from './views/create.js';
 import { renderControl, updateCurrentValues } from './views/control.js';
 import { renderScenario } from './views/scenario.js';
+import { initAccountMenu, loadAccount, signIn, isSigningIn } from './views/account.js';
 
 // ================= Top bar / log =================
 async function loadInfo() {
@@ -50,7 +51,7 @@ $('#profileApply').addEventListener('click', async () => {
     stopActiveRun();
     clearCapDefs();
     toast(`Switched to profile "${profile}"`, 'ok');
-    await Promise.all([loadLocations(), loadDevices()]);
+    await loadAccountAndData();
   } catch (e) { toast(e.message, 'err'); }
 });
 
@@ -70,6 +71,7 @@ async function loadLocations() {
 }
 
 async function loadDevices() {
+  if (!state.account?.signedIn || isSigningIn()) return renderSignedOut();
   const list = $('#deviceList');
   list.innerHTML = '<div class="muted pad"><span class="spinner"></span> Loading…</div>';
   const loc = $('#locationFilter').value;
@@ -107,6 +109,7 @@ $('#deviceList').addEventListener('click', (e) => {
 $('#refreshDevices').addEventListener('click', loadDevices);
 $('#locationFilter').addEventListener('change', loadDevices);
 $('#newDeviceBtn').addEventListener('click', () => {
+  if (!state.account?.signedIn) { toast('Sign in to a SmartThings account first (account menu, top right).', 'err'); return; }
   stopAuto();
   stopActiveRun();
   state.selectedId = null;
@@ -246,6 +249,50 @@ async function deleteDevice() {
   } catch (e) { toast(`Delete failed\n${e.message}`, 'err'); }
 }
 
+// ================= Account changes =================
+function clearAccountData() {
+  stopAuto();
+  stopActiveRun();
+  clearCapDefs();
+  state.selectedId = null;
+  state.device = null;
+  state.status = null;
+  state.devices = [];
+  state.locations = [];
+  $('#locationFilter').innerHTML = '<option value="">All locations</option>';
+  $('#main').innerHTML = '';
+  $('#main').appendChild($('#welcomeTpl').content.cloneNode(true));
+}
+
+function renderSignedOut() {
+  const list = $('#deviceList');
+  if (isSigningIn()) {
+    list.innerHTML = '<div class="signed-out muted"><span class="spinner"></span><p>Finish signing in in the browser window the CLI opened.</p></div>';
+    return;
+  }
+  list.innerHTML = `<div class="signed-out">
+      <b>Not signed in</b>
+      <p class="muted small">Sign in to a SmartThings account to see and create virtual devices.</p>
+      <button class="btn primary small" id="sideSignIn">Sign in</button>
+    </div>`;
+  $('#sideSignIn').addEventListener('click', () => signIn());
+}
+
+async function loadAccountAndData() {
+  const acct = await loadAccount();
+  if (acct?.signedIn) {
+    await loadLocations();
+    await loadDevices();
+  } else {
+    clearAccountData();
+    renderSignedOut();
+  }
+}
+
+actions.onSignedOut = () => { clearAccountData(); renderSignedOut(); };
+actions.onSigningIn = () => { clearAccountData(); renderSignedOut(); };
+actions.onSignedIn = async () => { clearAccountData(); await loadLocations(); await loadDevices(); };
+
 // Wire shared view hooks
 actions.loadDevices = loadDevices;
 actions.loadTemplates = loadTemplates;
@@ -256,9 +303,9 @@ actions.renderTabBody = renderTabBody;
 // ================= Start =================
 (async function init() {
   $('#main').appendChild($('#welcomeTpl').content.cloneNode(true));
+  initAccountMenu();
   await loadInfo();
   refreshLog();
   loadTemplates();
-  await loadLocations();
-  await loadDevices();
+  await loadAccountAndData();
 })();

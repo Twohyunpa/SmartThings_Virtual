@@ -10,6 +10,12 @@ const crypto = require('crypto');
 
 const STATE_FILE = process.env.ST_MOCK_STATE || path.join(os.tmpdir(), 'st-mock-state.json');
 const LOC = '6f3a2c1e-0000-4000-8000-000000000001';
+// Two fake accounts so "Switch account" can be tried without SmartThings. Logging out and running any
+// command again "logs in" to the other account (after a short pause that stands in for the browser login).
+const ACCOUNTS = [
+  { org: 'Mock Developer A (mock)', locations: [{ locationId: LOC, name: 'Mock Home (mock)' }] },
+  { org: 'Mock Developer B (mock)', locations: [{ locationId: '6f3a2c1e-0000-4000-8000-000000000002', name: 'Mock Office (mock)' }] },
+];
 
 const str = (e) => ({ type: 'string', ...(e ? { enum: e } : {}) });
 const num = (min, max, units, def) => ({ value: { type: 'number', ...(min !== undefined ? { minimum: min } : {}), ...(max !== undefined ? { maximum: max } : {}) }, unit: units ? { type: 'string', enum: units, default: def || units[0] } : undefined });
@@ -97,6 +103,23 @@ const readInput = () => JSON.parse(fs.readFileSync(flags.input, 'utf8'));
 if (flags.version && !cmd) { console.log('3.0.1-mock'); process.exit(0); }
 
 const s = load();
+s.auth = s.auth || { loggedIn: true, account: 0 };
+
+if (cmd === '__mock-auth') { out({ loggedIn: s.auth.loggedIn }); process.exit(0); }
+if (cmd === 'logout') {
+  s.auth.loggedIn = false;
+  save(s); console.log('logged out');
+  process.exit(0);
+}
+if (!s.auth.loggedIn) {
+  // simulate the browser login: the next account signs in
+  const until = Date.now() + Number(process.env.ST_MOCK_LOGIN_MS || 1500);
+  while (Date.now() < until) { /* wait */ }
+  s.auth = { loggedIn: true, account: (s.auth.account + 1) % ACCOUNTS.length };
+  save(s);
+}
+const account = ACCOUNTS[s.auth.account] || ACCOUNTS[0];
+const accountLocs = new Set(account.locations.map((l) => l.locationId));
 const getDev = (id) => s.devices[id] || fail(`device ${id} not found`);
 
 function makeDevice(name, owner, roomId, components, typeName) {
@@ -118,7 +141,10 @@ function makeDevice(name, owner, roomId, components, typeName) {
 
 switch (cmd) {
   case 'locations':
-    out([{ locationId: LOC, name: 'Mock Home (mock)' }]);
+    out(account.locations);
+    break;
+  case 'organizations':
+    out([{ organizationId: '6f3a2c1e-0000-4000-8000-0000000000c' + s.auth.account, name: account.org, label: account.org, isDefaultUserOrg: true }]);
     break;
   case 'locations:rooms':
     out([{ roomId: '6f3a2c1e-0000-4000-8000-0000000000a1', locationId: LOC, name: 'Living Room' }, { roomId: '6f3a2c1e-0000-4000-8000-0000000000a2', locationId: LOC, name: 'Utility Room' }]);
@@ -127,7 +153,7 @@ switch (cmd) {
     out([{ id: '6f3a2c1e-0000-4000-8000-0000000000f1', name: 'Mock Washer Profile', status: 'PUBLISHED' }]);
     break;
   case 'virtualdevices':
-    out(Object.values(s.devices).map((d) => d.dev).filter((d) => !flags.location || d.locationId === flags.location));
+    out(Object.values(s.devices).map((d) => d.dev).filter((d) => accountLocs.has(d.locationId) && (!flags.location || d.locationId === flags.location)));
     break;
   case 'devices':
     out(getDev(pos[0]).dev);
