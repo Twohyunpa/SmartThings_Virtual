@@ -267,3 +267,11 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
 .pinned-pane { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
 .pinned-pane[hidden] { display: none; }
 .pinned-title { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+
+/* Matter device templates */
+.badge.matter { font-size: 10.5px; padding: 1px 6px; margin-left: 4px; vertical-align: middle; background: var(--accent-weak); color: var(--accent); border-color: transparent; }
+.tpl .matter-ver { float: right; font-size: 10.5px; padding: 1px 6px; }
+.matter-detail { border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; margin-bottom: 8px; background: var(--panel-2); }
+.map-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
+.map-table th, .map-table td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+.map-table th { color: var(--muted); font-weight: 600; }

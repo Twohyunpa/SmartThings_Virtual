@@ -15,10 +15,11 @@ const run = (args) => (CLI.endsWith('.js')
 
 const ver = (run(['--version']).stdout || '').trim();
 const major = Number((ver.match(/(\d+)\.\d+\.\d+/) || [])[1]);
-const data = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'templates', 'samsung-appliances.json'), 'utf8'));
+const readTemplates = (file) => JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'templates', file), 'utf8')).templates;
+const templates = [...readTemplates('samsung-appliances.json'), ...readTemplates('matter-devices.json')];
 
 const caps = new Map();
-for (const t of data.templates) {
+for (const t of templates) {
   for (const c of t.deviceProfile.components) for (const x of c.capabilities) caps.set(`${x.id}@${x.version || 1}`, x);
 }
 const list = [...caps.values()].sort((a, b) => a.id.localeCompare(b.id));
@@ -33,4 +34,8 @@ for (const c of list) {
   console.log(`${ok ? 'ok     ' : 'MISSING'} ${c.id}`);
 }
 console.log(`\n${list.length - missing.length} found, ${missing.length} not visible to this account.`);
-if (missing.length) console.log('Not visible:\n  ' + missing.join('\n  '));
+if (missing.length) {
+  console.log('Not visible:\n  ' + missing.join('\n  '));
+  const affected = templates.filter((t) => t.deviceProfile.components.some((c) => c.capabilities.some((x) => missing.includes(x.id))));
+  console.log('\nTemplates that use them (remove the capability in the profile JSON before creating):\n  ' + affected.map((t) => t.name).join('\n  '));
+}
