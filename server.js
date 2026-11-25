@@ -56,7 +56,7 @@ function quoteForWindowsShell(arg) {
   return /^[\w@%+=:,./\\-]+$/.test(arg) ? arg : `"${String(arg).replace(/"/g, '""')}"`;
 }
 
-async function runCli(args, { json = true, api = true, input, inputFile } = {}) {
+async function runCli(args, { json = true, api = true, input, inputFile, timeoutMs = CLI_TIMEOUT_MS } = {}) {
   const fullArgs = [...args];
   if (json) fullArgs.push('--json');
   if (api && currentProfile && currentProfile !== 'default') fullArgs.push('--profile', currentProfile);
@@ -99,7 +99,7 @@ async function runCli(args, { json = true, api = true, input, inputFile } = {}) 
       pushLog(entry);
       return finish({ ok: false, error: err.message, command: display });
     }
-    const timer = setTimeout(() => child.kill('SIGTERM'), CLI_TIMEOUT_MS);
+    const timer = setTimeout(() => child.kill('SIGTERM'), timeoutMs);
     child.stdout.on('data', (d) => (stdout += d));
     child.stderr.on('data', (d) => (stderr += d));
     child.on('error', (err) => {
@@ -301,6 +301,143 @@ async function assertVirtual(id) {
   if (epoch === profileEpoch) verifiedVirtual.add(id);
 }
 
+
+// ---------- Account (which SmartThings login the CLI is using) ----------
+// The app has no login of its own: it uses whatever the CLI has stored. The CLI keeps browser-login
+// tokens in credentials.json. We only check whether an entry exists for the profile; tokens are never read out.
+//   CLI 2.x/3.x (env-paths data dir), key "<profile>:api.smartthings.com"
+//     macOS   ~/Library/Application Support/@smartthings/cli/credentials.json
+//     Windows %LOCALAPPDATA%\@smartthings\cli\Data\credentials.json
+//     Linux   ~/.local/share/@smartthings/cli/credentials.json
+//   CLI 1.x (oclif config dir), key "<profile>"
+//     macOS/Linux ~/.config/@smartthings/cli/credentials.json, Windows %LOCALAPPDATA%\@smartthings\cli\credentials.json
+const LOGIN_TIMEOUT_MS = 11 * 60 * 1000; // the CLI waits up to 10 minutes for the browser login
+
+function cliDirs() {
+  const home = os.homedir();
+  const env = process.env;
+  const name = path.join('@smartthings', 'cli');
+  let dataDir;
+  let configDir;
+  if (process.platform === 'darwin') {
+    dataDir = path.join(home, 'Library', 'Application Support', name);
+    configDir = path.join(home, 'Library', 'Preferences', name);
+  } else if (process.platform === 'win32') {
+    const local = env.LOCALAPPDATA || path.join(home, 'AppData', 'Local');
+    const roaming = env.APPDATA || path.join(home, 'AppData', 'Roaming');
+    dataDir = path.join(local, name, 'Data');
+    configDir = path.join(roaming, name, 'Config');
+  } else {
+    dataDir = path.join(env.XDG_DATA_HOME || path.join(home, '.local', 'share'), name);
+    configDir = path.join(env.XDG_CONFIG_HOME || path.join(home, '.config'), name);
+  }
+  const oldBase = env.XDG_CONFIG_HOME || (process.platform === 'win32' && env.LOCALAPPDATA) || path.join(home, '.config');
+  const oldConfigDir = path.join(oldBase, name);
+  if (env.ST_CLI_DATA_DIR) dataDir = env.ST_CLI_DATA_DIR; // for tests / unusual setups
+  if (env.ST_CLI_CONFIG_DIR) configDir = env.ST_CLI_CONFIG_DIR;
+  return { dataDir, configDir, oldConfigDir };
+}
+
+function readJsonFile(file) {
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
+}
+
+// Best-effort check for `token:` under the profile in config.yaml (a profile set up with a PAT).
+function profileHasToken(configFile, profile) {
+  let text;
+  try { text = fs.readFileSync(configFile, 'utf8'); } catch { return false; }
+  const lines = text.split(/\r?\n/);
+  const start = lines.findIndex((l) => l.replace(/["']/g, '').trimEnd() === `${profile}:`);
+  if (start < 0) return false;
+  for (let i = start + 1; i < lines.length; i++) {
+    const l = lines[i];
+    if (!l.trim() || l.trim().startsWith('#')) continue;
+    if (!/^\s/.test(l)) break; // next top-level key
+    if (/^\s+["']?token["']?\s*:\s*\S/.test(l)) return true;
+  }
+  return false;
+}
+
+function findStoredLogin(profile) {
+  const { dataDir, configDir, oldConfigDir } = cliDirs();
+  const candidates = cliMajor === 1
+    ? [{ file: path.join(oldConfigDir, 'credentials.json'), keys: [profile] }]
+    : [
+      { file: path.join(dataDir, 'credentials.json'), keys: [`${profile}:`] },
+      // CLI 3.x copies the old file over on first run, so the old location only matters before that
+      { file: path.join(oldConfigDir, 'credentials.json'), keys: [profile] },
+    ];
+  for (const c of candidates) {
+    const data = readJsonFile(c.file);
+    if (!data || typeof data !== 'object') continue;
+    const key = Object.keys(data).find((k) => c.keys.some((want) => (want.endsWith(':') ? k.startsWith(want) : k === want)));
+    if (key) return { file: c.file, expires: data[key]?.expires || null };
+  }
+  const configFile = cliMajor === 1 ? path.join(oldConfigDir, 'config.yaml') : path.join(configDir, 'config.yaml');
+  return { file: path.join(cliMajor === 1 ? oldConfigDir : dataDir, 'credentials.json'), missing: true, profileToken: profileHasToken(configFile, profile) };
+}
+
+// auth: "env-token" (SMARTTHINGS_TOKEN), "profile-token" (token in config.yaml), "login" (browser login stored), "none"
+async function authState() {
+  await detectCli();
+  if (process.env.SMARTTHINGS_TOKEN) return { auth: 'env-token' };
+  if (USE_MOCK) {
+    const r = await runCli(['__mock-auth'], { api: true });
+    return { auth: r.ok && r.data?.loggedIn ? 'login' : 'none', credentialsFile: '(mock)' };
+  }
+  const found = findStoredLogin(currentProfile);
+  if (!found.missing) return { auth: 'login', credentialsFile: found.file };
+  if (found.profileToken) return { auth: 'profile-token' };
+  return { auth: 'none', credentialsFile: found.file };
+}
+
+// SmartThings has no public "who am I" endpoint, so the account is described by its default
+// organization and its locations. Only called when credentials exist, so it never pops up a login window.
+async function accountDetails() {
+  const [orgs, locs] = await Promise.all([runCli(['organizations']), runCli(['locations'])]);
+  const orgList = orgs.ok && Array.isArray(orgs.data) ? orgs.data : [];
+  const org = orgList.find((o) => o.isDefaultUserOrg) || orgList[0];
+  return {
+    organization: org ? { name: org.label || org.name, id: org.organizationId } : null,
+    locations: locs.ok && Array.isArray(locs.data) ? locs.data.map((l) => ({ id: l.locationId, name: l.name })) : [],
+    error: locs.ok ? undefined : locs.error,
+  };
+}
+
+async function accountInfo() {
+  const st = await authState();
+  const out = { profile: currentProfile, ...st, signedIn: st.auth !== 'none' };
+  if (out.signedIn) Object.assign(out, await accountDetails());
+  return out;
+}
+
+function resetProfileCaches() {
+  profileEpoch++;
+  capabilityCache.clear();
+  capabilityInflight.clear();
+  verifiedVirtual.clear();
+}
+
+let loginInflight = null;
+function login() {
+  // Any API command makes the CLI open its browser login when no credentials are stored.
+  if (!loginInflight) {
+    loginInflight = runCli(['locations'], { timeoutMs: LOGIN_TIMEOUT_MS }).finally(() => { loginInflight = null; });
+  }
+  return loginInflight;
+}
+
+async function logout() {
+  const st = await authState();
+  if (st.auth === 'env-token') throw httpError(409, 'Signed in with the SMARTTHINGS_TOKEN environment variable. Unset it and restart the app to use a different account.');
+  if (st.auth === 'profile-token') throw httpError(409, `Profile "${currentProfile}" uses a token from the CLI config.yaml. Remove it there, or switch to another profile.`);
+  const r = await runCli(['logout'], { json: false });
+  if (!r.ok) throw httpError(502, r.error);
+  if (/PAT|bearer token/i.test(String(r.data))) throw httpError(409, String(r.data).trim());
+  resetProfileCaches();
+  return { status: 200, body: { ok: true } };
+}
+
 const routes = [
   ['GET', /^\/api\/info$/, async () => {
     const info = await detectCli(true);
@@ -310,11 +447,16 @@ const routes = [
     const { profile } = await readBody(req);
     if (!profile || !SAFE_ID.test(profile)) throw httpError(400, 'Invalid profile name');
     currentProfile = profile;
-    profileEpoch++;
-    capabilityCache.clear();
-    capabilityInflight.clear();
-    verifiedVirtual.clear();
+    resetProfileCaches();
     return { status: 200, body: { profile } };
+  }],
+  ['GET', /^\/api\/account$/, async () => ({ status: 200, body: { data: await accountInfo() } })],
+  ['POST', /^\/api\/account\/logout$/, async () => logout()],
+  ['POST', /^\/api\/account\/login$/, async () => {
+    const r = await login();
+    if (!r.ok) throw httpError(502, `Sign-in did not finish: ${r.error}`);
+    resetProfileCaches();
+    return { status: 200, body: { data: await accountInfo() } };
   }],
   ['GET', /^\/api\/log$/, async () => ({ status: 200, body: { data: commandLog } })],
   ['DELETE', /^\/api\/log$/, async () => { commandLog.length = 0; return { status: 200, body: { ok: true } }; }],
@@ -473,4 +615,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { server, detectCli };
+module.exports = { server, detectCli, cliDirs, profileHasToken };
