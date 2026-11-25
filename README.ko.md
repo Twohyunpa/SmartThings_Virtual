@@ -122,7 +122,7 @@ SmartThings는 Matter 1.5까지 지원합니다. 실제 Matter 기기를 추가�
 
 **한계:** 클라우드 가상 기기라서 페어링(QR 코드), Matter 클러스터·엔드포인트·통신은 없고 카메라 영상도 나오지 않습니다. Matter 통신 자체를 테스트하려면 SmartThings 허브와 실제 기기 또는 삼성 [Matter Virtual Device](https://developer.samsung.com/smartthings/blog/en/2023/12/14/creating-a-matter-virtual-device)를 쓰세요.
 
-`operationalState`, `evseState` 같은 최신 capability는 계정에 따라 가상 기기에서 거부될 수 있습니다. `npm run check-capabilities`를 한 번 실행하면 안 되는 capability와 그걸 쓰는 템플릿을 알려줍니다. 그 capability를 프로필 정의에서 빼고 만들면 됩니다.
+`operationalState`, `evseState` 같은 최신 capability는 계정에 따라 가상 기기에서 거부될 수 있습니다. `npm run check-capabilities`(저장소를 받지 않았다면 `npx --yes -p github:Twohyunpa/SmartThings_Virtual st-check-capabilities`)를 한 번 실행하면 안 되는 capability와 그걸 쓰는 템플릿을 알려줍니다. 그 capability를 프로필 정의에서 빼고 만들면 됩니다.
 
 ## 사용하는 CLI 명령
 

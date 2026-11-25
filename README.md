@@ -130,7 +130,7 @@ SmartThings supports Matter 1.5 (hub rollout completed in 2026). When a real Mat
 
 **Limits.** These are cloud virtual devices, not Matter devices. There is no commissioning (QR / pairing code), no Matter clusters, endpoints or Matter traffic, and the camera shows no video. To test the Matter protocol itself, use a real or emulated Matter device with a SmartThings hub, for example Samsung's [Matter Virtual Device](https://developer.samsung.com/smartthings/blog/en/2023/12/14/creating-a-matter-virtual-device).
 
-Some newer capabilities (for example `operationalState`, `evseState`, `cameraPrivacyMode`) may not be accepted for virtual devices on every account. Run `npm run check-capabilities` once: it lists any capability your account cannot see and the templates that use it. Remove that capability in **View / edit the profile definition** before creating.
+Some newer capabilities (for example `operationalState`, `evseState`, `cameraPrivacyMode`) may not be accepted for virtual devices on every account. Run `npm run check-capabilities` once (or, without cloning, `npx --yes -p github:Twohyunpa/SmartThings_Virtual st-check-capabilities`): it lists any capability your account cannot see and the templates that use it. Remove that capability in **View / edit the profile definition** before creating.
 
 ## CLI commands used
 

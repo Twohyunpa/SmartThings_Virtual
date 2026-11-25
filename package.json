@@ -4,7 +4,8 @@
   "description": "Local GUI to create SmartThings virtual devices and inject states, powered by the SmartThings CLI",
   "private": true,
   "bin": {
-    "st-virtual-gui": "server.js"
+    "st-virtual-gui": "server.js",
+    "st-check-capabilities": "tools/check-capabilities.js"
   },
   "scripts": {
     "start": "node server.js",
