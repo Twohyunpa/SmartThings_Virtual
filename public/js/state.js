@@ -5,6 +5,8 @@ export const state = {
   devices: [],
   templates: [],
   templatesMeta: null, // where the templates were derived from
+  matterTemplates: [], // Matter device templates (SmartThings Matter driver profiles)
+  matterMeta: null,
   presets: [],
   selectedId: null,
   device: null,       // result of `devices <id>`
@@ -97,3 +99,6 @@ export function stopActiveRun() {
     state.activeRun = null;
   }
 }
+
+// Find an appliance or Matter template by id (ids of Matter templates start with "matter-").
+export const findTemplate = (id) => (id ? state.templates.find((x) => x.id === id) || state.matterTemplates.find((x) => x.id === id) : undefined);

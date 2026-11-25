@@ -76,9 +76,10 @@ npm test
 
 **Create virtual devices**
 
-The **New virtual device** panel has four tabs, and each tab shows a short explanation of what it does and when to use it.
+The **New virtual device** panel has five tabs, and each tab shows a short explanation of what it does and when to use it.
 
 - Appliance templates: 35 real models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, a cooktop, a range hood, a TV, a soundbar ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
+- Matter devices: 36 common Matter device types from Matter 1.0 to 1.5 (lights, plugs, buttons, sensors, door lock, thermostat, blinds, TV, air conditioner, fan, air purifier, smoke/CO alarm, robot vacuum, washer, dryer, dishwasher, refrigerator, oven, cooktop, range hood, microwave, water leak sensor, EV charger, solar, home battery, heat pump, water heater, camera/doorbell, garage door/gate, soil sensor). Filter by category or Matter version, and see which Matter cluster each capability stands for. See [Matter devices](#matter-devices).
 - Standard prototypes such as `VIRTUAL_SWITCH` and `VIRTUAL_MOTION_SENSOR` (17 in total, `virtualdevices:create-standard`).
 - Create from one of your own device profile IDs, or paste a profile JSON (`virtualdevices:create`).
 - The dry-run button shows the request JSON without creating anything.
@@ -115,6 +116,21 @@ The **New virtual device** panel has four tabs, and each tab shows a short expla
 The templates are not hand-picked. They are generated from the SmartThings test fixtures of [Home Assistant](https://github.com/home-assistant/core) (`tests/components/smartthings/fixtures`, Apache-2.0, see [NOTICE](NOTICE)), which are dumps of real Samsung appliances. `tools/build-templates.py` extracts each model's components, capabilities and sample attribute values; the upstream commit is recorded in `templates/samsung-appliances.json`.
 
 Only **standard SmartThings capabilities** (`switch`, `washerOperatingState`, `ovenMode`, `temperatureMeasurement` ...) are used, because they work for any virtual device. The Samsung-specific capabilities that the real devices also have (`custom.*`, `samsungce.*`, `hca.*`, `sec.*`) and the OCF/cloud plumbing ones (`ocf`, `execute`, `logTrigger`, `demandResponseLoadControl`) are deliberately left out, and models that end up with fewer than 4 standard capabilities are skipped. After creating a device, **Load sample state** injects the values recorded from the real appliance. To regenerate the templates from a newer Home Assistant checkout, see the header of `tools/build-templates.py`. `npm run check-capabilities` verifies that your account can see every capability the templates use.
+
+## Matter devices
+
+![Matter devices tab](docs/matter-devices.png)
+
+SmartThings supports Matter 1.5 (hub rollout completed in 2026). When a real Matter device is added, a SmartThings Matter Edge driver gives it a device profile made of **standard capabilities**: Matter's On/Off cluster becomes `switch`, Level Control becomes `switchLevel`, Door Lock becomes `lock`, and so on. The **Matter devices** tab creates a virtual device with the same profile, so apps, automations and API integrations see what they would see for a real Matter device of that type.
+
+- The profiles are taken from [SmartThings' official Matter Edge drivers](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers) (`drivers/SmartThings/matter-*/profiles`, Apache-2.0, see [NOTICE](NOTICE)) by `tools/build-matter-templates.py`. The upstream commit is recorded in `templates/matter-devices.json`.
+- Left out: `firmwareUpdate`, command-only `stateless*` capabilities, camera streaming and storage capabilities (`webrtc`, `videoCapture2`, ...) and vendor capabilities such as `vision.*`.
+- Each device starts with a typical state (for example a light at 70 %, a lock locked), and presets such as *Lock: forced opening attempt*, *Alarm: smoke detected*, *Cycle: running* or *EV charger: plugged in, charging* appear on the **Presets & scenarios** tab.
+- Devices created from a Matter template are marked **Matter** in the device list.
+
+**Limits.** These are cloud virtual devices, not Matter devices. There is no commissioning (QR / pairing code), no Matter clusters, endpoints or Matter traffic, and the camera shows no video. To test the Matter protocol itself, use a real or emulated Matter device with a SmartThings hub, for example Samsung's [Matter Virtual Device](https://developer.samsung.com/smartthings/blog/en/2023/12/14/creating-a-matter-virtual-device).
+
+Some newer capabilities (for example `operationalState`, `evseState`, `cameraPrivacyMode`) may not be accepted for virtual devices on every account. Run `npm run check-capabilities` once (or, without cloning, `npx --yes -p github:Twohyunpa/SmartThings_Virtual st-check-capabilities`): it lists any capability your account cannot see and the templates that use it. Remove that capability in **View / edit the profile definition** before creating.
 
 ## CLI commands used
 

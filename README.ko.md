@@ -74,9 +74,10 @@ npm test
 ## 기능
 
 **가상 기기 만들기**
-**New virtual device** 패널의 탭 4개에는 각각 무엇을 하는 탭이고 언제 쓰는지 짧은 설명이 붙어 있습니다.
+**New virtual device** 패널의 탭 5개에는 각각 무엇을 하는 탭이고 언제 쓰는지 짧은 설명이 붙어 있습니다.
 
 - Appliance templates: 세탁기, 건조기, 식기세척기, 에어컨, 공기청정기, 냉장고, 로봇청소기, 오븐, TV 등 실제 모델 35종. 프로필 정의(JSON)를 열어서 capability를 더하거나 뺄 수 있습니다.
+- Matter devices: Matter 1.0~1.5의 대표 기기 36종(조명, 플러그, 버튼, 각종 센서, 도어락, 온도조절기, 블라인드, TV, 에어컨, 선풍기, 공기청정기, 화재/CO 경보기, 로봇청소기, 세탁기, 건조기, 식기세척기, 냉장고, 오븐, 쿡탑, 후드, 전자레인지, 누수 센서, 전기차 충전기, 태양광, 가정용 배터리, 히트펌프, 온수기, 카메라/도어벨, 차고문/게이트, 토양 센서). 분류와 Matter 버전으로 거를 수 있고, 각 capability가 어떤 Matter 클러스터에 해당하는지 표로 보여줍니다. 아래 [Matter 기기](#matter-기기) 참고.
 - 표준 프로토타입: `VIRTUAL_SWITCH`, `VIRTUAL_MOTION_SENSOR` 등 17종 (`virtualdevices:create-standard`)
 - 내 디바이스 프로필 ID로 만들기, 또는 프로필 JSON 직접 입력 (`virtualdevices:create`)
 - dry-run 버튼으로 실제 생성 없이 요청 JSON을 확인할 수 있습니다.
@@ -110,6 +111,18 @@ npm test
 ## 템플릿 출처
 
 삼성 가전 템플릿은 임의로 만든 것이 아니라 [Home Assistant](https://github.com/home-assistant/core)의 SmartThings 테스트 데이터(`tests/components/smartthings/fixtures`, Apache-2.0, [NOTICE](NOTICE) 참고)에서 생성합니다. 실제 삼성 가전에서 덤프한 데이터이고, `tools/build-templates.py`가 모델별 capability 목록과 샘플 속성 값을 추출합니다. **표준 capability만** 사용하고, `custom.*`/`samsungce.*` 같은 삼성 전용 capability는 의도적으로 제외했습니다. 자세한 내용은 영어 [README](README.md) 참고.
+
+## Matter 기기
+
+SmartThings는 Matter 1.5까지 지원합니다. 실제 Matter 기기를 추가하면 SmartThings Matter 드라이버가 **표준 capability**로 된 프로필을 붙입니다(On/Off 클러스터 → `switch`, Level Control → `switchLevel`, Door Lock → `lock` 등). **Matter devices** 탭은 같은 프로필로 가상 기기를 만들어서, 앱·자동화·API 연동에서 실제 Matter 기기와 똑같이 보이게 합니다.
+
+- 프로필은 [SmartThings 공식 Matter Edge 드라이버](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers)(Apache-2.0, [NOTICE](NOTICE) 참고)에서 `tools/build-matter-templates.py`로 가져옵니다.
+- `firmwareUpdate`, 명령 전용 `stateless*`, 카메라 영상 관련 capability, `vision.*` 같은 전용 capability는 뺐습니다.
+- 만들면 기본 상태가 들어가고(예: 조명 70%, 도어락 잠김), *Lock: forced opening attempt*, *Alarm: smoke detected*, *Cycle: running* 같은 프리셋을 쓸 수 있습니다. 기기 목록에는 **Matter** 표시가 붙습니다.
+
+**한계:** 클라우드 가상 기기라서 페어링(QR 코드), Matter 클러스터·엔드포인트·통신은 없고 카메라 영상도 나오지 않습니다. Matter 통신 자체를 테스트하려면 SmartThings 허브와 실제 기기 또는 삼성 [Matter Virtual Device](https://developer.samsung.com/smartthings/blog/en/2023/12/14/creating-a-matter-virtual-device)를 쓰세요.
+
+`operationalState`, `evseState` 같은 최신 capability는 계정에 따라 가상 기기에서 거부될 수 있습니다. `npm run check-capabilities`(저장소를 받지 않았다면 `npx --yes -p github:Twohyunpa/SmartThings_Virtual st-check-capabilities`)를 한 번 실행하면 안 되는 capability와 그걸 쓰는 템플릿을 알려줍니다. 그 capability를 프로필 정의에서 빼고 만들면 됩니다.
 
 ## 사용하는 CLI 명령
 

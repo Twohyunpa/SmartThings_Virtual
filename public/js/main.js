@@ -1,7 +1,7 @@
 // Application entry point: top bar, CLI log drawer, device sidebar, device selection, and tab routing.
 
 import {
-  state, actions, store, capCacheKey, setCapDef, clearCapDefs, stopAuto, stopActiveRun,
+  state, actions, store, capCacheKey, setCapDef, clearCapDefs, stopAuto, stopActiveRun, findTemplate,
 } from './state.js';
 import { $, esc, api, toast, refreshLog } from './api.js';
 import { renderCreate, applySampleState } from './views/create.js';
@@ -97,7 +97,7 @@ function renderDeviceList() {
     .sort((a, b) => (a.label || a.name || '').localeCompare(b.label || b.name || ''))
     .map((d) => `
       <button class="device-item ${d.deviceId === state.selectedId ? 'active' : ''}" data-id="${esc(d.deviceId)}">
-        <div class="name">${esc(d.label || d.name)}</div>
+        <div class="name">${esc(d.label || d.name)}${String(store(`st.tpl.${d.deviceId}`) || '').startsWith('matter-') ? ' <span class="badge matter" title="Created from a Matter device template">Matter</span>' : ''}</div>
         <div class="meta">${esc(d.deviceId.slice(0, 8))}… ${esc(locName(d.locationId))}</div>
       </button>`).join('');
 }
@@ -123,6 +123,11 @@ async function loadTemplates() {
     state.templates = r.templates || [];
     state.templatesMeta = r.generatedFrom || null;
   } catch { state.templates = []; }
+  try {
+    const r = await api('GET', '/api/matter-templates');
+    state.matterTemplates = r.templates || [];
+    state.matterMeta = { ...(r.generatedFrom || {}), matterVersion: r.matterVersion };
+  } catch { state.matterTemplates = []; }
   try { state.presets = (await api('GET', '/api/presets')) || []; } catch { state.presets = []; }
 }
 
@@ -186,7 +191,7 @@ function renderDevice() {
         <div class="ids">${esc(d.deviceId)} · ${esc(locName)}${d.deviceTypeName ? ' · ' + esc(d.deviceTypeName) : ''}</div>
       </div>
       <div class="actions">
-        ${store(`st.tpl.${d.deviceId}`) ? '<button class="btn small" id="sampleBtn" title="Inject the values recorded from the real appliance">Load sample state</button>' : ''}
+        ${store(`st.tpl.${d.deviceId}`) ? '<button class="btn small" id="sampleBtn" title="Inject the template sample values again">Load sample state</button>' : ''}
         <button class="btn small" id="copyId">Copy ID</button>
         <button class="btn small" id="renameBtn">Rename</button>
         <button class="btn small danger" id="deleteBtn">Delete</button>
@@ -200,7 +205,7 @@ function renderDevice() {
     <div id="tabBody"></div>`;
 
   $('#copyId').addEventListener('click', () => navigator.clipboard?.writeText(d.deviceId).then(() => toast('ID copied')));
-  $('#sampleBtn')?.addEventListener('click', () => applySampleState(state.templates.find((x) => x.id === store(`st.tpl.${d.deviceId}`)), d.deviceId));
+  $('#sampleBtn')?.addEventListener('click', () => applySampleState(findTemplate(store(`st.tpl.${d.deviceId}`)), d.deviceId));
   $('#renameBtn').addEventListener('click', renameDevice);
   $('#deleteBtn').addEventListener('click', deleteDevice);
   document.querySelectorAll('#main .tabs .tab').forEach((t) => t.addEventListener('click', () => { state.tab = t.dataset.tab; renderTabBody(); }));

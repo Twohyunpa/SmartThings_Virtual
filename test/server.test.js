@@ -125,6 +125,10 @@ describe('server.js integration (mock CLI)', () => {
     assert.equal(tpl.status, 200);
     assert.ok(Array.isArray(tpl.json.data.templates) && tpl.json.data.templates.length > 0);
 
+    const matter = await request('GET', '/api/matter-templates');
+    assert.equal(matter.status, 200);
+    assert.equal(matter.json.data.templates.length, 36);
+
     const presets = await request('GET', '/api/presets');
     assert.equal(presets.status, 200);
     assert.ok(Array.isArray(presets.json.data) && presets.json.data.length > 0);

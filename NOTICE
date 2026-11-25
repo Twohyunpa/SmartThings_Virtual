@@ -13,3 +13,16 @@ Samsung appliance fixtures were extracted and reshaped into device profile defin
 by tools/build-templates.py (device-specific identifiers such as device, location and
 owner ids are not included). The exact upstream commit is recorded in the
 "generatedFrom" field of the template file.
+
+templates/matter-devices.json is derived from the device profiles of the SmartThings Edge
+drivers (https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers, path
+drivers/SmartThings/matter-*/profiles), which are licensed under the Apache License 2.0
+(https://www.apache.org/licenses/LICENSE-2.0).
+
+Copyright (c) SmartThings, Inc. and contributors.
+
+Changes: only the component ids, standard capability lists and categories of selected
+profiles were copied by tools/build-matter-templates.py; firmware, command-only, camera
+streaming and vendor capabilities were removed, and some components were dropped or merged.
+Matter cluster names, sample states and presets were added. The exact upstream commit is
+recorded in the "generatedFrom" field of the template file.

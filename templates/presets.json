@@ -465,5 +465,443 @@
     "value": "HDMI1"
    }
   ]
+ },
+ {
+  "label": "Light: dim to 20%",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "switchLevel",
+    "attribute": "level",
+    "value": 20,
+    "unit": "%"
+   }
+  ]
+ },
+ {
+  "label": "Light: warm white 2700K",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "colorTemperature",
+    "attribute": "colorTemperature",
+    "value": 2700,
+    "unit": "K"
+   }
+  ]
+ },
+ {
+  "label": "Light: red",
+  "events": [
+   {
+    "component": "main",
+    "capability": "switch",
+    "attribute": "switch",
+    "value": "on"
+   },
+   {
+    "component": "main",
+    "capability": "colorControl",
+    "attribute": "hue",
+    "value": 0
+   },
+   {
+    "component": "main",
+    "capability": "colorControl",
+    "attribute": "saturation",
+    "value": 100
+   }
+  ]
+ },
+ {
+  "label": "Contact: open",
+  "events": [
+   {
+    "component": "main",
+    "capability": "contactSensor",
+    "attribute": "contact",
+    "value": "open"
+   }
+  ]
+ },
+ {
+  "label": "Contact: closed",
+  "events": [
+   {
+    "component": "main",
+    "capability": "contactSensor",
+    "attribute": "contact",
+    "value": "closed"
+   }
+  ]
+ },
+ {
+  "label": "Motion: detected",
+  "events": [
+   {
+    "component": "main",
+    "capability": "motionSensor",
+    "attribute": "motion",
+    "value": "active"
+   }
+  ]
+ },
+ {
+  "label": "Motion: clear",
+  "events": [
+   {
+    "component": "main",
+    "capability": "motionSensor",
+    "attribute": "motion",
+    "value": "inactive"
+   }
+  ]
+ },
+ {
+  "label": "Lock: unlocked",
+  "events": [
+   {
+    "component": "main",
+    "capability": "lock",
+    "attribute": "lock",
+    "value": "unlocked"
+   }
+  ]
+ },
+ {
+  "label": "Lock: locked",
+  "events": [
+   {
+    "component": "main",
+    "capability": "lock",
+    "attribute": "lock",
+    "value": "locked"
+   },
+   {
+    "component": "main",
+    "capability": "lockAlarm",
+    "attribute": "alarm",
+    "value": "clear"
+   }
+  ]
+ },
+ {
+  "label": "Lock: forced opening attempt",
+  "events": [
+   {
+    "component": "main",
+    "capability": "lockAlarm",
+    "attribute": "alarm",
+    "value": "forcedOpeningAttempt"
+   }
+  ]
+ },
+ {
+  "label": "Alarm: smoke detected",
+  "events": [
+   {
+    "component": "main",
+    "capability": "smokeDetector",
+    "attribute": "smoke",
+    "value": "detected"
+   }
+  ]
+ },
+ {
+  "label": "Alarm: CO detected",
+  "events": [
+   {
+    "component": "main",
+    "capability": "carbonMonoxideDetector",
+    "attribute": "carbonMonoxide",
+    "value": "detected"
+   }
+  ]
+ },
+ {
+  "label": "Alarm: all clear",
+  "events": [
+   {
+    "component": "main",
+    "capability": "smokeDetector",
+    "attribute": "smoke",
+    "value": "clear"
+   },
+   {
+    "component": "main",
+    "capability": "carbonMonoxideDetector",
+    "attribute": "carbonMonoxide",
+    "value": "clear"
+   }
+  ]
+ },
+ {
+  "label": "Leak: water detected",
+  "events": [
+   {
+    "component": "main",
+    "capability": "waterSensor",
+    "attribute": "water",
+    "value": "wet"
+   }
+  ]
+ },
+ {
+  "label": "Leak: dry",
+  "events": [
+   {
+    "component": "main",
+    "capability": "waterSensor",
+    "attribute": "water",
+    "value": "dry"
+   }
+  ]
+ },
+ {
+  "label": "Blind: open",
+  "events": [
+   {
+    "component": "main",
+    "capability": "windowShade",
+    "attribute": "windowShade",
+    "value": "open"
+   },
+   {
+    "component": "main",
+    "capability": "windowShadeLevel",
+    "attribute": "shadeLevel",
+    "value": 100,
+    "unit": "%"
+   }
+  ]
+ },
+ {
+  "label": "Blind: closed",
+  "events": [
+   {
+    "component": "main",
+    "capability": "windowShade",
+    "attribute": "windowShade",
+    "value": "closed"
+   },
+   {
+    "component": "main",
+    "capability": "windowShadeLevel",
+    "attribute": "shadeLevel",
+    "value": 0,
+    "unit": "%"
+   }
+  ]
+ },
+ {
+  "label": "Cycle: running",
+  "events": [
+   {
+    "component": "main",
+    "capability": "operationalState",
+    "attribute": "operationalState",
+    "value": "running"
+   }
+  ]
+ },
+ {
+  "label": "Cycle: paused",
+  "events": [
+   {
+    "component": "main",
+    "capability": "operationalState",
+    "attribute": "operationalState",
+    "value": "paused"
+   }
+  ]
+ },
+ {
+  "label": "Cycle: stopped",
+  "events": [
+   {
+    "component": "main",
+    "capability": "operationalState",
+    "attribute": "operationalState",
+    "value": "stopped"
+   }
+  ]
+ },
+ {
+  "label": "Cycle: error",
+  "events": [
+   {
+    "component": "main",
+    "capability": "operationalState",
+    "attribute": "operationalState",
+    "value": "unableToCompleteOperation"
+   }
+  ]
+ },
+ {
+  "label": "Robot (Matter): cleaning",
+  "events": [
+   {
+    "component": "main",
+    "capability": "robotCleanerOperatingState",
+    "attribute": "operatingState",
+    "value": "running"
+   }
+  ]
+ },
+ {
+  "label": "Robot (Matter): returning to dock",
+  "events": [
+   {
+    "component": "main",
+    "capability": "robotCleanerOperatingState",
+    "attribute": "operatingState",
+    "value": "seekingCharger"
+   }
+  ]
+ },
+ {
+  "label": "Robot (Matter): docked",
+  "events": [
+   {
+    "component": "main",
+    "capability": "robotCleanerOperatingState",
+    "attribute": "operatingState",
+    "value": "docked"
+   }
+  ]
+ },
+ {
+  "label": "EV charger: plugged in, charging",
+  "events": [
+   {
+    "component": "main",
+    "capability": "evseState",
+    "attribute": "state",
+    "value": "pluggedInCharging"
+   },
+   {
+    "component": "main",
+    "capability": "evseChargingSession",
+    "attribute": "chargingState",
+    "value": "charging"
+   }
+  ]
+ },
+ {
+  "label": "EV charger: unplugged",
+  "events": [
+   {
+    "component": "main",
+    "capability": "evseState",
+    "attribute": "state",
+    "value": "notPluggedIn"
+   },
+   {
+    "component": "main",
+    "capability": "evseChargingSession",
+    "attribute": "chargingState",
+    "value": "stopped"
+   }
+  ]
+ },
+ {
+  "label": "Home battery: fully charged",
+  "events": [
+   {
+    "component": "main",
+    "capability": "battery",
+    "attribute": "battery",
+    "value": 100,
+    "unit": "%"
+   },
+   {
+    "component": "main",
+    "capability": "chargingState",
+    "attribute": "chargingState",
+    "value": "fullyCharged"
+   }
+  ]
+ },
+ {
+  "label": "Garage door: opening",
+  "events": [
+   {
+    "component": "main",
+    "capability": "doorControl",
+    "attribute": "door",
+    "value": "opening"
+   }
+  ]
+ },
+ {
+  "label": "Garage door: open",
+  "events": [
+   {
+    "component": "main",
+    "capability": "doorControl",
+    "attribute": "door",
+    "value": "open"
+   },
+   {
+    "component": "main",
+    "capability": "level",
+    "attribute": "level",
+    "value": 100,
+    "unit": "%"
+   }
+  ]
+ },
+ {
+  "label": "Garage door: closed",
+  "events": [
+   {
+    "component": "main",
+    "capability": "doorControl",
+    "attribute": "door",
+    "value": "closed"
+   },
+   {
+    "component": "main",
+    "capability": "level",
+    "attribute": "level",
+    "value": 0,
+    "unit": "%"
+   }
+  ]
+ },
+ {
+  "label": "Doorbell: pressed",
+  "events": [
+   {
+    "component": "doorbell",
+    "capability": "button",
+    "attribute": "button",
+    "value": "pushed"
+   }
+  ]
+ },
+ {
+  "label": "Soil: dry (10%)",
+  "events": [
+   {
+    "component": "main",
+    "capability": "relativeHumidityMeasurement",
+    "attribute": "humidity",
+    "value": 10,
+    "unit": "%"
+   }
+  ]
  }
 ]
