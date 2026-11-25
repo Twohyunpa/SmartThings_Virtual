@@ -17,6 +17,12 @@
     </div>
     <div class="top-actions">
       <span id="cliBadge" class="badge">Checking CLI…</span>
+      <div class="account">
+        <button id="accountBtn" class="btn small account-btn" aria-haspopup="true" aria-expanded="false">
+          <span id="accountDot" class="dot"></span><span id="accountLabel">Checking account…</span> ▾
+        </button>
+        <div id="accountMenu" class="account-menu" hidden></div>
+      </div>
       <label class="profile">
         Profile
         <input id="profileInput" value="default" size="10" />
@@ -58,7 +64,7 @@
         <li>Change a value and press <b>Inject</b> to send an event with <code>smartthings virtualdevices:events</code>.</li>
         <li>Use the <b>Presets &amp; scenarios</b> tab to replay several events in order, with delays.</li>
       </ol>
-      <p class="muted">If you are not logged in, the CLI opens a browser login window on the first request.</p>
+      <p class="muted">The app uses the SmartThings account the CLI is signed in to. The account menu at the top right shows which one, and lets you log out or switch to another account.</p>
     </div>
   </template>
 

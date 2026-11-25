@@ -101,6 +101,12 @@ The **New virtual device** panel has five tabs, and each tab shows a short expla
 - Collect steps with the ＋ buttons on the State tab, set a delay per step, and replay them once or in a loop.
 - Scenarios are stored in your browser (localStorage) and can be imported / exported as JSON.
 
+**Account**: the account menu at the top right shows which SmartThings account the CLI is signed in to (its default organization and locations; SmartThings has no public API that returns your email), and how it is signed in (browser login, `SMARTTHINGS_TOKEN`, or a token in the CLI profile).
+- **Log out** runs `smartthings logout`, which removes the CLI's stored login for the current profile. Your devices are not touched.
+- **Switch account** logs out and then starts a fresh browser login. If the browser signs you straight back in to the same account, sign out of your Samsung account on that page (or at account.samsung.com) and try again.
+- With `SMARTTHINGS_TOKEN` (or a token in `config.yaml`) the token decides the account, so these buttons are disabled; restart with another token instead.
+- Signed out, the app shows a **Sign in** button instead of opening a login window by itself.
+
 **Also**: rename, delete, raw JSON view (`devices`, `devices:status`), and the CLI command log (click an entry to copy it).
 
 **Error handling**: when a CLI command fails, the error is shown in the UI with a clearer message and also printed to the terminal (`[cli failed] ...`). The server keeps running after unexpected errors, and tells you if port 3700 is already in use (start on another port with `PORT=3800 npm start`).
@@ -137,6 +143,7 @@ Some newer capabilities (for example `operationalState`, `evseState`, `cameraPri
 | Create | `smartthings virtualdevices:create-standard -i input.json`, `smartthings virtualdevices:create -i input.json` |
 | Inject events | `smartthings virtualdevices:events <id> -i input.json` |
 | Rename / delete | `smartthings virtualdevices:update <id> -i input.json`, `smartthings virtualdevices:delete <id>` |
+| Account | `smartthings organizations`, `smartthings logout` (sign-in: any command, e.g. `smartthings locations`, opens the browser login) |
 
 All commands are run with `--json` and parsed. The server detects the CLI version and adjusts arguments, so both CLI 1.10.x and 3.x work.
 

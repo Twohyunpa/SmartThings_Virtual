@@ -64,6 +64,7 @@ describe('server.js integration (mock CLI)', () => {
         HOST: '127.0.0.1',
         ST_MOCK_STATE: MOCK_STATE_FILE,
         ST_CLI_CONCURRENCY: '3',
+        ST_MOCK_LOGIN_MS: '50',
       },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -189,5 +190,51 @@ describe('server.js integration (mock CLI)', () => {
     const logAfter = await request('GET', '/api/log');
     const switchCallsAfter = logAfter.json.data.filter((e) => e.command.includes('capabilities switch'));
     assert.equal(switchCallsAfter.length, 2);
+  });
+
+  it('shows the signed-in account, logs out, and switches to another account', async () => {
+    const before = await request('GET', '/api/account');
+    assert.equal(before.status, 200);
+    assert.equal(before.json.data.signedIn, true);
+    assert.equal(before.json.data.auth, 'login');
+    const firstOrg = before.json.data.organization.name;
+    assert.ok(firstOrg);
+    assert.ok(before.json.data.locations.length > 0);
+    assert.ok(!JSON.stringify(before.json).match(/accessToken|refreshToken/), 'tokens must never be returned');
+
+    const out = await request('POST', '/api/account/logout');
+    assert.equal(out.status, 200);
+    const afterLogout = await request('GET', '/api/account');
+    assert.equal(afterLogout.json.data.signedIn, false);
+    assert.equal(afterLogout.json.data.auth, 'none');
+
+    // concurrent sign-in requests share one CLI login
+    await request('DELETE', '/api/log');
+    const [a, b] = await Promise.all([request('POST', '/api/account/login'), request('POST', '/api/account/login')]);
+    assert.equal(a.status, 200);
+    assert.equal(b.status, 200);
+    assert.equal(a.json.data.signedIn, true);
+    assert.notEqual(a.json.data.organization.name, firstOrg, 'mock signs in to the other account');
+    const log = await request('GET', '/api/log');
+    const locCalls = log.json.data.filter((e) => /^smartthings locations --json/.test(e.command)).length;
+    assert.equal(locCalls, 3, 'one shared login call + one details call per request');
+  });
+});
+
+describe('account helpers', () => {
+  const { profileHasToken, cliDirs } = require('../server.js');
+  it('detects a token configured under a CLI profile in config.yaml', () => {
+    const file = path.join(os.tmpdir(), `st-cfg-${process.pid}.yaml`);
+    fs.writeFileSync(file, 'default:\n  clientIdProvider: {}\nhub2:\n  token: abc-123\n');
+    try {
+      assert.equal(profileHasToken(file, 'hub2'), true);
+      assert.equal(profileHasToken(file, 'default'), false);
+      assert.equal(profileHasToken(file, 'missing'), false);
+    } finally { fs.rmSync(file, { force: true }); }
+  });
+  it('builds CLI data/config paths for this OS', () => {
+    const d = cliDirs();
+    assert.match(d.dataDir, /@smartthings[\\/]cli/);
+    assert.match(d.oldConfigDir, /@smartthings[\\/]cli/);
   });
 });

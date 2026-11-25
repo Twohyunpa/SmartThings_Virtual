@@ -98,6 +98,12 @@ npm test
 - 상태 탭의 ＋ 버튼으로 단계를 모아 시나리오를 만들고, 단계별 대기 시간(ms)과 반복 실행을 설정할 수 있습니다.
 - 시나리오는 브라우저(localStorage)에 저장되고 JSON으로 가져오기/내보내기가 됩니다.
 
+**계정**: 오른쪽 위 계정 메뉴에 CLI가 로그인한 SmartThings 계정(기본 조직 이름과 로케이션. SmartThings에는 이메일을 돌려주는 공개 API가 없습니다)과 로그인 방식(브라우저 로그인, `SMARTTHINGS_TOKEN`, CLI 프로필 토큰)이 표시됩니다.
+- **Log out**: `smartthings logout`을 실행해 현재 프로필의 CLI 로그인 정보를 지웁니다. 기기는 그대로입니다.
+- **Switch account**: 로그아웃한 뒤 새 브라우저 로그인을 시작합니다. 브라우저가 같은 계정으로 바로 다시 로그인되면, 그 페이지(또는 account.samsung.com)에서 삼성 계정을 로그아웃한 뒤 다시 시도하세요.
+- `SMARTTHINGS_TOKEN`(또는 `config.yaml`의 토큰)을 쓰는 경우 토큰이 계정을 결정하므로 버튼이 비활성화됩니다. 다른 토큰으로 다시 실행하세요.
+- 로그아웃 상태에서는 앱이 스스로 로그인 창을 띄우지 않고 **Sign in** 버튼을 보여줍니다.
+
 **기타**: 이름 변경, 삭제, 원본 JSON(`devices`, `devices:status`) 보기, CLI 명령 로그(클릭하면 복사).
 
 **오류 처리**: CLI 명령이 실패하면 UI에 알기 쉬운 메시지가 뜨고 터미널에도 `[cli failed] ...`로 출력됩니다. 예상치 못한 오류가 나도 서버는 계속 돌아가고, 3700 포트가 이미 쓰이고 있으면 알려 줍니다(`PORT=3800 npm start`로 다른 포트에서 실행).
@@ -129,6 +135,7 @@ SmartThings는 Matter 1.5까지 지원합니다. 실제 Matter 기기를 추가�
 | 생성 | `smartthings virtualdevices:create-standard -i input.json`, `smartthings virtualdevices:create -i input.json` |
 | 이벤트 주입 | `smartthings virtualdevices:events <id> -i input.json` |
 | 이름 변경/삭제 | `smartthings virtualdevices:update <id> -i input.json`, `smartthings virtualdevices:delete <id>` |
+| 계정 | `smartthings organizations`, `smartthings logout` (로그인: 아무 명령, 예: `smartthings locations` 실행 시 브라우저 로그인이 열림) |
 
 모든 명령에 `--json` 을 붙여 결과를 파싱합니다. CLI 1.10.x와 3.x 둘 다 동작하도록 버전을 감지해 인자를 맞춥니다.
 
