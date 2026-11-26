@@ -125,9 +125,9 @@ describe('server.js integration (mock CLI)', () => {
     assert.equal(tpl.status, 200);
     assert.ok(Array.isArray(tpl.json.data.templates) && tpl.json.data.templates.length > 0);
 
-    const matter = await request('GET', '/api/matter-templates');
-    assert.equal(matter.status, 200);
-    assert.equal(matter.json.data.templates.length, 36);
+    const iot = await request('GET', '/api/iot-templates');
+    assert.equal(iot.status, 200);
+    assert.equal(iot.json.data.templates.length, 50);
 
     const presets = await request('GET', '/api/presets');
     assert.equal(presets.status, 200);
@@ -168,17 +168,17 @@ describe('server.js integration (mock CLI)', () => {
 
     const dryProfile = await request('POST', '/api/devices/profile', {
       body: {
-        name: 'Probe Matter Light',
+        name: 'Probe IoT Light',
         locationId,
         dryRun: true,
         deviceProfile: {
-          name: 'Virtual Matter On/Off & Dimmer, v1',
+          name: 'Virtual On/Off & Dimmer (v1)',
           components: [{ id: 'main', capabilities: [{ id: 'switch', version: 1 }] }],
         },
       },
     });
     assert.equal(dryProfile.status, 200);
-    assert.equal(dryProfile.json.data.deviceProfile.name, 'Virtual Matter On-Off and Dimmer v1');
+    assert.equal(dryProfile.json.data.deviceProfile.name, 'Virtual On-Off and Dimmer v1');
   });
 
   it('deduplicates concurrent capability fetches and respects profile reset', async () => {
@@ -238,8 +238,9 @@ describe('server.js integration (mock CLI)', () => {
 describe('account helpers', () => {
   const { profileHasToken, cliDirs, sanitizeProfileName } = require('../server.js');
   it('sanitizes deviceProfile.name to avoid SmartThings 422 errors', () => {
-    assert.equal(sanitizeProfileName('Virtual Matter On/Off light'), 'Virtual Matter On-Off light');
-    assert.equal(sanitizeProfileName('Virtual Matter Temperature & humidity sensor'), 'Virtual Matter Temperature and humidity sensor');
+    assert.equal(sanitizeProfileName('Virtual On/Off light'), 'Virtual On-Off light');
+    assert.equal(sanitizeProfileName('Virtual Temperature & humidity sensor'), 'Virtual Temperature and humidity sensor');
+    assert.equal(sanitizeProfileName('Virtual Oven (two cavities)'), 'Virtual Oven two cavities');
     assert.equal(sanitizeProfileName('Virtual Heat pump, two indoor units'), 'Virtual Heat pump two indoor units');
     assert.equal(sanitizeProfileName('///'), '---');
     assert.equal(sanitizeProfileName('   '), 'Virtual Profile');

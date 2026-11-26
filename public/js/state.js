@@ -5,8 +5,10 @@ export const state = {
   devices: [],
   templates: [],
   templatesMeta: null, // where the templates were derived from
-  matterTemplates: [], // Matter device templates (SmartThings Matter driver profiles)
-  matterMeta: null,
+  iotTemplates: [],   // IoT device templates (SmartThings Edge driver profiles)
+  iotMeta: null,
+  categories: ['Lighting', 'Plugs and actuators', 'Switches and controls', 'Sensors', 'Closures', 'HVAC',
+    'Media', 'Robotic', 'Appliances', 'Energy management', 'Cameras', 'Other'], // Matter Device Library chapters
   presets: [],
   selectedId: null,
   device: null,       // result of `devices <id>`
@@ -100,5 +102,10 @@ export function stopActiveRun() {
   }
 }
 
-// Find an appliance or Matter template by id (ids of Matter templates start with "matter-").
-export const findTemplate = (id) => (id ? state.templates.find((x) => x.id === id) || state.matterTemplates.find((x) => x.id === id) : undefined);
+// Find an appliance or IoT template by id. IoT template ids start with "iot-"; devices created before the
+// rename remember a "matter-" id, which maps to the same template.
+export const findTemplate = (id) => {
+  if (!id) return undefined;
+  const iotId = String(id).replace(/^matter-/, 'iot-');
+  return state.templates.find((x) => x.id === id) || state.iotTemplates.find((x) => x.id === iotId);
+};

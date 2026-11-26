@@ -2,13 +2,27 @@
  "generatedFrom": {
   "repository": "https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers",
   "commit": "b01c9e1848d25854da2c6c2a8209ace2c19729eb",
-  "path": "drivers/SmartThings/matter-*/profiles",
+  "path": "drivers/SmartThings/*/profiles",
   "license": "Apache-2.0"
  },
- "matterVersion": "1.5",
+ "basedOn": "Matter 1.5 Device Library (device types and categories)",
+ "categories": [
+  "Lighting",
+  "Plugs and actuators",
+  "Switches and controls",
+  "Sensors",
+  "Closures",
+  "HVAC",
+  "Media",
+  "Robotic",
+  "Appliances",
+  "Energy management",
+  "Cameras",
+  "Other"
+ ],
  "templates": [
   {
-   "id": "matter-on-off-light",
+   "id": "iot-on-off-light",
    "name": "On/Off light",
    "icon": "💡",
    "category": "Lighting",
@@ -16,24 +30,14 @@
     "deviceType": "On/Off Light",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · On/Off Light · 2 capabilities",
+   "description": "2 standard capabilities",
    "source": {
     "profiles": [
      "matter-switch/profiles/light-binary.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter On-Off light",
+    "name": "Virtual On-Off light",
     "components": [
      {
       "id": "main",
@@ -66,7 +70,7 @@
    }
   },
   {
-   "id": "matter-dimmable-light",
+   "id": "iot-dimmable-light",
    "name": "Dimmable light",
    "icon": "💡",
    "category": "Lighting",
@@ -74,28 +78,14 @@
     "deviceType": "Dimmable Light",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Dimmable Light · 3 capabilities",
+   "description": "3 standard capabilities",
    "source": {
     "profiles": [
      "matter-switch/profiles/light-level.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "Level Control",
-     "capability": "switchLevel"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Dimmable light",
+    "name": "Virtual Dimmable light",
     "components": [
      {
       "id": "main",
@@ -138,7 +128,7 @@
    }
   },
   {
-   "id": "matter-color-temperature-light",
+   "id": "iot-color-temperature-light",
    "name": "Color temperature light",
    "icon": "💡",
    "category": "Lighting",
@@ -146,32 +136,14 @@
     "deviceType": "Color Temperature Light",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Color Temperature Light · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-switch/profiles/light-level-colorTemperature.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "Level Control",
-     "capability": "switchLevel"
-    },
-    {
-     "cluster": "Color Control (color temperature)",
-     "capability": "colorTemperature"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Color temperature light",
+    "name": "Virtual Color temperature light",
     "components": [
      {
       "id": "main",
@@ -224,7 +196,7 @@
    }
   },
   {
-   "id": "matter-extended-color-light",
+   "id": "iot-extended-color-light",
    "name": "Color light",
    "icon": "🌈",
    "category": "Lighting",
@@ -232,36 +204,14 @@
     "deviceType": "Extended Color Light",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Extended Color Light · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-switch/profiles/light-color-level.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "Level Control",
-     "capability": "switchLevel"
-    },
-    {
-     "cluster": "Color Control (color temperature)",
-     "capability": "colorTemperature"
-    },
-    {
-     "cluster": "Color Control (hue / saturation)",
-     "capability": "colorControl"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Color light",
+    "name": "Virtual Color light",
     "components": [
      {
       "id": "main",
@@ -326,32 +276,22 @@
    }
   },
   {
-   "id": "matter-on-off-plug",
+   "id": "iot-on-off-plug",
    "name": "Smart plug",
    "icon": "🔌",
-   "category": "Plugs & switches",
+   "category": "Plugs and actuators",
    "matter": {
     "deviceType": "On/Off Plug-in Unit",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · On/Off Plug-in Unit · 2 capabilities",
+   "description": "2 standard capabilities",
    "source": {
     "profiles": [
      "matter-switch/profiles/plug-binary.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Smart plug",
+    "name": "Virtual Smart plug",
     "components": [
      {
       "id": "main",
@@ -384,36 +324,22 @@
    }
   },
   {
-   "id": "matter-generic-switch",
+   "id": "iot-generic-switch",
    "name": "Button",
    "icon": "🔘",
-   "category": "Plugs & switches",
+   "category": "Switches and controls",
    "matter": {
     "deviceType": "Generic Switch",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Generic Switch · 3 capabilities",
+   "description": "3 standard capabilities",
    "source": {
     "profiles": [
      "matter-switch/profiles/button-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Switch",
-     "capability": "button"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Button",
+    "name": "Virtual Button",
     "components": [
      {
       "id": "main",
@@ -463,7 +389,7 @@
    }
   },
   {
-   "id": "matter-contact-sensor",
+   "id": "iot-contact-sensor",
    "name": "Contact sensor",
    "icon": "🚪",
    "category": "Sensors",
@@ -471,28 +397,14 @@
     "deviceType": "Contact Sensor",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Contact Sensor · 3 capabilities",
+   "description": "3 standard capabilities",
    "source": {
     "profiles": [
      "matter-sensor/profiles/contact-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Boolean State",
-     "capability": "contactSensor"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Contact sensor",
+    "name": "Virtual Contact sensor",
     "components": [
      {
       "id": "main",
@@ -535,7 +447,7 @@
    }
   },
   {
-   "id": "matter-occupancy-sensor",
+   "id": "iot-occupancy-sensor",
    "name": "Occupancy (motion) sensor",
    "icon": "🏃",
    "category": "Sensors",
@@ -543,28 +455,14 @@
     "deviceType": "Occupancy Sensor",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Occupancy Sensor · 3 capabilities",
+   "description": "3 standard capabilities",
    "source": {
     "profiles": [
      "matter-sensor/profiles/motion-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Occupancy Sensing",
-     "capability": "motionSensor"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Occupancy (motion) sensor",
+    "name": "Virtual Occupancy motion sensor",
     "components": [
      {
       "id": "main",
@@ -607,7 +505,7 @@
    }
   },
   {
-   "id": "matter-temperature-humidity-sensor",
+   "id": "iot-temperature-humidity-sensor",
    "name": "Temperature & humidity sensor",
    "icon": "🌡️",
    "category": "Sensors",
@@ -615,32 +513,14 @@
     "deviceType": "Temperature Sensor + Humidity Sensor",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Temperature Sensor + Humidity Sensor · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-sensor/profiles/temperature-humidity-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Temperature Measurement",
-     "capability": "temperatureMeasurement"
-    },
-    {
-     "cluster": "Relative Humidity Measurement",
-     "capability": "relativeHumidityMeasurement"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Temperature and humidity sensor",
+    "name": "Virtual Temperature and humidity sensor",
     "components": [
      {
       "id": "main",
@@ -694,44 +574,22 @@
    }
   },
   {
-   "id": "matter-door-lock",
+   "id": "iot-door-lock",
    "name": "Door lock",
    "icon": "🔒",
-   "category": "Security",
+   "category": "Closures",
    "matter": {
     "deviceType": "Door Lock",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Door Lock · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-lock/profiles/lock-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Door Lock",
-     "capability": "lock"
-    },
-    {
-     "cluster": "Door Lock (alarm events)",
-     "capability": "lockAlarm"
-    },
-    {
-     "cluster": "Door Lock (operating mode)",
-     "capability": "remoteControlStatus"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Door lock",
+    "name": "Virtual Door lock",
     "components": [
      {
       "id": "main",
@@ -792,52 +650,22 @@
    }
   },
   {
-   "id": "matter-thermostat",
+   "id": "iot-thermostat",
    "name": "Thermostat",
    "icon": "🌡️",
-   "category": "Climate",
+   "category": "HVAC",
    "matter": {
     "deviceType": "Thermostat",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Thermostat · 7 capabilities",
+   "description": "7 standard capabilities",
    "source": {
     "profiles": [
      "matter-thermostat/profiles/thermostat.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Temperature Measurement",
-     "capability": "temperatureMeasurement"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatMode"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatHeatingSetpoint"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatCoolingSetpoint"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatOperatingState"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Thermostat",
+    "name": "Virtual Thermostat",
     "components": [
      {
       "id": "main",
@@ -927,44 +755,22 @@
    }
   },
   {
-   "id": "matter-window-covering",
+   "id": "iot-window-covering",
    "name": "Blind (window covering)",
    "icon": "🪟",
-   "category": "Climate",
+   "category": "Closures",
    "matter": {
     "deviceType": "Window Covering",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Window Covering · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-window-covering/profiles/window-covering-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Window Covering",
-     "capability": "windowShade"
-    },
-    {
-     "cluster": "Window Covering (preset position)",
-     "capability": "windowShadePreset"
-    },
-    {
-     "cluster": "Window Covering",
-     "capability": "windowShadeLevel"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Blind (window covering)",
+    "name": "Virtual Blind window covering",
     "components": [
      {
       "id": "main",
@@ -1028,44 +834,22 @@
    }
   },
   {
-   "id": "matter-video-player",
+   "id": "iot-video-player",
    "name": "TV (video player)",
    "icon": "📺",
-   "category": "Appliances",
+   "category": "Media",
    "matter": {
     "deviceType": "Basic Video Player",
     "version": "1.0"
    },
-   "description": "Matter 1.0 · Basic Video Player · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-media/profiles/media-video-player.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Media Playback",
-     "capability": "mediaPlayback"
-    },
-    {
-     "cluster": "Media Playback (next / previous)",
-     "capability": "mediaTrackControl"
-    },
-    {
-     "cluster": "Keypad Input",
-     "capability": "keypadInput"
-    },
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter TV (video player)",
+    "name": "Virtual TV video player",
     "components": [
      {
       "id": "main",
@@ -1122,68 +906,22 @@
    }
   },
   {
-   "id": "matter-room-air-conditioner",
+   "id": "iot-room-air-conditioner",
    "name": "Air conditioner",
    "icon": "❄️",
-   "category": "Climate",
+   "category": "Appliances",
    "matter": {
     "deviceType": "Room Air Conditioner",
     "version": "1.2"
    },
-   "description": "Matter 1.2 · Room Air Conditioner · 11 capabilities",
+   "description": "11 standard capabilities",
    "source": {
     "profiles": [
      "matter-thermostat/profiles/room-air-conditioner.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "Temperature Measurement",
-     "capability": "temperatureMeasurement"
-    },
-    {
-     "cluster": "Relative Humidity Measurement",
-     "capability": "relativeHumidityMeasurement"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatMode"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatHeatingSetpoint"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatCoolingSetpoint"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatOperatingState"
-    },
-    {
-     "cluster": "Fan Control",
-     "capability": "airConditionerFanMode"
-    },
-    {
-     "cluster": "Fan Control",
-     "capability": "fanSpeedPercent"
-    },
-    {
-     "cluster": "Fan Control (wind)",
-     "capability": "windMode"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Air conditioner",
+    "name": "Virtual Air conditioner",
     "components": [
      {
       "id": "main",
@@ -1325,40 +1063,22 @@
    }
   },
   {
-   "id": "matter-fan",
+   "id": "iot-fan",
    "name": "Fan",
    "icon": "🌀",
-   "category": "Climate",
+   "category": "HVAC",
    "matter": {
     "deviceType": "Fan",
     "version": "1.2"
    },
-   "description": "Matter 1.2 · Fan · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-thermostat/profiles/fan.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Fan Control",
-     "capability": "airConditionerFanMode"
-    },
-    {
-     "cluster": "Fan Control",
-     "capability": "fanSpeedPercent"
-    },
-    {
-     "cluster": "Fan Control (wind)",
-     "capability": "windMode"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Fan",
+    "name": "Virtual Fan",
     "components": [
      {
       "id": "main",
@@ -1425,44 +1145,22 @@
    }
   },
   {
-   "id": "matter-air-purifier",
+   "id": "iot-air-purifier",
    "name": "Air purifier",
    "icon": "🍃",
-   "category": "Climate",
+   "category": "HVAC",
    "matter": {
     "deviceType": "Air Purifier",
     "version": "1.2"
    },
-   "description": "Matter 1.2 · Air Purifier · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-thermostat/profiles/air-purifier-hepa.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Fan Control",
-     "capability": "airPurifierFanMode"
-    },
-    {
-     "cluster": "Fan Control",
-     "capability": "fanSpeedPercent"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    },
-    {
-     "cluster": "HEPA Filter Monitoring",
-     "capability": "filterState"
-    },
-    {
-     "cluster": "HEPA Filter Monitoring",
-     "capability": "filterStatus"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Air purifier",
+    "name": "Virtual Air purifier",
     "components": [
      {
       "id": "main",
@@ -1544,44 +1242,22 @@
    }
   },
   {
-   "id": "matter-smoke-co-alarm",
+   "id": "iot-smoke-co-alarm",
    "name": "Smoke & CO alarm",
    "icon": "🔥",
-   "category": "Security",
+   "category": "Sensors",
    "matter": {
     "deviceType": "Smoke CO Alarm",
     "version": "1.2"
    },
-   "description": "Matter 1.2 · Smoke CO Alarm · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-sensor/profiles/smoke-co-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Smoke CO Alarm",
-     "capability": "smokeDetector"
-    },
-    {
-     "cluster": "Smoke CO Alarm",
-     "capability": "carbonMonoxideDetector"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "Smoke CO Alarm (hardware fault)",
-     "capability": "hardwareFault"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Smoke and CO alarm",
+    "name": "Virtual Smoke and CO alarm",
     "components": [
      {
       "id": "main",
@@ -1642,36 +1318,22 @@
    }
   },
   {
-   "id": "matter-robot-vacuum",
+   "id": "iot-robot-vacuum",
    "name": "Robot vacuum",
    "icon": "🤖",
-   "category": "Appliances",
+   "category": "Robotic",
    "matter": {
     "deviceType": "Robotic Vacuum Cleaner",
     "version": "1.2"
    },
-   "description": "Matter 1.2 · Robotic Vacuum Cleaner · 3 capabilities",
+   "description": "3 standard capabilities",
    "source": {
     "profiles": [
      "matter-rvc/profiles/rvc-clean-mode.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "RVC Operational State",
-     "capability": "robotCleanerOperatingState"
-    },
-    {
-     "cluster": "RVC Clean Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Robot vacuum",
+    "name": "Virtual Robot vacuum",
     "components": [
      {
       "id": "main",
@@ -1720,7 +1382,7 @@
    }
   },
   {
-   "id": "matter-laundry-washer",
+   "id": "iot-laundry-washer",
    "name": "Washer",
    "icon": "🧺",
    "category": "Appliances",
@@ -1728,40 +1390,14 @@
     "deviceType": "Laundry Washer",
     "version": "1.2"
    },
-   "description": "Matter 1.2 · Laundry Washer · 6 capabilities",
+   "description": "6 standard capabilities",
    "source": {
     "profiles": [
      "matter-appliance/profiles/laundry-washer.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "Laundry Washer Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "Laundry Washer Controls",
-     "capability": "laundryWasherRinseMode"
-    },
-    {
-     "cluster": "Operational State",
-     "capability": "operationalState"
-    },
-    {
-     "cluster": "Laundry Washer Controls",
-     "capability": "laundryWasherSpinSpeed"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Washer",
+    "name": "Virtual Washer",
     "components": [
      {
       "id": "main",
@@ -1841,7 +1477,7 @@
    }
   },
   {
-   "id": "matter-dishwasher",
+   "id": "iot-dishwasher",
    "name": "Dishwasher",
    "icon": "🍽️",
    "category": "Appliances",
@@ -1849,44 +1485,14 @@
     "deviceType": "Dishwasher",
     "version": "1.2"
    },
-   "description": "Matter 1.2 · Dishwasher · 7 capabilities",
+   "description": "7 standard capabilities",
    "source": {
     "profiles": [
      "matter-appliance/profiles/dishwasher.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "Dishwasher Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "Dishwasher Alarm",
-     "capability": "waterFlowAlarm"
-    },
-    {
-     "cluster": "Boolean State",
-     "capability": "contactSensor"
-    },
-    {
-     "cluster": "Dishwasher Alarm",
-     "capability": "temperatureAlarm"
-    },
-    {
-     "cluster": "Operational State",
-     "capability": "operationalState"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Dishwasher",
+    "name": "Virtual Dishwasher",
     "components": [
      {
       "id": "main",
@@ -1974,7 +1580,7 @@
    }
   },
   {
-   "id": "matter-refrigerator",
+   "id": "iot-refrigerator",
    "name": "Refrigerator",
    "icon": "🧊",
    "category": "Appliances",
@@ -1982,40 +1588,14 @@
     "deviceType": "Refrigerator (with freezer cabinet)",
     "version": "1.2"
    },
-   "description": "Matter 1.2 · Refrigerator (with freezer cabinet) · 6 capabilities",
+   "description": "6 standard capabilities",
    "source": {
     "profiles": [
      "matter-appliance/profiles/refrigerator-freezer.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Refrigerator And Temperature Controlled Cabinet Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "Boolean State",
-     "capability": "contactSensor"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    },
-    {
-     "cluster": "Temperature Control",
-     "capability": "temperatureSetpoint"
-    },
-    {
-     "cluster": "Temperature Control",
-     "capability": "temperatureLevel"
-    },
-    {
-     "cluster": "Temperature Measurement",
-     "capability": "temperatureMeasurement"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Refrigerator",
+    "name": "Virtual Refrigerator",
     "components": [
      {
       "id": "main",
@@ -2132,7 +1712,7 @@
    }
   },
   {
-   "id": "matter-laundry-dryer",
+   "id": "iot-laundry-dryer",
    "name": "Dryer",
    "icon": "🌬️",
    "category": "Appliances",
@@ -2140,32 +1720,14 @@
     "deviceType": "Laundry Dryer",
     "version": "1.3"
    },
-   "description": "Matter 1.3 · Laundry Dryer · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-appliance/profiles/laundry-dryer.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "Laundry Washer Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "Operational State",
-     "capability": "operationalState"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Dryer",
+    "name": "Virtual Dryer",
     "components": [
      {
       "id": "main",
@@ -2223,7 +1785,7 @@
    }
   },
   {
-   "id": "matter-microwave-oven",
+   "id": "iot-microwave-oven",
    "name": "Microwave",
    "icon": "♨️",
    "category": "Appliances",
@@ -2231,32 +1793,14 @@
     "deviceType": "Microwave Oven",
     "version": "1.3"
    },
-   "description": "Matter 1.3 · Microwave Oven · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-appliance/profiles/microwave-oven.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Microwave Oven Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "Operational State",
-     "capability": "operationalState"
-    },
-    {
-     "cluster": "Microwave Oven Control",
-     "capability": "cookTime"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Microwave",
+    "name": "Virtual Microwave",
     "components": [
      {
       "id": "main",
@@ -2313,7 +1857,7 @@
    }
   },
   {
-   "id": "matter-oven",
+   "id": "iot-oven",
    "name": "Oven (two cavities)",
    "icon": "🔥",
    "category": "Appliances",
@@ -2321,36 +1865,14 @@
     "deviceType": "Oven",
     "version": "1.3"
    },
-   "description": "Matter 1.3 · Oven · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-appliance/profiles/oven-cabinet-one-tn-cabinet-two-tl-cook-top-cook-surface-one-tl-cook-surface-two-tl.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    },
-    {
-     "cluster": "Oven Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "Temperature Measurement",
-     "capability": "temperatureMeasurement"
-    },
-    {
-     "cluster": "Temperature Control",
-     "capability": "temperatureSetpoint"
-    },
-    {
-     "cluster": "Temperature Control",
-     "capability": "temperatureLevel"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Oven (two cavities)",
+    "name": "Virtual Oven two cavities",
     "components": [
      {
       "id": "main",
@@ -2464,7 +1986,7 @@
    }
   },
   {
-   "id": "matter-cooktop",
+   "id": "iot-cooktop",
    "name": "Cooktop (two burners)",
    "icon": "🍳",
    "category": "Appliances",
@@ -2472,33 +1994,15 @@
     "deviceType": "Cooktop",
     "version": "1.3"
    },
-   "description": "Matter 1.3 · Cooktop · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-appliance/profiles/cook-top.yml",
      "matter-appliance/profiles/oven-cabinet-one-tn-cabinet-two-tl-cook-top-cook-surface-one-tl-cook-surface-two-tl.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    },
-    {
-     "cluster": "Temperature Control",
-     "capability": "temperatureLevel"
-    },
-    {
-     "cluster": "Temperature Measurement",
-     "capability": "temperatureMeasurement"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Cooktop (two burners)",
+    "name": "Virtual Cooktop two burners",
     "components": [
      {
       "id": "main",
@@ -2597,7 +2101,7 @@
    }
   },
   {
-   "id": "matter-extractor-hood",
+   "id": "iot-extractor-hood",
    "name": "Range hood",
    "icon": "💨",
    "category": "Appliances",
@@ -2605,32 +2109,14 @@
     "deviceType": "Extractor Hood",
     "version": "1.3"
    },
-   "description": "Matter 1.3 · Extractor Hood · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-appliance/profiles/extractor-hood-light.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Fan Control",
-     "capability": "fanMode"
-    },
-    {
-     "cluster": "Fan Control",
-     "capability": "fanSpeedPercent"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    },
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Range hood",
+    "name": "Virtual Range hood",
     "components": [
      {
       "id": "main",
@@ -2702,7 +2188,7 @@
    }
   },
   {
-   "id": "matter-water-leak-detector",
+   "id": "iot-water-leak-detector",
    "name": "Water leak sensor",
    "icon": "💧",
    "category": "Sensors",
@@ -2710,28 +2196,14 @@
     "deviceType": "Water Leak Detector",
     "version": "1.3"
    },
-   "description": "Matter 1.3 · Water Leak Detector · 3 capabilities",
+   "description": "3 standard capabilities",
    "source": {
     "profiles": [
      "matter-sensor/profiles/leak-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Boolean State",
-     "capability": "waterSensor"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Water leak sensor",
+    "name": "Virtual Water leak sensor",
     "components": [
      {
       "id": "main",
@@ -2774,44 +2246,22 @@
    }
   },
   {
-   "id": "matter-energy-plug",
+   "id": "iot-energy-plug",
    "name": "Smart plug with energy meter",
    "icon": "🔌",
-   "category": "Plugs & switches",
+   "category": "Plugs and actuators",
    "matter": {
     "deviceType": "On/Off Plug-in Unit + Electrical Sensor",
     "version": "1.3"
    },
-   "description": "Matter 1.3 · On/Off Plug-in Unit + Electrical Sensor · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-switch/profiles/plug-power-energy-powerConsumption.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "On/Off",
-     "capability": "switch"
-    },
-    {
-     "cluster": "Electrical Power Measurement",
-     "capability": "powerMeter"
-    },
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "energyMeter"
-    },
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "powerConsumptionReport"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Smart plug with energy meter",
+    "name": "Virtual Smart plug with energy meter",
     "components": [
      {
       "id": "main",
@@ -2868,44 +2318,22 @@
    }
   },
   {
-   "id": "matter-ev-charger",
+   "id": "iot-ev-charger",
    "name": "EV charger",
    "icon": "🚗",
-   "category": "Energy",
+   "category": "Energy management",
    "matter": {
     "deviceType": "EVSE (EV charger)",
     "version": "1.3"
    },
-   "description": "Matter 1.3 · EVSE (EV charger) · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-energy/profiles/evse-energy-meas.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Energy EVSE",
-     "capability": "evseState"
-    },
-    {
-     "cluster": "Energy EVSE",
-     "capability": "evseChargingSession"
-    },
-    {
-     "cluster": "Energy EVSE Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "powerConsumptionReport"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter EV charger",
+    "name": "Virtual EV charger",
     "components": [
      {
       "id": "main",
@@ -2973,40 +2401,22 @@
    }
   },
   {
-   "id": "matter-solar-power",
+   "id": "iot-solar-power",
    "name": "Solar power",
    "icon": "☀️",
-   "category": "Energy",
+   "category": "Energy management",
    "matter": {
     "deviceType": "Solar Power",
     "version": "1.4"
    },
-   "description": "Matter 1.4 · Solar Power · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-energy/profiles/solar-power.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "energyMeter"
-    },
-    {
-     "cluster": "Electrical Power Measurement",
-     "capability": "powerMeter"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    },
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "powerConsumptionReport"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Solar power",
+    "name": "Virtual Solar power",
     "components": [
      {
       "id": "main",
@@ -3059,48 +2469,22 @@
    }
   },
   {
-   "id": "matter-battery-storage",
+   "id": "iot-battery-storage",
    "name": "Home battery",
    "icon": "🔋",
-   "category": "Energy",
+   "category": "Energy management",
    "matter": {
     "deviceType": "Battery Storage",
     "version": "1.4"
    },
-   "description": "Matter 1.4 · Battery Storage · 6 capabilities",
+   "description": "6 standard capabilities",
    "source": {
     "profiles": [
      "matter-energy/profiles/battery-storage.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "Power Source (battery charge state)",
-     "capability": "chargingState"
-    },
-    {
-     "cluster": "Electrical Power Measurement",
-     "capability": "powerMeter"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    },
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "energyMeter"
-    },
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "powerConsumptionReport"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Home battery",
+    "name": "Virtual Home battery",
     "components": [
      {
       "id": "main",
@@ -3195,40 +2579,22 @@
    }
   },
   {
-   "id": "matter-heat-pump",
+   "id": "iot-heat-pump",
    "name": "Heat pump",
    "icon": "♨️",
-   "category": "Energy",
+   "category": "HVAC",
    "matter": {
     "deviceType": "Heat Pump",
     "version": "1.4"
    },
-   "description": "Matter 1.4 · Heat Pump · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-thermostat/profiles/heat-pump.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "energyMeter"
-    },
-    {
-     "cluster": "Electrical Power Measurement",
-     "capability": "powerMeter"
-    },
-    {
-     "cluster": "Electrical Energy Measurement",
-     "capability": "powerConsumptionReport"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Heat pump",
+    "name": "Virtual Heat pump",
     "components": [
      {
       "id": "main",
@@ -3276,44 +2642,22 @@
    }
   },
   {
-   "id": "matter-water-heater",
+   "id": "iot-water-heater",
    "name": "Water heater",
    "icon": "🚿",
-   "category": "Energy",
+   "category": "Energy management",
    "matter": {
     "deviceType": "Water Heater",
     "version": "1.4"
    },
-   "description": "Matter 1.4 · Water Heater · 5 capabilities",
+   "description": "5 standard capabilities",
    "source": {
     "profiles": [
      "matter-thermostat/profiles/water-heater.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Temperature Measurement",
-     "capability": "temperatureMeasurement"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatMode"
-    },
-    {
-     "cluster": "Thermostat",
-     "capability": "thermostatHeatingSetpoint"
-    },
-    {
-     "cluster": "Water Heater Mode",
-     "capability": "mode"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Water heater",
+    "name": "Virtual Water heater",
     "components": [
      {
       "id": "main",
@@ -3388,76 +2732,22 @@
    }
   },
   {
-   "id": "matter-camera",
+   "id": "iot-camera",
    "name": "Camera / video doorbell",
    "icon": "📷",
-   "category": "Security",
+   "category": "Cameras",
    "matter": {
     "deviceType": "Camera (with doorbell)",
     "version": "1.5"
    },
-   "description": "Matter 1.5 · Camera (with doorbell) · 13 capabilities",
+   "description": "13 standard capabilities",
    "source": {
     "profiles": [
      "matter-switch/profiles/camera.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Camera AV Settings User Level Management",
-     "capability": "mechanicalPanTiltZoom"
-    },
-    {
-     "cluster": "Camera AV Stream Management",
-     "capability": "hdr"
-    },
-    {
-     "cluster": "Camera AV Stream Management",
-     "capability": "nightVision"
-    },
-    {
-     "cluster": "Camera AV Stream Management",
-     "capability": "imageControl"
-    },
-    {
-     "cluster": "Chime",
-     "capability": "sounds"
-    },
-    {
-     "cluster": "Camera AV Stream Management (privacy)",
-     "capability": "cameraPrivacyMode"
-    },
-    {
-     "cluster": "Occupancy Sensing",
-     "capability": "motionSensor"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "Power Source (battery charge state)",
-     "capability": "chargingState"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    },
-    {
-     "cluster": "Camera AV Stream Management (audio)",
-     "capability": "audioMute"
-    },
-    {
-     "cluster": "Camera AV Stream Management (audio)",
-     "capability": "audioVolume"
-    },
-    {
-     "cluster": "Switch",
-     "capability": "button"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Camera - video doorbell",
+    "name": "Virtual Camera - video doorbell",
     "components": [
      {
       "id": "main",
@@ -3601,40 +2891,22 @@
    }
   },
   {
-   "id": "matter-closure",
+   "id": "iot-closure",
    "name": "Garage door / gate",
    "icon": "🚘",
-   "category": "Security",
+   "category": "Closures",
    "matter": {
     "deviceType": "Closure (garage door, gate)",
     "version": "1.5"
    },
-   "description": "Matter 1.5 · Closure (garage door, gate) · 4 capabilities",
+   "description": "4 standard capabilities",
    "source": {
     "profiles": [
      "matter-window-covering/profiles/garage-door.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Closure Control",
-     "capability": "doorControl"
-    },
-    {
-     "cluster": "Closure Dimension",
-     "capability": "level"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Garage door - gate",
+    "name": "Virtual Garage door - gate",
     "components": [
      {
       "id": "main",
@@ -3687,7 +2959,7 @@
    }
   },
   {
-   "id": "matter-soil-sensor",
+   "id": "iot-soil-sensor",
    "name": "Soil moisture sensor",
    "icon": "🌱",
    "category": "Sensors",
@@ -3695,28 +2967,14 @@
     "deviceType": "Soil Sensor",
     "version": "1.5"
    },
-   "description": "Matter 1.5 · Soil Sensor · 3 capabilities",
+   "description": "3 standard capabilities",
    "source": {
     "profiles": [
      "matter-sensor/profiles/soil-sensor-battery.yml"
     ]
    },
-   "mapping": [
-    {
-     "cluster": "Relative Humidity Measurement",
-     "capability": "relativeHumidityMeasurement"
-    },
-    {
-     "cluster": "Power Source",
-     "capability": "battery"
-    },
-    {
-     "cluster": "(SmartThings: re-reads attributes)",
-     "capability": "refresh"
-    }
-   ],
    "deviceProfile": {
-    "name": "Virtual Matter Soil moisture sensor",
+    "name": "Virtual Soil moisture sensor",
     "components": [
      {
       "id": "main",
@@ -3753,6 +3011,972 @@
      "battery": {
       "battery": {
        "value": 77,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-presence-sensor",
+   "name": "Presence sensor",
+   "icon": "🧍",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Occupancy Sensor (radar)",
+    "version": "1.4"
+   },
+   "description": "6 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/presence-illuminance-temperature-humidity-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Presence sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "presenceSensor",
+        "version": 1
+       },
+       {
+        "id": "temperatureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "relativeHumidityMeasurement",
+        "version": 1
+       },
+       {
+        "id": "illuminanceMeasurement",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "PresenceSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "presenceSensor": {
+      "presence": {
+       "value": "present"
+      }
+     },
+     "temperatureMeasurement": {
+      "temperature": {
+       "value": 22,
+       "unit": "C"
+      }
+     },
+     "relativeHumidityMeasurement": {
+      "humidity": {
+       "value": 48,
+       "unit": "%"
+      }
+     },
+     "illuminanceMeasurement": {
+      "illuminance": {
+       "value": 320,
+       "unit": "lux"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 90,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-arrival-sensor",
+   "name": "Arrival sensor",
+   "icon": "🏠",
+   "category": "Sensors",
+   "description": "4 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-presence-sensor/profiles/smartthings-arrival-sensor.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Arrival sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "presenceSensor",
+        "version": 1
+       },
+       {
+        "id": "tone",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "MobilePresence"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "presenceSensor": {
+      "presence": {
+       "value": "not present"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 85,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-light-sensor",
+   "name": "Light sensor",
+   "icon": "🔆",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Light Sensor",
+    "version": "1.0"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/illuminance-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Light sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "illuminanceMeasurement",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "LightSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "illuminanceMeasurement": {
+      "illuminance": {
+       "value": 250,
+       "unit": "lux"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 93,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-temperature-sensor",
+   "name": "Temperature sensor",
+   "icon": "🌡️",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Temperature Sensor",
+    "version": "1.0"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/temperature-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Temperature sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "temperatureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "TempSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "temperatureMeasurement": {
+      "temperature": {
+       "value": 21.5,
+       "unit": "C"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 88,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-sound-sensor",
+   "name": "Sound sensor",
+   "icon": "🔉",
+   "category": "Sensors",
+   "description": "4 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-sound-sensor/profiles/battery-sound-temperature.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Sound sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "soundSensor",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "temperatureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "SoundSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "soundSensor": {
+      "sound": {
+       "value": "not detected"
+      }
+     },
+     "temperatureMeasurement": {
+      "temperature": {
+       "value": 22,
+       "unit": "C"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 91,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-water-freeze-detector",
+   "name": "Water freeze detector",
+   "icon": "🥶",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Water Freeze Detector",
+    "version": "1.3"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/freeze-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Water freeze detector",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "temperatureAlarm",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "WaterFreezeDetector"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "temperatureAlarm": {
+      "temperatureAlarm": {
+       "value": "cleared"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 95,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-flow-sensor",
+   "name": "Flow sensor",
+   "icon": "🚰",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Flow Sensor",
+    "version": "1.0"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/flow-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Flow sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "flowMeasurement",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "FlowSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "flowMeasurement": {
+      "flow": {
+       "value": 1.2,
+       "unit": "m^3/h"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 80,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-rain-sensor",
+   "name": "Rain sensor",
+   "icon": "🌧️",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Rain Sensor",
+    "version": "1.3"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/rain-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Rain sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "rainSensor",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "RainSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "rainSensor": {
+      "rain": {
+       "value": "not detected"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 87,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-air-quality-sensor",
+   "name": "Indoor air quality sensor",
+   "icon": "🌫️",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Air Quality Sensor",
+    "version": "1.2"
+   },
+   "description": "7 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/aqs-temp-humidity-co2-pm25-tvoc-meas.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Indoor air quality sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "airQualityHealthConcern",
+        "version": 1
+       },
+       {
+        "id": "temperatureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "relativeHumidityMeasurement",
+        "version": 1
+       },
+       {
+        "id": "carbonDioxideMeasurement",
+        "version": 1
+       },
+       {
+        "id": "fineDustSensor",
+        "version": 1
+       },
+       {
+        "id": "tvocMeasurement",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "EnvironmentSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "airQualityHealthConcern": {
+      "airQualityHealthConcern": {
+       "value": "good"
+      }
+     },
+     "temperatureMeasurement": {
+      "temperature": {
+       "value": 23,
+       "unit": "C"
+      }
+     },
+     "relativeHumidityMeasurement": {
+      "humidity": {
+       "value": 42,
+       "unit": "%"
+      }
+     },
+     "carbonDioxideMeasurement": {
+      "carbonDioxide": {
+       "value": 650,
+       "unit": "ppm"
+      }
+     },
+     "fineDustSensor": {
+      "fineDustLevel": {
+       "value": 8,
+       "unit": "μg/m^3"
+      }
+     },
+     "tvocMeasurement": {
+      "tvocLevel": {
+       "value": 0.12,
+       "unit": "ppm"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-multi-sensor",
+   "name": "Multipurpose sensor",
+   "icon": "📳",
+   "category": "Sensors",
+   "description": "6 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-contact/profiles/multi-sensor.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Multipurpose sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "contactSensor",
+        "version": 1
+       },
+       {
+        "id": "temperatureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "threeAxis",
+        "version": 1
+       },
+       {
+        "id": "accelerationSensor",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "MultiFunctionalSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "contactSensor": {
+      "contact": {
+       "value": "closed"
+      }
+     },
+     "accelerationSensor": {
+      "acceleration": {
+       "value": "inactive"
+      }
+     },
+     "threeAxis": {
+      "threeAxis": {
+       "value": [
+        0,
+        0,
+        1000
+       ],
+       "unit": "mG"
+      }
+     },
+     "temperatureMeasurement": {
+      "temperature": {
+       "value": 21,
+       "unit": "C"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 86,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-pressure-sensor",
+   "name": "Pressure sensor",
+   "icon": "⏲️",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Pressure Sensor",
+    "version": "1.0"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/pressure-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Pressure sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "atmosphericPressureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "GenericSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "atmosphericPressureMeasurement": {
+      "atmosphericPressure": {
+       "value": 101.3,
+       "unit": "kPa"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 90,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-zone-sensor",
+   "name": "Security zone sensor",
+   "icon": "🛡️",
+   "category": "Sensors",
+   "description": "4 standard capabilities",
+   "source": {
+    "profiles": [
+     "zwave-sensor/profiles/contact-battery-tamperalert.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Security zone sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "contactSensor",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "tamperAlert",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "ZoneSensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "contactSensor": {
+      "contact": {
+       "value": "closed"
+      }
+     },
+     "tamperAlert": {
+      "tamper": {
+       "value": "clear"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 92,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-weather-station",
+   "name": "Weather station",
+   "icon": "⛅",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Temperature Sensor + Humidity Sensor + Pressure Sensor",
+    "version": "1.0"
+   },
+   "description": "5 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/temperature-humidity-pressure-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Weather station",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "temperatureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "relativeHumidityMeasurement",
+        "version": 1
+       },
+       {
+        "id": "atmosphericPressureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "WeatherStation"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "temperatureMeasurement": {
+      "temperature": {
+       "value": 14,
+       "unit": "C"
+      }
+     },
+     "relativeHumidityMeasurement": {
+      "humidity": {
+       "value": 70,
+       "unit": "%"
+      }
+     },
+     "atmosphericPressureMeasurement": {
+      "atmosphericPressure": {
+       "value": 100.8,
+       "unit": "kPa"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 75,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-co-alarm",
+   "name": "Carbon monoxide alarm",
+   "icon": "⚠️",
+   "category": "Sensors",
+   "matter": {
+    "deviceType": "Smoke CO Alarm (CO only)",
+    "version": "1.2"
+   },
+   "description": "5 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-sensor/profiles/co-comeas-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Carbon monoxide alarm",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "carbonMonoxideDetector",
+        "version": 1
+       },
+       {
+        "id": "carbonMonoxideMeasurement",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "hardwareFault",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "SmokeDetector"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "carbonMonoxideDetector": {
+      "carbonMonoxide": {
+       "value": "clear"
+      }
+     },
+     "carbonMonoxideMeasurement": {
+      "carbonMonoxideLevel": {
+       "value": 0,
+       "unit": "ppm"
+      }
+     },
+     "hardwareFault": {
+      "hardwareFault": {
+       "value": "clear"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 94,
        "unit": "%"
       }
      }

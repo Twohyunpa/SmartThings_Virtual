@@ -48,14 +48,28 @@ MODELS = {
     'vd_stv_2017_k': ('TV', '📺'), 'hw_q80r_soundbar': ('Soundbar', '🔊'),
 }
 
+# Matter Device Library chapter used as the GUI category (same list as tools/build-iot-templates.py).
+def category(fixture):
+    if fixture.startswith(('da_ac_ehs', 'da_sac_ehs', 'da_ac_air_')):
+        return 'HVAC'
+    if fixture.startswith('da_ac_airsensor'):
+        return 'Sensors'
+    if fixture.startswith(('da_rvc', 'da_vc')):
+        return 'Robotic'
+    if fixture.startswith(('vd_', 'hw_')):
+        return 'Media'
+    return 'Appliances'  # washers, dryers, dishwashers, air conditioners, refrigerators, cooking
+
+
 def standard(cap_id):
     return '.' not in cap_id
 
 
 def sanitize_profile_name(name):
-    # SmartThings virtualdevices:create rejects '/', '&', ',' in deviceProfile.name with HTTP 422.
+    # SmartThings virtualdevices:create rejects '/', '&', ',' in deviceProfile.name with HTTP 422;
+    # brackets and other symbols are dropped too, to be safe.
     s = name.replace('&', ' and ').replace('/', '-')
-    s = re.sub(r'[^A-Za-z0-9 ()_-]', ' ', s)
+    s = re.sub(r'[^A-Za-z0-9 _-]', ' ', s)
     return re.sub(r'\s+', ' ', s).strip() or 'Virtual Profile'
 
 out = []
@@ -87,7 +101,7 @@ for fixture, (name, icon) in MODELS.items():
         print('skip', fixture, n_std, 'standard capabilities')
         continue
     out.append({
-        'id': fixture, 'name': name, 'icon': icon,
+        'id': fixture, 'name': name, 'icon': icon, 'category': category(fixture),
         'description': f"{dev.get('deviceTypeName')} · {dev.get('presentationId')} · {n_std} standard capabilities",
         'source': {'fixture': fixture, 'presentationId': dev.get('presentationId'), 'deviceTypeName': dev.get('deviceTypeName')},
         'deviceProfile': {'name': sanitize_profile_name(f'Virtual {name}')[:40].strip(), 'components': comps},

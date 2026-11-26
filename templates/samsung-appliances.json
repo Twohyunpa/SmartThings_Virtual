@@ -10,6 +10,7 @@
    "id": "da_wm_wm_01011",
    "name": "Washer",
    "icon": "🧺",
+   "category": "Appliances",
    "description": "Samsung OCF Washer · DA-WM-WM-01011 · 5 standard capabilities",
    "source": {
     "fixture": "da_wm_wm_01011",
@@ -59,7 +60,7 @@
         "energy": 26800,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "persistedSavedEnergy": 0,
@@ -103,6 +104,7 @@
    "id": "da_wm_wm_000001",
    "name": "Washer (older model)",
    "icon": "🧺",
+   "category": "Appliances",
    "description": "Samsung OCF Washer · DA-WM-WM-000001 · 5 standard capabilities",
    "source": {
     "fixture": "da_wm_wm_000001",
@@ -110,7 +112,7 @@
     "deviceTypeName": "Samsung OCF Washer"
    },
    "deviceProfile": {
-    "name": "Virtual Washer (older model)",
+    "name": "Virtual Washer older model",
     "components": [
      {
       "id": "main",
@@ -152,7 +154,7 @@
         "energy": 352800,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "start": "2025-02-07T03:09:24Z",
@@ -195,6 +197,7 @@
    "id": "da_wm_wm_100002",
    "name": "Washer (two-unit)",
    "icon": "🧺",
+   "category": "Appliances",
    "description": "Samsung OCF Washer · DA-WM-WM-100002 · 8 standard capabilities",
    "source": {
     "fixture": "da_wm_wm_100002",
@@ -202,7 +205,7 @@
     "deviceTypeName": "Samsung OCF Washer"
    },
    "deviceProfile": {
-    "name": "Virtual Washer (two-unit)",
+    "name": "Virtual Washer two-unit",
     "components": [
      {
       "id": "main",
@@ -301,6 +304,7 @@
    "id": "da_wm_wd_01011",
    "name": "Dryer",
    "icon": "🌀",
+   "category": "Appliances",
    "description": "Samsung OCF Dryer · DA-WM-WD-01011 · 5 standard capabilities",
    "source": {
     "fixture": "da_wm_wd_01011",
@@ -378,7 +382,7 @@
         "energy": 16900,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "persistedSavedEnergy": 1387,
@@ -394,6 +398,7 @@
    "id": "da_wm_wd_000001",
    "name": "Dryer (older model)",
    "icon": "🌀",
+   "category": "Appliances",
    "description": "Samsung OCF Dryer · DA-WM-WD-000001 · 5 standard capabilities",
    "source": {
     "fixture": "da_wm_wd_000001",
@@ -401,7 +406,7 @@
     "deviceTypeName": "Samsung OCF Dryer"
    },
    "deviceProfile": {
-    "name": "Virtual Dryer (older model)",
+    "name": "Virtual Dryer older model",
     "components": [
      {
       "id": "main",
@@ -471,7 +476,7 @@
         "energy": 4495500,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "start": "2025-02-07T04:00:19Z",
@@ -486,6 +491,7 @@
    "id": "da_wm_dw_01011",
    "name": "Dishwasher",
    "icon": "🍽️",
+   "category": "Appliances",
    "description": "Samsung OCF Dishwasher · DA-WM-DW-01011 · 5 standard capabilities",
    "source": {
     "fixture": "da_wm_dw_01011",
@@ -535,7 +541,7 @@
         "energy": 98300,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "persistedSavedEnergy": 0,
@@ -579,6 +585,7 @@
    "id": "da_wm_dw_000001",
    "name": "Dishwasher (older model)",
    "icon": "🍽️",
+   "category": "Appliances",
    "description": "Samsung OCF Dishwasher · DA-WM-DW-000001 · 5 standard capabilities",
    "source": {
     "fixture": "da_wm_dw_000001",
@@ -586,7 +593,7 @@
     "deviceTypeName": "Samsung OCF Dishwasher"
    },
    "deviceProfile": {
-    "name": "Virtual Dishwasher (older model)",
+    "name": "Virtual Dishwasher older model",
     "components": [
      {
       "id": "main",
@@ -628,7 +635,7 @@
         "energy": 101600,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "persistedSavedEnergy": 0,
@@ -672,6 +679,7 @@
    "id": "da_wm_sc_000001",
    "name": "Steam closet (AirDresser)",
    "icon": "👔",
+   "category": "Appliances",
    "description": "Samsung OCF Steam Closet · DA-WM-SC-000001 · 5 standard capabilities",
    "source": {
     "fixture": "da_wm_sc_000001",
@@ -679,7 +687,7 @@
     "deviceTypeName": "Samsung OCF Steam Closet"
    },
    "deviceProfile": {
-    "name": "Virtual Steam closet (AirDresser)",
+    "name": "Virtual Steam closet AirDresser",
     "components": [
      {
       "id": "main",
@@ -749,7 +757,7 @@
         "energy": 207500,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "start": "2025-02-10T22:51:59Z",
@@ -764,6 +772,7 @@
    "id": "da_ac_rac_01001",
    "name": "Air conditioner",
    "icon": "❄️",
+   "category": "Appliances",
    "description": "Samsung OCF Air Conditioner · DA-AC-RAC-01001 · 16 standard capabilities",
    "source": {
     "fixture": "da_ac_rac_01001",
@@ -953,7 +962,7 @@
         "energy": 13836,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 13836,
         "energySaved": 0,
         "persistedSavedEnergy": 0,
@@ -969,6 +978,7 @@
    "id": "da_ac_rac_000001",
    "name": "Air conditioner (multi-unit)",
    "icon": "❄️",
+   "category": "Appliances",
    "description": "Samsung OCF Air Conditioner · DA-AC-RAC-000001 · 28 standard capabilities",
    "source": {
     "fixture": "da_ac_rac_000001",
@@ -976,7 +986,7 @@
     "deviceTypeName": "Samsung OCF Air Conditioner"
    },
    "deviceProfile": {
-    "name": "Virtual Air conditioner (multi-unit)",
+    "name": "Virtual Air conditioner multi-unit",
     "components": [
      {
       "id": "main",
@@ -1113,6 +1123,30 @@
     ]
    },
    "sampleState": {
+    "1": {
+     "airConditionerFanMode": {
+      "supportedAcFanModes": {
+       "value": [
+        "auto",
+        "low",
+        "medium",
+        "high",
+        "turbo"
+       ]
+      }
+     },
+     "fanOscillationMode": {
+      "fanOscillationMode": {
+       "value": "fixed"
+      }
+     },
+     "relativeHumidityMeasurement": {
+      "humidity": {
+       "value": 0,
+       "unit": "%"
+      }
+     }
+    },
     "main": {
      "switch": {
       "switch": {
@@ -1182,36 +1216,12 @@
         "energy": 2247300,
         "deltaEnergy": 400,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 2247300,
         "energySaved": 0,
         "start": "2025-02-09T15:45:29Z",
         "end": "2025-02-09T16:15:33Z"
        }
-      }
-     }
-    },
-    "1": {
-     "airConditionerFanMode": {
-      "supportedAcFanModes": {
-       "value": [
-        "auto",
-        "low",
-        "medium",
-        "high",
-        "turbo"
-       ]
-      }
-     },
-     "fanOscillationMode": {
-      "fanOscillationMode": {
-       "value": "fixed"
-      }
-     },
-     "relativeHumidityMeasurement": {
-      "humidity": {
-       "value": 0,
-       "unit": "%"
       }
      }
     }
@@ -1221,6 +1231,7 @@
    "id": "da_ac_rac_000003",
    "name": "Air conditioner (older model)",
    "icon": "❄️",
+   "category": "Appliances",
    "description": "Samsung OCF Air Conditioner · DA-AC-RAC-000003 · 15 standard capabilities",
    "source": {
     "fixture": "da_ac_rac_000003",
@@ -1228,7 +1239,7 @@
     "deviceTypeName": "Samsung OCF Air Conditioner"
    },
    "deviceProfile": {
-    "name": "Virtual Air conditioner (older model)",
+    "name": "Virtual Air conditioner older model",
     "components": [
      {
       "id": "main",
@@ -1395,6 +1406,7 @@
    "id": "da_ac_rac_100001",
    "name": "Air conditioner (minimal)",
    "icon": "❄️",
+   "category": "Appliances",
    "description": "Samsung OCF Air Conditioner · DA-AC-RAC-100001 · 9 standard capabilities",
    "source": {
     "fixture": "da_ac_rac_100001",
@@ -1402,7 +1414,7 @@
     "deviceTypeName": "Samsung OCF Air Conditioner"
    },
    "deviceProfile": {
-    "name": "Virtual Air conditioner (minimal)",
+    "name": "Virtual Air conditioner minimal",
     "components": [
      {
       "id": "main",
@@ -1515,6 +1527,7 @@
    "id": "da_ac_cac_01001",
    "name": "Cassette air conditioner",
    "icon": "❄️",
+   "category": "Appliances",
    "description": "Samsung OCF Air Conditioner · DA-AC-CAC-01001 · 16 standard capabilities",
    "source": {
     "fixture": "da_ac_cac_01001",
@@ -1712,7 +1725,7 @@
         "energy": 83160,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 83160,
         "energySaved": 0,
         "persistedSavedEnergy": 0,
@@ -1735,6 +1748,7 @@
    "id": "da_ac_ehs_01001",
    "name": "Heat pump (EHS)",
    "icon": "♨️",
+   "category": "HVAC",
    "description": "oic.d.thermostat · DA-AC-EHS-01001 · 10 standard capabilities",
    "source": {
     "fixture": "da_ac_ehs_01001",
@@ -1742,7 +1756,7 @@
     "deviceTypeName": "oic.d.thermostat"
    },
    "deviceProfile": {
-    "name": "Virtual Heat pump (EHS)",
+    "name": "Virtual Heat pump EHS",
     "components": [
      {
       "id": "main",
@@ -1844,7 +1858,7 @@
         "energy": 4053792,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "persistedSavedEnergy": 0,
@@ -1891,6 +1905,7 @@
    "id": "da_sac_ehs_000001_sub",
    "name": "Heat pump indoor unit",
    "icon": "♨️",
+   "category": "HVAC",
    "description": "Samsung OCF Air Conditioner · DA-SAC-EHS-000001-SUB · 11 standard capabilities",
    "source": {
     "fixture": "da_sac_ehs_000001_sub",
@@ -2000,11 +2015,11 @@
      "powerConsumptionReport": {
       "powerConsumption": {
        "value": {
-        "energy": 8901522.0,
+        "energy": 8901522,
         "deltaEnergy": 0,
         "power": 0.015,
         "powerEnergy": 0.01082494583328565,
-        "persistedEnergy": 8901522.0,
+        "persistedEnergy": 8901522,
         "energySaved": 0,
         "start": "2025-05-16T11:18:12Z",
         "end": "2025-05-16T12:01:29Z"
@@ -2054,6 +2069,7 @@
    "id": "da_sac_ehs_000002_sub",
    "name": "Heat pump, two indoor units",
    "icon": "♨️",
+   "category": "HVAC",
    "description": "Samsung OCF Air Conditioner · DA-SAC-EHS-000002-SUB · 16 standard capabilities",
    "source": {
     "fixture": "da_sac_ehs_000002_sub",
@@ -2194,11 +2210,11 @@
      "powerConsumptionReport": {
       "powerConsumption": {
        "value": {
-        "energy": 9575308.0,
-        "deltaEnergy": 45.0,
+        "energy": 9575308,
+        "deltaEnergy": 45,
         "power": 0.015,
         "powerEnergy": 0.22207609332044917,
-        "persistedEnergy": 9575308.0,
+        "persistedEnergy": 9575308,
         "energySaved": 0,
         "start": "2025-05-09T04:39:01Z",
         "end": "2025-05-09T05:02:01Z"
@@ -2279,6 +2295,7 @@
    "id": "da_ac_air_01011",
    "name": "Air purifier",
    "icon": "🍃",
+   "category": "HVAC",
    "description": "Samsung OCF Air Purifier · DA-AC-AIR-01011 · 11 standard capabilities",
    "source": {
     "fixture": "da_ac_air_01011",
@@ -2374,7 +2391,7 @@
         "energy": 221878,
         "deltaEnergy": 4,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "start": "2026-03-09T20:42:57Z",
@@ -2395,6 +2412,7 @@
    "id": "da_ac_air_000001",
    "name": "Air purifier (older model)",
    "icon": "🍃",
+   "category": "HVAC",
    "description": "Samsung OCF Air Purifier · DA-AC-AIR-000001 · 10 standard capabilities",
    "source": {
     "fixture": "da_ac_air_000001",
@@ -2402,7 +2420,7 @@
     "deviceTypeName": "Samsung OCF Air Purifier"
    },
    "deviceProfile": {
-    "name": "Virtual Air purifier (older model)",
+    "name": "Virtual Air purifier older model",
     "components": [
      {
       "id": "main",
@@ -2526,6 +2544,7 @@
    "id": "da_ac_airsensor_01001",
    "name": "Air quality sensor",
    "icon": "🌫️",
+   "category": "Sensors",
    "description": "x.com.st.d.airqualitysensor · DA-AC-AIRSENSOR-01001 · 12 standard capabilities",
    "source": {
     "fixture": "da_ac_airsensor_01001",
@@ -2599,7 +2618,7 @@
     "main": {
      "temperatureMeasurement": {
       "temperature": {
-       "value": 23.0,
+       "value": 23,
        "unit": "C"
       }
      },
@@ -2669,6 +2688,7 @@
    "id": "da_ref_normal_01011",
    "name": "Refrigerator",
    "icon": "🧊",
+   "category": "Appliances",
    "description": "Samsung OCF Refrigerator · DA-REF-NORMAL-01011 · 21 standard capabilities",
    "source": {
     "fixture": "da_ref_normal_01011",
@@ -2952,6 +2972,7 @@
    "id": "da_ref_normal_01011_onedoor",
    "name": "Refrigerator (one-door zone)",
    "icon": "🧊",
+   "category": "Appliances",
    "description": "Samsung OCF Refrigerator · DA-REF-NORMAL-01011 · 21 standard capabilities",
    "source": {
     "fixture": "da_ref_normal_01011_onedoor",
@@ -2959,7 +2980,7 @@
     "deviceTypeName": "Samsung OCF Refrigerator"
    },
    "deviceProfile": {
-    "name": "Virtual Refrigerator (one-door zone)",
+    "name": "Virtual Refrigerator one-door zone",
     "components": [
      {
       "id": "main",
@@ -3210,6 +3231,7 @@
    "id": "da_ref_normal_000001",
    "name": "Refrigerator (older model)",
    "icon": "🧊",
+   "category": "Appliances",
    "description": "Samsung OCF Refrigerator · DA-REF-NORMAL-000001 · 20 standard capabilities",
    "source": {
     "fixture": "da_ref_normal_000001",
@@ -3217,7 +3239,7 @@
     "deviceTypeName": "Samsung OCF Refrigerator"
    },
    "deviceProfile": {
-    "name": "Virtual Refrigerator (older model)",
+    "name": "Virtual Refrigerator older model",
     "components": [
      {
       "id": "main",
@@ -3471,6 +3493,7 @@
    "id": "da_ref_normal_01001",
    "name": "Refrigerator (with scale / camera)",
    "icon": "🧊",
+   "category": "Appliances",
    "description": "Samsung OCF Refrigerator · DA-REF-NORMAL-01001 · 17 standard capabilities",
    "source": {
     "fixture": "da_ref_normal_01001",
@@ -3478,7 +3501,7 @@
     "deviceTypeName": "Samsung OCF Refrigerator"
    },
    "deviceProfile": {
-    "name": "Virtual Refrigerator (with scale - camer",
+    "name": "Virtual Refrigerator with scale - camera",
     "components": [
      {
       "id": "main",
@@ -3737,6 +3760,7 @@
    "id": "da_ref_normal_100001",
    "name": "Refrigerator (minimal)",
    "icon": "🧊",
+   "category": "Appliances",
    "description": "Samsung OCF Refrigerator · DA-REF-NORMAL-100001 · 12 standard capabilities",
    "source": {
     "fixture": "da_ref_normal_100001",
@@ -3744,7 +3768,7 @@
     "deviceTypeName": "Samsung OCF Refrigerator"
    },
    "deviceProfile": {
-    "name": "Virtual Refrigerator (minimal)",
+    "name": "Virtual Refrigerator minimal",
     "components": [
      {
       "id": "main",
@@ -3880,6 +3904,7 @@
    "id": "da_rvc_map_01011",
    "name": "Robot vacuum (with map / station)",
    "icon": "🤖",
+   "category": "Robotic",
    "description": "Samsung OCF Robot Vacuum · DA-RVC-MAP-01011 · 17 standard capabilities",
    "source": {
     "fixture": "da_rvc_map_01011",
@@ -3887,7 +3912,7 @@
     "deviceTypeName": "Samsung OCF Robot Vacuum"
    },
    "deviceProfile": {
-    "name": "Virtual Robot vacuum (with map - station",
+    "name": "Virtual Robot vacuum with map - station",
     "components": [
      {
       "id": "main",
@@ -4011,7 +4036,7 @@
         "energy": 335,
         "deltaEnergy": 3,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "start": "2026-02-27T16:52:44Z",
@@ -4060,6 +4085,7 @@
    "id": "da_rvc_normal_000001",
    "name": "Robot vacuum",
    "icon": "🤖",
+   "category": "Robotic",
    "description": "Samsung OCF Robot Vacuum · DA-RVC-NORMAL-000001 · 7 standard capabilities",
    "source": {
     "fixture": "da_rvc_normal_000001",
@@ -4144,6 +4170,7 @@
    "id": "da_ks_oven_0107x",
    "name": "Oven",
    "icon": "🔥",
+   "category": "Appliances",
    "description": "Samsung OCF Oven · DA-KS-OVEN-0107X · 10 standard capabilities",
    "source": {
     "fixture": "da_ks_oven_0107x",
@@ -4313,6 +4340,7 @@
    "id": "da_ks_oven_01061",
    "name": "Oven (older model)",
    "icon": "🔥",
+   "category": "Appliances",
    "description": "Samsung OCF Oven · DA-KS-OVEN-01061 · 6 standard capabilities",
    "source": {
     "fixture": "da_ks_oven_01061",
@@ -4320,7 +4348,7 @@
     "deviceTypeName": "Samsung OCF Oven"
    },
    "deviceProfile": {
-    "name": "Virtual Oven (older model)",
+    "name": "Virtual Oven older model",
     "components": [
      {
       "id": "main",
@@ -4415,6 +4443,7 @@
    "id": "da_ks_walloven_0107x",
    "name": "Wall oven (two cavities)",
    "icon": "🔥",
+   "category": "Appliances",
    "description": "Samsung OCF Oven · DA-KS-WALLOVEN-0107X · 16 standard capabilities",
    "source": {
     "fixture": "da_ks_walloven_0107x",
@@ -4422,7 +4451,7 @@
     "deviceTypeName": "Samsung OCF Oven"
    },
    "deviceProfile": {
-    "name": "Virtual Wall oven (two cavities)",
+    "name": "Virtual Wall oven two cavities",
     "components": [
      {
       "id": "main",
@@ -4573,7 +4602,7 @@
         "energy": 0,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "start": "2025-12-02T02:44:17Z",
@@ -4684,6 +4713,7 @@
    "id": "da_ks_range_0101x",
    "name": "Range",
    "icon": "🔥",
+   "category": "Appliances",
    "description": "Samsung OCF Range · DA-KS-RANGE-0101X · 10 standard capabilities",
    "source": {
     "fixture": "da_ks_range_0101x",
@@ -4855,6 +4885,7 @@
    "id": "da_ks_microwave_0101x",
    "name": "Microwave",
    "icon": "♨️",
+   "category": "Appliances",
    "description": "oic.d.microwave · DA-KS-MICROWAVE-0101X · 8 standard capabilities",
    "source": {
     "fixture": "da_ks_microwave_0101x",
@@ -4971,6 +5002,7 @@
    "id": "da_ks_cooktop_31001",
    "name": "Cooktop (6 burners)",
    "icon": "🍳",
+   "category": "Appliances",
    "description": "Samsung Cooktop · DA-KS-COOKTOP-31001 · 4 standard capabilities",
    "source": {
     "fixture": "da_ks_cooktop_31001",
@@ -4978,7 +5010,7 @@
     "deviceTypeName": "Samsung Cooktop"
    },
    "deviceProfile": {
-    "name": "Virtual Cooktop (6 burners)",
+    "name": "Virtual Cooktop 6 burners",
     "components": [
      {
       "id": "main",
@@ -5037,6 +5069,7 @@
    "id": "da_ks_hood_01001",
    "name": "Range hood",
    "icon": "💨",
+   "category": "Appliances",
    "description": "x.com.st.d.hood · DA-KS-HOOD-01001 · 13 standard capabilities",
    "source": {
     "fixture": "da_ks_hood_01001",
@@ -5153,7 +5186,7 @@
         "energy": 19997,
         "deltaEnergy": 0,
         "power": 0,
-        "powerEnergy": 0.0,
+        "powerEnergy": 0,
         "persistedEnergy": 0,
         "energySaved": 0,
         "persistedSavedEnergy": 0,
@@ -5213,6 +5246,7 @@
    "id": "vd_stv_2017_k",
    "name": "TV",
    "icon": "📺",
+   "category": "Media",
    "description": "Samsung OCF TV · VD-STV_2017_K · 8 standard capabilities",
    "source": {
     "fixture": "vd_stv_2017_k",
@@ -5323,6 +5357,7 @@
    "id": "hw_q80r_soundbar",
    "name": "Soundbar",
    "icon": "🔊",
+   "category": "Media",
    "description": "Samsung OCF Network Audio Player · VD-NetworkAudio-001S · 8 standard capabilities",
    "source": {
     "fixture": "hw_q80r_soundbar",

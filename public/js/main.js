@@ -97,7 +97,7 @@ function renderDeviceList() {
     .sort((a, b) => (a.label || a.name || '').localeCompare(b.label || b.name || ''))
     .map((d) => `
       <button class="device-item ${d.deviceId === state.selectedId ? 'active' : ''}" data-id="${esc(d.deviceId)}">
-        <div class="name">${esc(d.label || d.name)}${String(store(`st.tpl.${d.deviceId}`) || '').startsWith('matter-') ? ' <span class="badge matter" title="Created from a Matter device template">Matter</span>' : ''}</div>
+        <div class="name">${esc(d.label || d.name)}${/^(iot|matter)-/.test(String(store(`st.tpl.${d.deviceId}`) || '')) ? ' <span class="badge iot" title="Created from an IoT device template">IoT</span>' : ''}</div>
         <div class="meta">${esc(d.deviceId.slice(0, 8))}… ${esc(locName(d.locationId))}</div>
       </button>`).join('');
 }
@@ -124,10 +124,11 @@ async function loadTemplates() {
     state.templatesMeta = r.generatedFrom || null;
   } catch { state.templates = []; }
   try {
-    const r = await api('GET', '/api/matter-templates');
-    state.matterTemplates = r.templates || [];
-    state.matterMeta = { ...(r.generatedFrom || {}), matterVersion: r.matterVersion };
-  } catch { state.matterTemplates = []; }
+    const r = await api('GET', '/api/iot-templates');
+    state.iotTemplates = r.templates || [];
+    state.iotMeta = r.generatedFrom || null;
+    if (Array.isArray(r.categories) && r.categories.length) state.categories = r.categories;
+  } catch { state.iotTemplates = []; }
   try { state.presets = (await api('GET', '/api/presets')) || []; } catch { state.presets = []; }
 }
 

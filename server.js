@@ -20,7 +20,7 @@ const CLI_TIMEOUT_MS = Number(process.env.ST_CLI_TIMEOUT_MS || 120000);
 const CLI_CONCURRENCY = Math.max(1, Number(process.env.ST_CLI_CONCURRENCY || 5));
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
 const TEMPLATES_FILE = path.join(__dirname, 'templates', 'samsung-appliances.json');
-const MATTER_FILE = path.join(__dirname, 'templates', 'matter-devices.json');
+const IOT_FILE = path.join(__dirname, 'templates', 'iot-devices.json');
 const PRESETS_FILE = path.join(__dirname, 'templates', 'presets.json');
 
 let currentProfile = process.env.ST_PROFILE || 'default';
@@ -443,7 +443,7 @@ function sanitizeProfileName(name) {
   return String(name || '')
     .replace(/&/g, ' and ')
     .replace(/\//g, '-')
-    .replace(/[^A-Za-z0-9 ()_-]/g, ' ')
+    .replace(/[^A-Za-z0-9 _-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim() || 'Virtual Profile';
 }
@@ -471,7 +471,7 @@ const routes = [
   ['GET', /^\/api\/log$/, async () => ({ status: 200, body: { data: commandLog } })],
   ['DELETE', /^\/api\/log$/, async () => { commandLog.length = 0; return { status: 200, body: { ok: true } }; }],
   ['GET', /^\/api\/templates$/, async () => ({ status: 200, body: { data: loadJsonCached(TEMPLATES_FILE) } })],
-  ['GET', /^\/api\/matter-templates$/, async () => ({ status: 200, body: { data: loadJsonCached(MATTER_FILE) } })],
+  ['GET', /^\/api\/iot-templates$/, async () => ({ status: 200, body: { data: loadJsonCached(IOT_FILE) } })],
   ['GET', /^\/api\/presets$/, async () => ({ status: 200, body: { data: loadJsonCached(PRESETS_FILE) } })],
 
   ['GET', /^\/api\/locations$/, async () => runCli(['locations'])],
