@@ -1,4 +1,4 @@
-// Device creation view (Appliance templates, IoT devices, Standard prototype, Device profile ID, Profile JSON)
+// Device creation view (Samsung appliances, IoT devices, Standard prototype, Device profile ID, Profile JSON)
 // and sample state injection.
 
 import { state, actions, PROTOTYPES, store, deviceCapSet } from '../state.js';
@@ -7,7 +7,7 @@ import { $, esc, api, toast, sendEvents } from '../api.js';
 const createState = { mode: 'template', templateId: null, iotId: null, cat: {}, filter: {} };
 
 const MODE_INTROS = {
-  template: '<b>Appliance templates</b> — pick a real appliance model (washer, oven, TV …) and get a virtual device with the same <em>standard</em> SmartThings capabilities. Best for trying an app or automation against Samsung-like devices. These are not official Samsung profiles: the capability lists and sample values were taken from real devices (Home Assistant test data), and Samsung-specific capabilities are left out.',
+  template: '<b>Samsung appliances</b> — pick a real Samsung appliance model (washer, oven, TV …) and get a virtual device with the same <em>standard</em> SmartThings capabilities. Best for trying an app or automation against Samsung-like devices. These are not official Samsung profiles: the capability lists and sample values were taken from real devices (Home Assistant test data), and Samsung-specific capabilities are left out.',
   iot: '<b>IoT devices</b> — common smart home device types (lights, plugs, sensors, locks, blinds, climate, appliances, energy …) with the same <em>standard</em> capabilities that SmartThings\' official Edge drivers give a real device of that type. Use it to check how an app, automation or API integration sees such a device. <b>Limits:</b> the device is a cloud virtual device, so there is no pairing and no Matter, Zigbee or Z-Wave traffic, and a camera shows no video.',
   standard: '<b>Standard prototype</b> — one of SmartThings\' built-in virtual device types (switch, dimmer, motion sensor, lock, thermostat …). The quickest way to get a simple generic device; the capabilities are fixed by SmartThings.',
   profileId: '<b>Device profile ID</b> — reuse a device profile that already exists in your SmartThings account (for example one you made earlier with <code>smartthings deviceprofiles:create</code>). The list only shows profiles from your own account, so it is empty if you have not created any. In that case use another tab, or paste a profile UUID.',
@@ -23,7 +23,7 @@ export async function renderCreate() {
   main.innerHTML = `
     <div class="dev-head"><div><h2>New virtual device</h2><div class="muted small">The device is created for real in the selected location of your SmartThings account.</div></div></div>
     <div class="tabs">
-      <button class="tab ${createState.mode === 'template' ? 'active' : ''}" data-mode="template">Appliance templates</button>
+      <button class="tab ${createState.mode === 'template' ? 'active' : ''}" data-mode="template">Samsung appliances</button>
       <button class="tab ${createState.mode === 'iot' ? 'active' : ''}" data-mode="iot">IoT devices</button>
       <button class="tab ${createState.mode === 'standard' ? 'active' : ''}" data-mode="standard">Standard prototype</button>
       <button class="tab ${createState.mode === 'profileId' ? 'active' : ''}" data-mode="profileId">Device profile ID</button>
@@ -70,7 +70,7 @@ function renderModeArea() {
   const area = $('#modeArea');
   const m = createState.mode;
   if (m === 'template') {
-    if (!createState.templateId && state.templates[0]) createState.templateId = state.templates[0].id;
+    if (!createState.templateId && state.templates[0]) createState.templateId = byName(state.templates)[0].id;
     const t = state.templates.find((x) => x.id === createState.templateId);
     const profile = t ? t.deviceProfile : null;
     const src = state.templatesMeta;
@@ -79,7 +79,7 @@ function renderModeArea() {
         (<a href="${esc(src?.repository || '#')}" target="_blank" rel="noopener">Home Assistant SmartThings test fixtures</a>, ${esc(src?.license || '')}). Only standard SmartThings capabilities are used; Samsung-specific ones (<code>samsungce.*</code>, <code>custom.*</code> …) are left out.</div>
       ${categoryChips(state.templates, 'template')}
       <input id="tplFilter" placeholder="Filter templates (e.g. washer, oven, tv)" style="width:100%;margin-bottom:8px" />
-      <div class="tpl-grid">${state.templates.map((x) => templateCard(x, createState.templateId)).join('')}</div>
+      <div class="tpl-grid">${byName(state.templates).map((x) => templateCard(x, createState.templateId)).join('')}</div>
       <label class="small" style="display:block;margin:4px 0"><input type="checkbox" id="tplSample" ${createState.sample === false ? '' : 'checked'}/>
         Load the real device's sample state after creating</label>
       ${profile ? `<details><summary class="muted small">View / edit the profile definition (add or remove capabilities)</summary>
@@ -114,6 +114,9 @@ function renderModeArea() {
   }
   area.insertAdjacentHTML('afterbegin', `<div class="mode-intro">${MODE_INTROS[m] || ''}</div>`);
 }
+
+// Template cards are listed alphabetically by name.
+const byName = (list) => [...list].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
 
 // Category chips (Matter Device Library chapters) above a template grid. `key` is 'template' or 'iot'.
 function categoryChips(list, key) {
@@ -161,7 +164,7 @@ function wireTemplateGrid(area, key, list, onPick) {
 
 function renderIotArea(area) {
   const list = state.iotTemplates;
-  if (!createState.iotId && list[0]) createState.iotId = list[0].id;
+  if (!createState.iotId && list[0]) createState.iotId = byName(list)[0].id;
   const t = list.find((x) => x.id === createState.iotId);
   const src = state.iotMeta;
   const comps = t ? t.deviceProfile.components : [];
@@ -172,7 +175,7 @@ function renderIotArea(area) {
       Firmware-update, command-only and camera streaming capabilities are left out.</div>
     ${categoryChips(list, 'iot')}
     <input id="tplFilter" placeholder="Filter IoT devices (e.g. light, lock, sensor)" style="width:100%;margin-bottom:8px" />
-    <div class="tpl-grid">${list.map((x) => templateCard(x, createState.iotId)).join('')}</div>
+    <div class="tpl-grid">${byName(list).map((x) => templateCard(x, createState.iotId)).join('')}</div>
     ${t ? `
     <div class="tpl-detail">
       <div class="small"><b>${esc(t.icon)} ${esc(t.name)}</b> · ${esc(t.category)}

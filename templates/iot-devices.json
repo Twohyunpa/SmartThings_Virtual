@@ -4755,6 +4755,746 @@
    }
   },
   {
+   "id": "iot-vent",
+   "name": "Smart vent",
+   "icon": "🌬️",
+   "category": "HVAC",
+   "description": "6 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-vent/profiles/vent-profile-1.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Smart vent",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "switch",
+        "version": 1
+       },
+       {
+        "id": "switchLevel",
+        "version": 1
+       },
+       {
+        "id": "temperatureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "atmosphericPressureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Vent"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "switch": {
+      "switch": {
+       "value": "on"
+      }
+     },
+     "switchLevel": {
+      "level": {
+       "value": 50,
+       "unit": "%"
+      }
+     },
+     "temperatureMeasurement": {
+      "temperature": {
+       "value": 21,
+       "unit": "C"
+      }
+     },
+     "atmosphericPressureMeasurement": {
+      "atmosphericPressure": {
+       "value": 101.2,
+       "unit": "kPa"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 84,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-window-opener",
+   "name": "Window opener",
+   "icon": "🪟",
+   "category": "Closures",
+   "description": "2 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-window-treatment/profiles/window-shade-only.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Window opener",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "windowShade",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "WindowOpener"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "windowShade": {
+      "windowShade": {
+       "value": "closed"
+      },
+      "supportedWindowShadeCommands": {
+       "value": [
+        "open",
+        "close",
+        "pause"
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-tilt-blind",
+   "name": "Venetian blind with tilt",
+   "icon": "🪟",
+   "category": "Closures",
+   "matter": {
+    "deviceType": "Window Covering (lift and tilt)",
+    "version": "1.0"
+   },
+   "description": "6 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-window-covering/profiles/window-covering-tilt-battery.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Venetian blind with tilt",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "windowShade",
+        "version": 1
+       },
+       {
+        "id": "windowShadePreset",
+        "version": 1
+       },
+       {
+        "id": "windowShadeLevel",
+        "version": 1
+       },
+       {
+        "id": "windowShadeTiltLevel",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Blind"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "windowShade": {
+      "windowShade": {
+       "value": "open"
+      },
+      "supportedWindowShadeCommands": {
+       "value": [
+        "open",
+        "close",
+        "pause"
+       ]
+      }
+     },
+     "windowShadeLevel": {
+      "shadeLevel": {
+       "value": 100,
+       "unit": "%"
+      }
+     },
+     "windowShadeTiltLevel": {
+      "shadeTiltLevel": {
+       "value": 30,
+       "unit": "%"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 72,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-projector-screen",
+   "name": "Projector screen",
+   "icon": "🎞️",
+   "category": "Media",
+   "description": "4 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-window-treatment/profiles/projector-screen-VWSDSTUST120H.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Projector screen",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "windowShade",
+        "version": 1
+       },
+       {
+        "id": "mode",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Projector"
+       }
+      ]
+     },
+     {
+      "id": "hardwareFault",
+      "capabilities": [
+       {
+        "id": "hardwareFault",
+        "version": 1
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "windowShade": {
+      "windowShade": {
+       "value": "closed"
+      },
+      "supportedWindowShadeCommands": {
+       "value": [
+        "open",
+        "close",
+        "pause"
+       ]
+      }
+     }
+    },
+    "hardwareFault": {
+     "hardwareFault": {
+      "hardwareFault": {
+       "value": "clear"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-speaker",
+   "name": "Speaker",
+   "icon": "🔈",
+   "category": "Media",
+   "matter": {
+    "deviceType": "Speaker",
+    "version": "1.0"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-media/profiles/media-speaker.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Speaker",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "audioVolume",
+        "version": 1
+       },
+       {
+        "id": "audioMute",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Speaker"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "audioVolume": {
+      "volume": {
+       "value": 35,
+       "unit": "%"
+      }
+     },
+     "audioMute": {
+      "mute": {
+       "value": "unmuted"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-network-speaker",
+   "name": "Network speaker",
+   "icon": "🔊",
+   "category": "Media",
+   "description": "9 standard capabilities",
+   "source": {
+    "profiles": [
+     "sonos/profiles/sonos-player.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Network speaker",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "mediaPlayback",
+        "version": 1
+       },
+       {
+        "id": "mediaGroup",
+        "version": 1
+       },
+       {
+        "id": "mediaPresets",
+        "version": 1
+       },
+       {
+        "id": "mediaTrackControl",
+        "version": 1
+       },
+       {
+        "id": "audioMute",
+        "version": 1
+       },
+       {
+        "id": "audioNotification",
+        "version": 1
+       },
+       {
+        "id": "audioTrackData",
+        "version": 1
+       },
+       {
+        "id": "audioVolume",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Speaker"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "mediaPlayback": {
+      "playbackStatus": {
+       "value": "stopped"
+      },
+      "supportedPlaybackCommands": {
+       "value": [
+        "play",
+        "pause",
+        "stop"
+       ]
+      }
+     },
+     "mediaTrackControl": {
+      "supportedTrackControlCommands": {
+       "value": [
+        "nextTrack",
+        "previousTrack"
+       ]
+      }
+     },
+     "audioVolume": {
+      "volume": {
+       "value": 25,
+       "unit": "%"
+      }
+     },
+     "audioMute": {
+      "mute": {
+       "value": "unmuted"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-soundbar",
+   "name": "Soundbar",
+   "icon": "🔊",
+   "category": "Media",
+   "description": "6 standard capabilities",
+   "source": {
+    "profiles": [
+     "samsung-audio/profiles/samsung-audio.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Soundbar",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "mediaPlayback",
+        "version": 1
+       },
+       {
+        "id": "mediaTrackControl",
+        "version": 1
+       },
+       {
+        "id": "audioMute",
+        "version": 1
+       },
+       {
+        "id": "audioVolume",
+        "version": 1
+       },
+       {
+        "id": "audioTrackData",
+        "version": 1
+       },
+       {
+        "id": "switch",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "SoundBar"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "switch": {
+      "switch": {
+       "value": "on"
+      }
+     },
+     "audioVolume": {
+      "volume": {
+       "value": 20,
+       "unit": "%"
+      }
+     },
+     "audioMute": {
+      "mute": {
+       "value": "unmuted"
+      }
+     },
+     "mediaPlayback": {
+      "playbackStatus": {
+       "value": "playing"
+      },
+      "supportedPlaybackCommands": {
+       "value": [
+        "play",
+        "pause",
+        "stop"
+       ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-dimmer-switch",
+   "name": "Dimmer switch",
+   "icon": "🎚️",
+   "category": "Switches and controls",
+   "matter": {
+    "deviceType": "Dimmer Switch",
+    "version": "1.0"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-switch/profiles/switch-level.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Dimmer switch",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "switch",
+        "version": 1
+       },
+       {
+        "id": "switchLevel",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Switch"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "switch": {
+      "switch": {
+       "value": "on"
+      }
+     },
+     "switchLevel": {
+      "level": {
+       "value": 40,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-two-gang-switch",
+   "name": "Two-gang wall switch",
+   "icon": "🎚️",
+   "category": "Switches and controls",
+   "matter": {
+    "deviceType": "On/Off Light Switch (2 endpoints)",
+    "version": "1.0"
+   },
+   "description": "2 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-switch/profiles/switch-2.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Two-gang wall switch",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "switch",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Switch"
+       }
+      ]
+     },
+     {
+      "id": "switch2",
+      "capabilities": [
+       {
+        "id": "switch",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Switch"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "switch": {
+      "switch": {
+       "value": "on"
+      }
+     }
+    },
+    "switch2": {
+     "switch": {
+      "switch": {
+       "value": "off"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-dew-mold-sensor",
+   "name": "Dew point and mold sensor",
+   "icon": "🍄",
+   "category": "Sensors",
+   "description": "6 standard capabilities",
+   "source": {
+    "profiles": [
+     "zwave-sensor/profiles/temp-humidity-dew-mold.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Dew point and mold sensor",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "temperatureMeasurement",
+        "version": 1
+       },
+       {
+        "id": "relativeHumidityMeasurement",
+        "version": 1
+       },
+       {
+        "id": "dewPoint",
+        "version": 1
+       },
+       {
+        "id": "moldHealthConcern",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "TempHumiditySensor"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "temperatureMeasurement": {
+      "temperature": {
+       "value": 19,
+       "unit": "C"
+      }
+     },
+     "relativeHumidityMeasurement": {
+      "humidity": {
+       "value": 68,
+       "unit": "%"
+      }
+     },
+     "dewPoint": {
+      "dewpoint": {
+       "value": 13,
+       "unit": "C"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 81,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
    "id": "iot-gas-meter",
    "name": "Gas meter",
    "icon": "🔥",
