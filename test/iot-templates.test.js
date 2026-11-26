@@ -20,9 +20,9 @@ describe('IoT device templates', () => {
     assert.deepEqual(data.categories, CATEGORIES);
   });
 
-  it('has 50 templates with unique ids and known categories', () => {
-    assert.equal(data.templates.length, 50);
-    assert.equal(new Set(data.templates.map((t) => t.id)).size, 50);
+  it('has 60 templates with unique ids and known categories', () => {
+    assert.equal(data.templates.length, 60);
+    assert.equal(new Set(data.templates.map((t) => t.id)).size, 60);
     for (const t of data.templates) {
       assert.match(t.id, /^iot-[a-z0-9-]+$/);
       assert.ok(CATEGORIES.includes(t.category), `${t.id}: category ${t.category}`);

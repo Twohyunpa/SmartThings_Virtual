@@ -3982,6 +3982,771 @@
      }
     }
    }
+  },
+  {
+   "id": "iot-siren",
+   "name": "Siren",
+   "icon": "🚨",
+   "category": "Other",
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-siren/profiles/switch-alarm.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Siren",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "switch",
+        "version": 1
+       },
+       {
+        "id": "alarm",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Siren"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "switch": {
+      "switch": {
+       "value": "off"
+      }
+     },
+     "alarm": {
+      "alarm": {
+       "value": "off"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-panic-button",
+   "name": "Panic button",
+   "icon": "🆘",
+   "category": "Switches and controls",
+   "description": "4 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-button/profiles/button-profile-panic-frient.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Panic button",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "button",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       },
+       {
+        "id": "panicAlarm",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "PanicButton"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "panicAlarm": {
+      "panicAlarm": {
+       "value": "clear"
+      }
+     },
+     "button": {
+      "numberOfButtons": {
+       "value": 1
+      },
+      "supportedButtonValues": {
+       "value": [
+        "pushed"
+       ]
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 90,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-door",
+   "name": "Door opener",
+   "icon": "🚪",
+   "category": "Closures",
+   "matter": {
+    "deviceType": "Closure (door)",
+    "version": "1.5"
+   },
+   "description": "4 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-window-covering/profiles/door.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Door opener",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "doorControl",
+        "version": 1
+       },
+       {
+        "id": "level",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Door"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "doorControl": {
+      "door": {
+       "value": "closed"
+      }
+     },
+     "level": {
+      "level": {
+       "value": 0,
+       "unit": "%"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 88,
+       "unit": "%"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-wall-switch",
+   "name": "Wall switch",
+   "icon": "🎚️",
+   "category": "Switches and controls",
+   "matter": {
+    "deviceType": "On/Off Light Switch",
+    "version": "1.0"
+   },
+   "description": "2 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-switch/profiles/switch-binary.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Wall switch",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "switch",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Switch"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "switch": {
+      "switch": {
+       "value": "off"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-power-meter",
+   "name": "Power meter (3 phase)",
+   "icon": "⚡",
+   "category": "Energy management",
+   "matter": {
+    "deviceType": "Electrical Sensor",
+    "version": "1.3"
+   },
+   "description": "6 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-power-meter/profiles/frient-power-energy-current-voltage.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Power meter 3 phase",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "powerMeter",
+        "version": 1
+       },
+       {
+        "id": "energyMeter",
+        "version": 1
+       },
+       {
+        "id": "powerConsumptionReport",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "PowerMeasurementSensor"
+       }
+      ]
+     },
+     {
+      "id": "production",
+      "capabilities": [
+       {
+        "id": "energyMeter",
+        "version": 1
+       }
+      ]
+     },
+     {
+      "id": "phaseA",
+      "capabilities": [
+       {
+        "id": "powerMeter",
+        "version": 1
+       },
+       {
+        "id": "voltageMeasurement",
+        "version": 1
+       },
+       {
+        "id": "currentMeasurement",
+        "version": 1
+       }
+      ]
+     },
+     {
+      "id": "phaseB",
+      "capabilities": [
+       {
+        "id": "powerMeter",
+        "version": 1
+       },
+       {
+        "id": "voltageMeasurement",
+        "version": 1
+       },
+       {
+        "id": "currentMeasurement",
+        "version": 1
+       }
+      ]
+     },
+     {
+      "id": "phaseC",
+      "capabilities": [
+       {
+        "id": "powerMeter",
+        "version": 1
+       },
+       {
+        "id": "voltageMeasurement",
+        "version": 1
+       },
+       {
+        "id": "currentMeasurement",
+        "version": 1
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "powerMeter": {
+      "power": {
+       "value": 2350,
+       "unit": "W"
+      }
+     },
+     "energyMeter": {
+      "energy": {
+       "value": 1520.4,
+       "unit": "kWh"
+      }
+     }
+    },
+    "production": {
+     "energyMeter": {
+      "energy": {
+       "value": 310.2,
+       "unit": "kWh"
+      }
+     }
+    },
+    "phaseA": {
+     "powerMeter": {
+      "power": {
+       "value": 820,
+       "unit": "W"
+      }
+     },
+     "voltageMeasurement": {
+      "voltage": {
+       "value": 230,
+       "unit": "V"
+      }
+     },
+     "currentMeasurement": {
+      "current": {
+       "value": 3.6,
+       "unit": "A"
+      }
+     }
+    },
+    "phaseB": {
+     "powerMeter": {
+      "power": {
+       "value": 760,
+       "unit": "W"
+      }
+     },
+     "voltageMeasurement": {
+      "voltage": {
+       "value": 231,
+       "unit": "V"
+      }
+     },
+     "currentMeasurement": {
+      "current": {
+       "value": 3.3,
+       "unit": "A"
+      }
+     }
+    },
+    "phaseC": {
+     "powerMeter": {
+      "power": {
+       "value": 770,
+       "unit": "W"
+      }
+     },
+     "voltageMeasurement": {
+      "voltage": {
+       "value": 229,
+       "unit": "V"
+      }
+     },
+     "currentMeasurement": {
+      "current": {
+       "value": 3.4,
+       "unit": "A"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-home-energy-meter",
+   "name": "Home energy meter",
+   "icon": "🏠",
+   "category": "Energy management",
+   "matter": {
+    "deviceType": "Electrical Sensor",
+    "version": "1.3"
+   },
+   "description": "3 standard capabilities",
+   "source": {
+    "profiles": [
+     "zwave-electric-meter/profiles/base-electric-meter.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Home energy meter",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "powerMeter",
+        "version": 1
+       },
+       {
+        "id": "energyMeter",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "CurbPowerMeter"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "powerMeter": {
+      "power": {
+       "value": 1840,
+       "unit": "W"
+      }
+     },
+     "energyMeter": {
+      "energy": {
+       "value": 8421.7,
+       "unit": "kWh"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-water-valve",
+   "name": "Water valve",
+   "icon": "🚰",
+   "category": "Plugs and actuators",
+   "matter": {
+    "deviceType": "Water Valve",
+    "version": "1.4"
+   },
+   "description": "4 standard capabilities",
+   "source": {
+    "profiles": [
+     "zigbee-valve/profiles/valve-battery-powerSource.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Water valve",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "valve",
+        "version": 1
+       },
+       {
+        "id": "battery",
+        "version": 1
+       },
+       {
+        "id": "powerSource",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "WaterValve"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "valve": {
+      "valve": {
+       "value": "open"
+      }
+     },
+     "battery": {
+      "battery": {
+       "value": 83,
+       "unit": "%"
+      }
+     },
+     "powerSource": {
+      "powerSource": {
+       "value": "battery"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-gas-valve",
+   "name": "Gas valve",
+   "icon": "🔥",
+   "category": "Plugs and actuators",
+   "description": "2 standard capabilities",
+   "source": {
+    "profiles": [
+     "zwave-valve/profiles/valve-generic.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Gas valve",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "valve",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "GasValve"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "valve": {
+      "valve": {
+       "value": "open"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-irrigation",
+   "name": "Irrigation controller",
+   "icon": "🌿",
+   "category": "Plugs and actuators",
+   "matter": {
+    "deviceType": "Irrigation System",
+    "version": "1.5"
+   },
+   "description": "5 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-switch/profiles/irrigation-system.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Irrigation controller",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "valve",
+        "version": 1
+       },
+       {
+        "id": "level",
+        "version": 1
+       },
+       {
+        "id": "flowMeasurement",
+        "version": 1
+       },
+       {
+        "id": "operationalState",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Irrigation"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "valve": {
+      "valve": {
+       "value": "closed"
+      }
+     },
+     "level": {
+      "level": {
+       "value": 0,
+       "unit": "%"
+      }
+     },
+     "flowMeasurement": {
+      "flow": {
+       "value": 0,
+       "unit": "m^3/h"
+      }
+     },
+     "operationalState": {
+      "operationalState": {
+       "value": "stopped"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-pump",
+   "name": "Pump",
+   "icon": "⛽",
+   "category": "HVAC",
+   "matter": {
+    "deviceType": "Pump",
+    "version": "1.0"
+   },
+   "description": "5 standard capabilities",
+   "source": {
+    "profiles": [
+     "matter-pump/profiles/pump-level.yml"
+    ]
+   },
+   "deviceProfile": {
+    "name": "Virtual Pump",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "switch",
+        "version": 1
+       },
+       {
+        "id": "switchLevel",
+        "version": 1
+       },
+       {
+        "id": "pumpOperationMode",
+        "version": 1
+       },
+       {
+        "id": "pumpControlMode",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Pump"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "switch": {
+      "switch": {
+       "value": "on"
+      }
+     },
+     "switchLevel": {
+      "level": {
+       "value": 60,
+       "unit": "%"
+      }
+     },
+     "pumpOperationMode": {
+      "operationMode": {
+       "value": "normal"
+      },
+      "supportedOperationModes": {
+       "value": [
+        "normal",
+        "minimum",
+        "maximum"
+       ]
+      }
+     },
+     "pumpControlMode": {
+      "controlMode": {
+       "value": "constantSpeed"
+      },
+      "supportedControlModes": {
+       "value": [
+        "constantSpeed",
+        "constantPressure",
+        "automatic"
+       ]
+      }
+     }
+    }
+   }
   }
  ]
 }
