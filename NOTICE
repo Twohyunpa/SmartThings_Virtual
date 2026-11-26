@@ -24,5 +24,7 @@ Copyright (c) SmartThings, Inc. and contributors.
 Changes: only the component ids, standard capability lists and categories of selected
 profiles were copied by tools/build-iot-templates.py; firmware, command-only, camera
 streaming and vendor capabilities were removed, and some components were dropped or merged.
-Matter device type names, categories, sample states and presets were added. The exact upstream commit is
+Matter device type names, categories, sample states and presets were added. The gas meter
+and gas leak detector templates in the same file come from the Home Assistant fixtures
+described above. The exact upstream commit is
 recorded in the "generatedFrom" field of the template file.

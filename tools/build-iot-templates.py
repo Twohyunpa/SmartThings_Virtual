@@ -11,10 +11,16 @@ The device types and categories follow the Matter Device Library (Matter 1.5), b
 only cross-vendor list of smart home device types. Most profiles come from the matter-* drivers; a
 few sensors come from zigbee-* / zwave-* drivers where no Matter profile fits.
 
+A few device types that no SmartThings driver profile covers (gas meter, gas detector) come from real
+devices in Home Assistant's SmartThings test fixtures (https://github.com/home-assistant/core,
+tests/components/smartthings/fixtures, Apache-2.0), the same source as templates/samsung-appliances.json.
+
 Usage:
   git clone --depth 1 --filter=blob:none --sparse https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers ste
   git -C ste sparse-checkout set --no-cone '/drivers/SmartThings/*/profiles/*'
-  python3 tools/build-iot-templates.py ste
+  git clone --depth 1 --filter=blob:none --sparse https://github.com/home-assistant/core ha-core
+  git -C ha-core sparse-checkout set tests/components/smartthings
+  python3 tools/build-iot-templates.py ste ha-core
 
 Requires PyYAML (pip install pyyaml).
 """
@@ -25,6 +31,9 @@ import yaml
 root = sys.argv[1] if len(sys.argv) > 1 else 'ste'
 drivers = os.path.join(root, 'drivers', 'SmartThings')
 commit = subprocess.run(['git', '-C', root, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
+ha_root = sys.argv[2] if len(sys.argv) > 2 else 'ha-core'
+ha_fixtures = os.path.join(ha_root, 'tests', 'components', 'smartthings', 'fixtures')
+ha_commit = subprocess.run(['git', '-C', ha_root, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
 
 # Capabilities that mean nothing on a virtual device: firmware plumbing, command-only "stateless" step
 # capabilities, and the camera streaming / storage capabilities (a virtual camera has no video).
@@ -32,6 +41,7 @@ DROP = {
     'firmwareUpdate', 'batteryLevel',
     'webrtc', 'videoCapture2', 'videoStreamSettings', 'imageCapture', 'localMediaStorage',
     'zoneManagement', 'cameraViewportSettings', 'audioRecording',
+    'healthCheck', 'signalStrength', 'momentary',  # cloud plumbing / radio quality / command-only (HA fixtures)
 }
 
 def keep(cap_id):
@@ -288,6 +298,13 @@ MODELS = [
                                               'supportedControlModes': v(['constantSpeed', 'constantPressure', 'automatic'])}}}}),
 ]
 
+# Device types with no SmartThings driver profile, taken from real devices in the Home Assistant fixtures:
+# id, fixture, name, icon, category, Matter device type, Matter version, SmartThings category (None: keep)
+HA_MODELS = [
+    ('gas-meter', 'gas_meter', 'Gas meter', '🔥', 'Energy management', None, None, None),
+    ('gas-detector', 'gas_detector', 'Gas leak detector', '💨', 'Sensors', None, None, None),
+]
+
 
 def load_profile(driver, profile):
     with open(os.path.join(drivers, driver, 'profiles', profile + '.yml')) as f:
@@ -343,10 +360,45 @@ for tid, (driver, profile), name, icon, category, matter_type, version, opt in M
         'sampleState': sample,
     })
 
+for tid, fixture, name, icon, category, matter_type, version, st_category in HA_MODELS:
+    assert category in CATEGORIES, f'{tid}: unknown category {category}'
+    dev = json.load(open(os.path.join(ha_fixtures, 'devices', f'{fixture}.json')))['items'][0]
+    status = json.load(open(os.path.join(ha_fixtures, 'device_status', f'{fixture}.json')))['components']
+    comps, sample = [], {}
+    for c in dev['components']:
+        caps = [{'id': x['id'], 'version': x.get('version', 1)} for x in c['capabilities'] if keep(x['id'])]
+        if not caps:
+            continue
+        comp = {'id': c['id'], 'capabilities': caps}
+        cats = [{'name': k['name']} for k in c.get('categories', [])][:1]
+        if c['id'] == 'main' and st_category:
+            cats = [{'name': st_category}]
+        if cats:
+            comp['categories'] = cats
+        comps.append(comp)
+        for x in caps:
+            attrs = {a: {'value': v['value'], **({'unit': v['unit']} if v.get('unit') else {})}
+                     for a, v in status.get(c['id'], {}).get(x['id'], {}).items()
+                     if isinstance(v, dict) and v.get('value') is not None}
+            if attrs:
+                sample.setdefault(c['id'], {})[x['id']] = attrs
+    assert comps and comps[0]['id'] == 'main' and sample, tid
+    n_caps = len({x['id'] for c in comps for x in c['capabilities']})
+    templates.append({
+        'id': f'iot-{tid}', 'name': name, 'icon': icon, 'category': category,
+        **({'matter': {'deviceType': matter_type, 'version': version}} if matter_type else {}),
+        'description': f'{n_caps} standard capabilities',
+        'source': {'fixture': fixture},
+        'deviceProfile': {'name': sanitize_profile_name(f'Virtual {name}'), 'components': comps},
+        'sampleState': sample,
+    })
+
 out = {
     'generatedFrom': {
         'repository': 'https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers',
         'commit': commit, 'path': 'drivers/SmartThings/*/profiles', 'license': 'Apache-2.0',
+        'homeAssistant': {'repository': 'https://github.com/home-assistant/core', 'commit': ha_commit,
+                          'path': 'tests/components/smartthings/fixtures', 'license': 'Apache-2.0'},
     },
     'basedOn': 'Matter 1.5 Device Library (device types and categories)',
     'categories': CATEGORIES,

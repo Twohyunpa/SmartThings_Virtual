@@ -168,6 +168,7 @@ function renderIotArea(area) {
   area.innerHTML = `
     <div class="muted small" style="margin-bottom:8px">Capability lists come from the device profiles of
       <a href="${esc(src?.repository || '#')}" target="_blank" rel="noopener">SmartThings' official Edge drivers</a> (${esc(src?.license || '')}).
+      A few device types with no driver profile (gas meter, gas leak detector) come from real devices in the Home Assistant test fixtures.
       Firmware-update, command-only and camera streaming capabilities are left out.</div>
     ${categoryChips(list, 'iot')}
     <input id="tplFilter" placeholder="Filter IoT devices (e.g. light, lock, sensor)" style="width:100%;margin-bottom:8px" />
@@ -180,7 +181,9 @@ function renderIotArea(area) {
         <thead><tr><th>Component</th><th>SmartThings capabilities</th></tr></thead>
         <tbody>${comps.map((c) => `<tr><td><code>${esc(c.id)}</code></td><td>${c.capabilities.map((x) => `<code>${esc(x.id)}</code>`).join(' ')}</td></tr>`).join('')}</tbody>
       </table>
-      <div class="muted small">Source profile: ${t.source.profiles.map((p) => `<code>${esc(p)}</code>`).join(', ')}</div>
+      <div class="muted small">${t.source.profiles
+        ? `Source profile: ${t.source.profiles.map((p) => `<code>${esc(p)}</code>`).join(', ')}`
+        : `Source: a real device in the Home Assistant SmartThings test fixtures (<code>${esc(t.source.fixture)}</code>)`}</div>
     </div>` : ''}
     <label class="small" style="display:block;margin:8px 0 4px"><input type="checkbox" id="tplSample" ${createState.sample === false ? '' : 'checked'}/>
       Load a typical starting state after creating</label>

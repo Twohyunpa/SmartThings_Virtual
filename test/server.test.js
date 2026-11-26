@@ -127,7 +127,7 @@ describe('server.js integration (mock CLI)', () => {
 
     const iot = await request('GET', '/api/iot-templates');
     assert.equal(iot.status, 200);
-    assert.equal(iot.json.data.templates.length, 60);
+    assert.equal(iot.json.data.templates.length, 62);
 
     const presets = await request('GET', '/api/presets');
     assert.equal(presets.status, 200);

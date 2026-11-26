@@ -77,7 +77,7 @@ npm test
 **New virtual device** 패널의 탭 5개에는 각각 무엇을 하는 탭이고 언제 쓰는지 짧은 설명이 붙어 있습니다.
 
 - Appliance templates: 세탁기, 건조기, 식기세척기, 에어컨, 공기청정기, 냉장고, 로봇청소기, 오븐, TV 등 실제 모델 35종. 프로필 정의(JSON)를 열어서 capability를 더하거나 뺄 수 있습니다.
-- IoT devices: 대표 스마트홈 기기 60종. 조명, 플러그, 벽 스위치, 버튼, 비상 버튼, 센서 20종(문열림, 동작, 재실, 도착, 온도, 습도, 조도, 소음, 기압, 유량, 강우, 누수, 동파, 토양, 공기질, 다기능, 보안 구역, 날씨, 화재/CO, CO), 사이렌, 도어락, 문 개폐기, 블라인드, 차고문, 수도 밸브, 가스 밸브, 관수기, 온도조절기, 펌프, 선풍기, 공기청정기, 히트펌프, TV, 로봇청소기, 세탁기, 건조기, 식기세척기, 냉장고, 오븐, 쿡탑, 후드, 전자레인지, 에어컨, 전기차 충전기, 태양광, 가정용 배터리, 온수기, 전력계, 카메라/도어벨. 분류로 거르거나 이름으로 찾을 수 있습니다. 아래 [IoT 기기](#iot-기기) 참고.
+- IoT devices: 대표 스마트홈 기기 62종. 조명, 플러그, 벽 스위치, 버튼, 비상 버튼, 센서 20종(문열림, 동작, 재실, 도착, 온도, 습도, 조도, 소음, 기압, 유량, 강우, 누수, 동파, 토양, 공기질, 다기능, 보안 구역, 날씨, 화재/CO, CO, 가스 누출), 사이렌, 도어락, 문 개폐기, 블라인드, 차고문, 수도 밸브, 가스 밸브, 관수기, 온도조절기, 펌프, 선풍기, 공기청정기, 히트펌프, TV, 로봇청소기, 세탁기, 건조기, 식기세척기, 냉장고, 오븐, 쿡탑, 후드, 전자레인지, 에어컨, 전기차 충전기, 태양광, 가정용 배터리, 온수기, 전력계, 가스 계량기, 카메라/도어벨. 분류로 거르거나 이름으로 찾을 수 있습니다. 아래 [IoT 기기](#iot-기기) 참고.
 - 표준 프로토타입: `VIRTUAL_SWITCH`, `VIRTUAL_MOTION_SENSOR` 등 17종 (`virtualdevices:create-standard`)
 - 내 디바이스 프로필 ID로 만들기, 또는 프로필 JSON 직접 입력 (`virtualdevices:create`)
 - dry-run 버튼으로 실제 생성 없이 요청 JSON을 확인할 수 있습니다.
@@ -117,7 +117,7 @@ npm test
 실제 기기를 SmartThings에 추가하면 Matter든 Zigbee든 Z-Wave든 SmartThings Edge 드라이버가 **표준 capability**로 된 프로필을 붙입니다(`switch`, `switchLevel`, `lock`, `temperatureMeasurement` 등). 앱·자동화·클라우드 연동은 이 프로필만 보고 통신 방식은 보지 않습니다. **IoT devices** 탭은 같은 프로필로 가상 기기를 만들어서 실제 기기와 똑같이 보이게 합니다.
 
 - **기기 종류와 분류는 Matter 1.5 Device Library를 따릅니다.** 업체에 상관없는 스마트홈 기기 분류는 이것뿐이라서, 그 장 구성대로 Lighting, Plugs and actuators, Switches and controls, Sensors, Closures, HVAC, Media, Robotic, Appliances, Energy management, Cameras(맞는 곳이 없으면 Other)로 나눕니다. 삼성 가전 템플릿도 같은 분류를 씁니다. 대응하는 Matter 기기 타입은 참고용으로 `templates/iot-devices.json`의 `matter` 필드에 적어 둡니다.
-- 프로필은 [SmartThings 공식 Edge 드라이버](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers)(Apache-2.0, [NOTICE](NOTICE) 참고)에서 `tools/build-iot-templates.py`로 가져옵니다. 대부분 `matter-*` 드라이버에서, Matter 프로필이 없는 일부 기기(도착, 소음, 다기능, 보안 구역 센서, 사이렌, 비상 버튼, 밸브, 전력계)는 `zigbee-*`/`zwave-*` 드라이버에서 가져옵니다.
+- 프로필은 [SmartThings 공식 Edge 드라이버](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers)(Apache-2.0, [NOTICE](NOTICE) 참고)에서 `tools/build-iot-templates.py`로 가져옵니다. 대부분 `matter-*` 드라이버에서, Matter 프로필이 없는 일부 기기(도착, 소음, 다기능, 보안 구역 센서, 사이렌, 비상 버튼, 밸브, 전력계)는 `zigbee-*`/`zwave-*` 드라이버에서 가져옵니다. 드라이버 프로필이 없는 가스 계량기와 가스 누출 감지기는 가전 템플릿처럼 Home Assistant의 SmartThings 실제 기기 데이터에서 가져옵니다.
 - `firmwareUpdate`, 명령 전용 `stateless*`, 카메라 영상 관련 capability, `vision.*` 같은 전용 capability는 뺐습니다.
 - 만들면 기본 상태가 들어가고(예: 조명 70%, 도어락 잠김), *Lock: forced opening attempt*, *Alarm: smoke detected*, *Cycle: running* 같은 프리셋을 쓸 수 있습니다. 기기 목록에는 **IoT** 표시가 붙습니다.
 

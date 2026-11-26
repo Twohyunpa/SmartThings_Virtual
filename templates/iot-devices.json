@@ -3,7 +3,13 @@
   "repository": "https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers",
   "commit": "b01c9e1848d25854da2c6c2a8209ace2c19729eb",
   "path": "drivers/SmartThings/*/profiles",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "homeAssistant": {
+   "repository": "https://github.com/home-assistant/core",
+   "commit": "e01f4cf733021a06dba18b617c7e24653090170a",
+   "path": "tests/components/smartthings/fixtures",
+   "license": "Apache-2.0"
+  }
  },
  "basedOn": "Matter 1.5 Device Library (device types and categories)",
  "categories": [
@@ -4743,6 +4749,111 @@
         "constantPressure",
         "automatic"
        ]
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-gas-meter",
+   "name": "Gas meter",
+   "icon": "🔥",
+   "category": "Energy management",
+   "description": "2 standard capabilities",
+   "source": {
+    "fixture": "gas_meter"
+   },
+   "deviceProfile": {
+    "name": "Virtual Gas meter",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "refresh",
+        "version": 1
+       },
+       {
+        "id": "gasMeter",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "GasMeter"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "gasMeter": {
+      "gasMeterPrecision": {
+       "value": {
+        "volume": 5,
+        "calorific": 1,
+        "conversion": 1
+       }
+      },
+      "gasMeterCalorific": {
+       "value": 40
+      },
+      "gasMeterTime": {
+       "value": "2025-04-11T13:30:00.028Z"
+      },
+      "gasMeterVolume": {
+       "value": 14,
+       "unit": "ccf"
+      },
+      "gasMeterConversion": {
+       "value": 3.6
+      },
+      "gasMeter": {
+       "value": 450.5,
+       "unit": "kWh"
+      }
+     }
+    }
+   }
+  },
+  {
+   "id": "iot-gas-detector",
+   "name": "Gas leak detector",
+   "icon": "💨",
+   "category": "Sensors",
+   "description": "2 standard capabilities",
+   "source": {
+    "fixture": "gas_detector"
+   },
+   "deviceProfile": {
+    "name": "Virtual Gas leak detector",
+    "components": [
+     {
+      "id": "main",
+      "capabilities": [
+       {
+        "id": "gasDetector",
+        "version": 1
+       },
+       {
+        "id": "refresh",
+        "version": 1
+       }
+      ],
+      "categories": [
+       {
+        "name": "Siren"
+       }
+      ]
+     }
+    ]
+   },
+   "sampleState": {
+    "main": {
+     "gasDetector": {
+      "gas": {
+       "value": "clear"
       }
      }
     }
