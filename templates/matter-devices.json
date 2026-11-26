@@ -33,7 +33,7 @@
     }
    ],
    "deviceProfile": {
-    "name": "Virtual Matter On/Off light",
+    "name": "Virtual Matter On-Off light",
     "components": [
      {
       "id": "main",
@@ -640,7 +640,7 @@
     }
    ],
    "deviceProfile": {
-    "name": "Virtual Matter Temperature & humidity sensor",
+    "name": "Virtual Matter Temperature and humidity sensor",
     "components": [
      {
       "id": "main",
@@ -1581,7 +1581,7 @@
     }
    ],
    "deviceProfile": {
-    "name": "Virtual Matter Smoke & CO alarm",
+    "name": "Virtual Matter Smoke and CO alarm",
     "components": [
      {
       "id": "main",
@@ -3457,7 +3457,7 @@
     }
    ],
    "deviceProfile": {
-    "name": "Virtual Matter Camera / video doorbell",
+    "name": "Virtual Matter Camera - video doorbell",
     "components": [
      {
       "id": "main",
@@ -3634,7 +3634,7 @@
     }
    ],
    "deviceProfile": {
-    "name": "Virtual Matter Garage door / gate",
+    "name": "Virtual Matter Garage door - gate",
     "components": [
      {
       "id": "main",

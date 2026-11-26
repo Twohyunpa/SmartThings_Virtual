@@ -55,6 +55,13 @@ describe('Matter device templates', () => {
     }
   });
 
+  it('every template deviceProfile.name uses only SmartThings-safe characters', () => {
+    const appliances = require(path.join(__dirname, '..', 'templates', 'samsung-appliances.json')).templates;
+    for (const t of [...appliances, ...data.templates]) {
+      assert.match(t.deviceProfile.name, /^[A-Za-z0-9 ()_-]+$/, `${t.id}: unsafe profile name "${t.deviceProfile.name}"`);
+    }
+  });
+
   it('every preset applies to at least one appliance or Matter template', () => {
     const appliances = require(path.join(__dirname, '..', 'templates', 'samsung-appliances.json')).templates;
     const all = [...appliances, ...data.templates];

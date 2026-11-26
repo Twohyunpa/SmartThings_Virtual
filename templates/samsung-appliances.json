@@ -2061,7 +2061,7 @@
     "deviceTypeName": "Samsung OCF Air Conditioner"
    },
    "deviceProfile": {
-    "name": "Virtual Heat pump, two indoor units",
+    "name": "Virtual Heat pump two indoor units",
     "components": [
      {
       "id": "main",
@@ -3478,7 +3478,7 @@
     "deviceTypeName": "Samsung OCF Refrigerator"
    },
    "deviceProfile": {
-    "name": "Virtual Refrigerator (with scale / camer",
+    "name": "Virtual Refrigerator (with scale - camer",
     "components": [
      {
       "id": "main",
@@ -3887,7 +3887,7 @@
     "deviceTypeName": "Samsung OCF Robot Vacuum"
    },
    "deviceProfile": {
-    "name": "Virtual Robot vacuum (with map / station",
+    "name": "Virtual Robot vacuum (with map - station",
     "components": [
      {
       "id": "main",

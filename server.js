@@ -439,6 +439,15 @@ async function logout() {
   return { status: 200, body: { ok: true } };
 }
 
+function sanitizeProfileName(name) {
+  return String(name || '')
+    .replace(/&/g, ' and ')
+    .replace(/\//g, '-')
+    .replace(/[^A-Za-z0-9 ()_-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim() || 'Virtual Profile';
+}
+
 const routes = [
   ['GET', /^\/api\/info$/, async () => {
     const info = await detectCli(true);
@@ -522,7 +531,13 @@ const routes = [
       executionTarget: 'CLOUD',
     };
     if (b.deviceProfileId) { assertId(b.deviceProfileId, 'deviceProfileId'); input.deviceProfileId = b.deviceProfileId; }
-    else input.deviceProfile = b.deviceProfile;
+    else {
+      const profile = b.deviceProfile && typeof b.deviceProfile === 'object' ? { ...b.deviceProfile } : b.deviceProfile;
+      if (profile && typeof profile === 'object' && typeof profile.name === 'string') {
+        profile.name = sanitizeProfileName(profile.name);
+      }
+      input.deviceProfile = profile;
+    }
     if (b.roomId) { assertId(b.roomId, 'roomId'); input.roomId = b.roomId; }
     const extra = b.dryRun ? ['--dry-run'] : [];
     return runWithInput(['virtualdevices:create', '--input', '@INPUT', ...extra], input);
@@ -617,4 +632,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { server, detectCli, cliDirs, profileHasToken };
+module.exports = { server, detectCli, cliDirs, profileHasToken, sanitizeProfileName };
