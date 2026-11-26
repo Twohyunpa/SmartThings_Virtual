@@ -15,7 +15,7 @@ Usage:
 
 Requires PyYAML (pip install pyyaml).
 """
-import json, os, subprocess, sys
+import json, os, re, subprocess, sys
 
 import yaml
 
@@ -247,6 +247,13 @@ def convert(components, only=None):
     return out
 
 
+def sanitize_profile_name(name):
+    # SmartThings virtualdevices:create rejects '/', '&', ',' in deviceProfile.name with HTTP 422.
+    s = name.replace('&', ' and ').replace('/', '-')
+    s = re.sub(r'[^A-Za-z0-9 ()_-]', ' ', s)
+    return re.sub(r'\s+', ' ', s).strip() or 'Virtual Profile'
+
+
 templates = []
 for tid, (driver, profile), name, icon, category, matter_type, version, opt in MODELS:
     src = load_profile(driver, profile)
@@ -278,7 +285,7 @@ for tid, (driver, profile), name, icon, category, matter_type, version, opt in M
         'description': f'Matter {version} · {matter_type} · {n_caps} capabilities',
         'source': {'profiles': sources},
         'mapping': mapping,
-        'deviceProfile': {'name': f'Virtual Matter {name}', 'components': comps},
+        'deviceProfile': {'name': sanitize_profile_name(f'Virtual Matter {name}'), 'components': comps},
         'sampleState': sample,
     })
 

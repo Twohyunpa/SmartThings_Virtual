@@ -10,7 +10,7 @@ Usage:
   git -C ha-core sparse-checkout set tests/components/smartthings
   python3 tools/build-templates.py ha-core
 """
-import json, os, subprocess, sys
+import json, os, re, subprocess, sys
 
 ha = sys.argv[1] if len(sys.argv) > 1 else 'ha-core'
 fx = os.path.join(ha, 'tests/components/smartthings/fixtures')
@@ -51,6 +51,13 @@ MODELS = {
 def standard(cap_id):
     return '.' not in cap_id
 
+
+def sanitize_profile_name(name):
+    # SmartThings virtualdevices:create rejects '/', '&', ',' in deviceProfile.name with HTTP 422.
+    s = name.replace('&', ' and ').replace('/', '-')
+    s = re.sub(r'[^A-Za-z0-9 ()_-]', ' ', s)
+    return re.sub(r'\s+', ' ', s).strip() or 'Virtual Profile'
+
 out = []
 for fixture, (name, icon) in MODELS.items():
     dev = json.load(open(f'{fx}/devices/{fixture}.json'))['items'][0]
@@ -83,7 +90,7 @@ for fixture, (name, icon) in MODELS.items():
         'id': fixture, 'name': name, 'icon': icon,
         'description': f"{dev.get('deviceTypeName')} · {dev.get('presentationId')} · {n_std} standard capabilities",
         'source': {'fixture': fixture, 'presentationId': dev.get('presentationId'), 'deviceTypeName': dev.get('deviceTypeName')},
-        'deviceProfile': {'name': f'Virtual {name}'[:40], 'components': comps},
+        'deviceProfile': {'name': sanitize_profile_name(f'Virtual {name}')[:40].strip(), 'components': comps},
         'sampleState': sample,
     })
 

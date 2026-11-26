@@ -165,6 +165,20 @@ describe('server.js integration (mock CLI)', () => {
 
     const deleted = await request('DELETE', `/api/devices/${deviceId}`);
     assert.equal(deleted.status, 200);
+
+    const dryProfile = await request('POST', '/api/devices/profile', {
+      body: {
+        name: 'Probe Matter Light',
+        locationId,
+        dryRun: true,
+        deviceProfile: {
+          name: 'Virtual Matter On/Off & Dimmer, v1',
+          components: [{ id: 'main', capabilities: [{ id: 'switch', version: 1 }] }],
+        },
+      },
+    });
+    assert.equal(dryProfile.status, 200);
+    assert.equal(dryProfile.json.data.deviceProfile.name, 'Virtual Matter On-Off and Dimmer v1');
   });
 
   it('deduplicates concurrent capability fetches and respects profile reset', async () => {
@@ -222,7 +236,14 @@ describe('server.js integration (mock CLI)', () => {
 });
 
 describe('account helpers', () => {
-  const { profileHasToken, cliDirs } = require('../server.js');
+  const { profileHasToken, cliDirs, sanitizeProfileName } = require('../server.js');
+  it('sanitizes deviceProfile.name to avoid SmartThings 422 errors', () => {
+    assert.equal(sanitizeProfileName('Virtual Matter On/Off light'), 'Virtual Matter On-Off light');
+    assert.equal(sanitizeProfileName('Virtual Matter Temperature & humidity sensor'), 'Virtual Matter Temperature and humidity sensor');
+    assert.equal(sanitizeProfileName('Virtual Heat pump, two indoor units'), 'Virtual Heat pump two indoor units');
+    assert.equal(sanitizeProfileName('///'), '---');
+    assert.equal(sanitizeProfileName('   '), 'Virtual Profile');
+  });
   it('detects a token configured under a CLI profile in config.yaml', () => {
     const file = path.join(os.tmpdir(), `st-cfg-${process.pid}.yaml`);
     fs.writeFileSync(file, 'default:\n  clientIdProvider: {}\nhub2:\n  token: abc-123\n');
