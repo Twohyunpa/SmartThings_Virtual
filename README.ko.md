@@ -1,6 +1,13 @@
-# SmartThings 가상 기기 콘솔
+# SmartThings 가상 기기 패널 (Virtual Device Panel)
 
 [English](README.md) | **한국어**
+
+**이 앱이 기기 역할을 합니다.** SmartThings 가상 기기의 control panel입니다. 실제 기기가 있을 자리에 있어서, 여기서 넣는(inject) 값이 기기가 보고하는 상태가 되고, 다른 앱(Homey, SmartThings 앱, 자동화)은 SmartThings 클라우드하고만 이야기합니다.
+
+```
+ 이 앱 (= 기기)   -- 상태 -->    SmartThings 클라우드   -- 상태 -->    Homey, 앱, 자동화
+                 <-- 명령 --                          <-- 명령 --
+```
 
 ![screenshot](docs/screenshot.png)
 
@@ -76,13 +83,16 @@ npm test
 **가상 기기 만들기**
 **New virtual device** 패널의 탭 5개에는 각각 무엇을 하는 탭이고 언제 쓰는지 짧은 설명이 붙어 있습니다.
 
-- Appliance templates: 세탁기, 건조기, 식기세척기, 에어컨, 공기청정기, 냉장고, 로봇청소기, 오븐, TV 등 실제 모델 35종. 프로필 정의(JSON)를 열어서 capability를 더하거나 뺄 수 있습니다.
-- Matter devices: Matter 1.0~1.5의 대표 기기 36종(조명, 플러그, 버튼, 각종 센서, 도어락, 온도조절기, 블라인드, TV, 에어컨, 선풍기, 공기청정기, 화재/CO 경보기, 로봇청소기, 세탁기, 건조기, 식기세척기, 냉장고, 오븐, 쿡탑, 후드, 전자레인지, 누수 센서, 전기차 충전기, 태양광, 가정용 배터리, 히트펌프, 온수기, 카메라/도어벨, 차고문/게이트, 토양 센서). 분류와 Matter 버전으로 거를 수 있고, 각 capability가 어떤 Matter 클러스터에 해당하는지 표로 보여줍니다. 아래 [Matter 기기](#matter-기기) 참고.
+- Samsung appliances: 삼성 세탁기, 건조기, 식기세척기, 에어컨, 공기청정기, 냉장고, 로봇청소기, 오븐, TV 등 실제 모델 35종. 프로필 정의(JSON)를 열어서 capability를 더하거나 뺄 수 있습니다.
+- IoT devices: 대표 스마트홈 기기 72종. 조명, 플러그, 벽 스위치(1구, 2구, 디머), 버튼, 비상 버튼, 센서 20종(문열림, 동작, 재실, 도착, 온도, 습도, 조도, 소음, 기압, 유량, 강우, 누수, 동파, 토양, 공기질, 다기능, 보안 구역, 날씨, 화재/CO, CO, 가스 누출, 이슬점·곰팡이), 사이렌, 도어락, 문 개폐기, 창문 개폐기, 블라인드(틸트 포함), 차고문, 수도 밸브, 가스 밸브, 관수기, 온도조절기, 스마트 환풍구, 펌프, 선풍기, 공기청정기, 히트펌프, TV, 스피커, 네트워크 스피커, 사운드바, 프로젝터 스크린, 로봇청소기, 세탁기, 건조기, 식기세척기, 냉장고, 오븐, 쿡탑, 후드, 전자레인지, 에어컨, 전기차 충전기, 태양광, 가정용 배터리, 온수기, 전력계, 가스 계량기, 카메라/도어벨. 카드는 이름순으로 정렬되고, 분류로 거르거나 이름으로 찾을 수 있습니다. 아래 [IoT 기기](#iot-기기) 참고.
 - 표준 프로토타입: `VIRTUAL_SWITCH`, `VIRTUAL_MOTION_SENSOR` 등 17종 (`virtualdevices:create-standard`)
 - 내 디바이스 프로필 ID로 만들기, 또는 프로필 JSON 직접 입력 (`virtualdevices:create`)
 - dry-run 버튼으로 실제 생성 없이 요청 JSON을 확인할 수 있습니다.
 
 **상태 & 주입**
+- 기기 화면 위쪽 띠에 방향을 보여 줍니다: 이 앱이 기기이고, 상태를 SmartThings로 보고하며, 다른 앱의 명령은 SmartThings로 들어옵니다.
+- **Recent activity**(`devices:history`)는 SmartThings가 이 기기에 기록한 최근 상태 변화 20개를 보여 줍니다. 다른 앱의 명령으로 바뀐 상태도 나오지만, 명령 자체는 기록되지 않습니다.
+- 명령만 있는 capability(`refresh`, `tone`, `audioNotification`)는 넣을 값이 없어서 목록에서 빼고 맨 아래에 이름만 표시합니다. 기기 프로필에는 그대로 있습니다.
 - 왼쪽은 capability 목록(현재 값 표시, 필터), 오른쪽은 선택한 capability의 상세입니다. 맨 위에는 한 줄 상태 요약 바가 있고, 누르면 해당 capability로 이동합니다.
 - **Custom event**(component/capability/attribute/value/unit 직접 입력)는 오른쪽 맨 위에 항상 있습니다.
 - 자주 쓰는 capability는 별표(☆/★)로 고정하세요. 목록 맨 위 *Pinned* 그룹으로 올라가고, Custom event 바로 아래에 항상 펼쳐집니다. 마지막 선택과 고정 목록은 기기별로 기억됩니다.
@@ -112,15 +122,16 @@ npm test
 
 삼성 가전 템플릿은 임의로 만든 것이 아니라 [Home Assistant](https://github.com/home-assistant/core)의 SmartThings 테스트 데이터(`tests/components/smartthings/fixtures`, Apache-2.0, [NOTICE](NOTICE) 참고)에서 생성합니다. 실제 삼성 가전에서 덤프한 데이터이고, `tools/build-templates.py`가 모델별 capability 목록과 샘플 속성 값을 추출합니다. **표준 capability만** 사용하고, `custom.*`/`samsungce.*` 같은 삼성 전용 capability는 의도적으로 제외했습니다. 자세한 내용은 영어 [README](README.md) 참고.
 
-## Matter 기기
+## IoT 기기
 
-SmartThings는 Matter 1.5까지 지원합니다. 실제 Matter 기기를 추가하면 SmartThings Matter 드라이버가 **표준 capability**로 된 프로필을 붙입니다(On/Off 클러스터 → `switch`, Level Control → `switchLevel`, Door Lock → `lock` 등). **Matter devices** 탭은 같은 프로필로 가상 기기를 만들어서, 앱·자동화·API 연동에서 실제 Matter 기기와 똑같이 보이게 합니다.
+실제 기기를 SmartThings에 추가하면 Matter든 Zigbee든 Z-Wave든 SmartThings Edge 드라이버가 **표준 capability**로 된 프로필을 붙입니다(`switch`, `switchLevel`, `lock`, `temperatureMeasurement` 등). 앱·자동화·클라우드 연동은 이 프로필만 보고 통신 방식은 보지 않습니다. **IoT devices** 탭은 같은 프로필로 가상 기기를 만들어서 실제 기기와 똑같이 보이게 합니다.
 
-- 프로필은 [SmartThings 공식 Matter Edge 드라이버](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers)(Apache-2.0, [NOTICE](NOTICE) 참고)에서 `tools/build-matter-templates.py`로 가져옵니다.
+- **기기 종류와 분류는 Matter 1.5 Device Library를 따릅니다.** 업체에 상관없는 스마트홈 기기 분류는 이것뿐이라서, 그 장 구성대로 Lighting, Plugs and actuators, Switches and controls, Sensors, Closures, HVAC, Media, Robotic, Appliances, Energy management, Cameras(맞는 곳이 없으면 Other)로 나눕니다. 삼성 가전 템플릿도 같은 분류를 씁니다. 대응하는 Matter 기기 타입은 참고용으로 `templates/iot-devices.json`의 `matter` 필드에 적어 둡니다.
+- 프로필은 [SmartThings 공식 Edge 드라이버](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers)(Apache-2.0, [NOTICE](NOTICE) 참고)에서 `tools/build-iot-templates.py`로 가져옵니다. 대부분 `matter-*` 드라이버에서, Matter 프로필이 없는 일부 기기(도착, 소음, 다기능, 보안 구역·이슬점 센서, 사이렌, 비상 버튼, 밸브, 전력계, 환풍구, 창문 개폐기, 프로젝터 스크린, 네트워크 스피커, 사운드바)는 `zigbee-*`/`zwave-*` 드라이버에서 가져옵니다. 드라이버 프로필이 없는 가스 계량기와 가스 누출 감지기는 가전 템플릿처럼 Home Assistant의 SmartThings 실제 기기 데이터에서 가져옵니다.
 - `firmwareUpdate`, 명령 전용 `stateless*`, 카메라 영상 관련 capability, `vision.*` 같은 전용 capability는 뺐습니다.
-- 만들면 기본 상태가 들어가고(예: 조명 70%, 도어락 잠김), *Lock: forced opening attempt*, *Alarm: smoke detected*, *Cycle: running* 같은 프리셋을 쓸 수 있습니다. 기기 목록에는 **Matter** 표시가 붙습니다.
+- 만들면 기본 상태가 들어가고(예: 조명 70%, 도어락 잠김), *Lock: forced opening attempt*, *Alarm: smoke detected*, *Cycle: running* 같은 프리셋을 쓸 수 있습니다. 기기 목록에는 **IoT** 표시가 붙습니다.
 
-**한계:** 클라우드 가상 기기라서 페어링(QR 코드), Matter 클러스터·엔드포인트·통신은 없고 카메라 영상도 나오지 않습니다. Matter 통신 자체를 테스트하려면 SmartThings 허브와 실제 기기 또는 삼성 [Matter Virtual Device](https://developer.samsung.com/smartthings/blog/en/2023/12/14/creating-a-matter-virtual-device)를 쓰세요.
+**한계:** 클라우드 가상 기기라서 페어링(QR 코드)도, Matter·Zigbee·Z-Wave 통신도 없고 카메라 영상도 나오지 않습니다. Matter 통신 자체를 테스트하려면 SmartThings 허브와 실제 기기 또는 삼성 [Matter Virtual Device](https://developer.samsung.com/smartthings/blog/en/2023/12/14/creating-a-matter-virtual-device)를 쓰세요.
 
 `operationalState`, `evseState` 같은 최신 capability는 계정에 따라 가상 기기에서 거부될 수 있습니다. `npm run check-capabilities`(저장소를 받지 않았다면 `npx --yes -p github:Twohyunpa/SmartThings_Virtual st-check-capabilities`)를 한 번 실행하면 안 되는 capability와 그걸 쓰는 템플릿을 알려줍니다. 그 capability를 프로필 정의에서 빼고 만들면 됩니다.
 

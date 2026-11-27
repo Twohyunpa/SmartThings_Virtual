@@ -198,12 +198,18 @@ switch (cmd) {
   case 'devices':
     out(getDev(pos[0]).dev);
     break;
+  case 'devices:history':
+    out((getDev(pos[0]).history || []).slice(0, Number(flags.limit || 20)));
+    break;
   case 'devices:status':
     out({ components: getDev(pos[0]).status });
     break;
   case 'capabilities': {
     const id = pos[0];
-    out({ id, version: Number(pos[1] || 1), status: 'live', name: id, attributes: CAPS[id] || {}, commands: {} }); // unknown capabilities: empty definition
+    // Known capabilities get their attributes; unknown ones an empty definition without `commands`, so the
+    // UI treats them as "not loaded" rather than command-only.
+    out(CAPS[id] ? { id, version: Number(pos[1] || 1), status: 'live', name: id, attributes: CAPS[id], commands: {} }
+      : { id, version: Number(pos[1] || 1), status: 'live', name: id, attributes: {} });
     break;
   }
   case 'virtualdevices:create-standard': {
@@ -239,6 +245,10 @@ switch (cmd) {
       if (!(e.attribute in slot)) slot[e.attribute] = { value: null }; // the mock does not know every capability's attributes
       const changed = JSON.stringify(slot[e.attribute].value) !== JSON.stringify(e.value);
       slot[e.attribute] = { value: e.value, ...(e.unit ? { unit: e.unit } : {}), timestamp: new Date().toISOString() };
+      d.history = d.history || [];
+      d.history.unshift({ deviceId: d.dev.deviceId, time: new Date().toISOString(), component: comp, capability: e.capability,
+        attribute: e.attribute, value: e.value, ...(e.unit ? { unit: e.unit } : {}), epoch: Date.now() });
+      d.history = d.history.slice(0, 100);
       return changed;
     });
     save(s); out({ input: events, output: { stateChanges: changes } });

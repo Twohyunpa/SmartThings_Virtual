@@ -16,7 +16,7 @@ const run = (args) => (CLI.endsWith('.js')
 const ver = (run(['--version']).stdout || '').trim();
 const major = Number((ver.match(/(\d+)\.\d+\.\d+/) || [])[1]);
 const readTemplates = (file) => JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'templates', file), 'utf8')).templates;
-const templates = [...readTemplates('samsung-appliances.json'), ...readTemplates('matter-devices.json')];
+const templates = [...readTemplates('samsung-appliances.json'), ...readTemplates('iot-devices.json')];
 
 const caps = new Map();
 for (const t of templates) {

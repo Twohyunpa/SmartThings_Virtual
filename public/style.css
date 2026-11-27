@@ -292,10 +292,26 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
 .signed-out { text-align: center; padding: 28px 12px; }
 .signed-out p { margin: 6px 0 14px; }
 
-/* Matter device templates */
-.badge.matter { font-size: 10.5px; padding: 1px 6px; margin-left: 4px; vertical-align: middle; background: var(--accent-weak); color: var(--accent); border-color: transparent; }
-.tpl .matter-ver { float: right; font-size: 10.5px; padding: 1px 6px; }
-.matter-detail { border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; margin-bottom: 8px; background: var(--panel-2); }
+/* IoT device templates */
+.badge.iot { font-size: 10.5px; padding: 1px 6px; margin-left: 4px; vertical-align: middle; background: var(--accent-weak); color: var(--accent); border-color: transparent; }
+.tpl-detail { border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; margin-bottom: 8px; background: var(--panel-2); }
 .map-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12.5px; }
 .map-table th, .map-table td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); }
 .map-table th { color: var(--muted); font-weight: 600; }
+
+/* Role strip: this app plays the device */
+.role-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 12px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel-2); font-size: 12.5px; }
+.rf-node { padding: 3px 9px; border-radius: 7px; border: 1px solid var(--border); background: var(--panel); font-weight: 600; display: inline-flex; flex-direction: column; line-height: 1.25; }
+.rf-node small { font-weight: 400; color: var(--muted); font-size: 11px; }
+.rf-node.you { border-color: var(--accent); color: var(--accent); background: var(--accent-weak); }
+.rf-arrows { display: inline-flex; flex-direction: column; font-size: 11px; color: var(--muted); line-height: 1.3; }
+.rf-note { flex-basis: 100%; }
+.panel.activity { margin-top: 12px; }
+.activity-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.activity-head h3 { margin: 0; }
+
+/* Refresh state feedback */
+#reloadStatus .ico { display: inline-block; }
+#reloadStatus.busy .ico { animation: spin .8s linear infinite; }
+.refresh-note.done { animation: note-in .6s ease-out; }
+@keyframes note-in { from { color: var(--accent); } to { color: var(--muted); } }

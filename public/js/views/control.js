@@ -2,18 +2,19 @@
 
 import { state, actions, store, fmtVal, getCapDef, currentCapStatus, currentAttr } from '../state.js';
 import { LIST_PREFIX, convertValue, valueSchema, valueOptions, listOptions, listHint } from '../schema.js';
-import { $, esc, toast, sendEvents } from '../api.js';
+import { $, esc, api, toast, sendEvents } from '../api.js';
 
 const capKey = (comp, capId) => `${comp}/${capId}`;
 const capName = (comp, capId) => (comp === 'main' ? '' : `${comp}: `) + capId;
-const capMaster = { entries: [], sel: null, pins: [] };
+const capMaster = { entries: [], sel: null, pins: [], hidden: [] };
 
 export function renderControl(body) {
   const d = state.device;
   const comps = d.components || [];
   body.innerHTML = `
     <div class="toolbar">
-      <button class="btn small" id="reloadStatus">↻ Refresh state</button>
+      <button class="btn small" id="reloadStatus"><span class="ico">↻</span> Refresh state</button>
+      <span class="muted small refresh-note" id="refreshNote" aria-live="polite"></span>
       <label class="small"><input type="checkbox" id="autoChk" ${state.autoRefresh ? 'checked' : ''}/> Auto-refresh every 5 s</label>
       <span class="muted small">Click a value chip to inject it right away, or type a value and press <b>Inject</b>. <b>＋</b> adds it as a scenario step.</span>
     </div>
@@ -37,10 +38,16 @@ export function renderControl(body) {
         <div id="capItems"></div>
       </aside>
       <section id="capPane" class="cap-pane"></section>
+    </div>
+    <div class="panel activity">
+      <div class="activity-head"><h3>Recent activity</h3><button class="btn small" id="loadActivity">Load</button></div>
+      <div class="muted small">The last 20 state changes SmartThings recorded for this device: values injected here and changes made by commands from other apps (for example Homey turning it on). SmartThings records the resulting state, not the command itself.</div>
+      <div id="activityList"></div>
     </div>`;
 
   initCapMaster(comps);
-  $('#reloadStatus').addEventListener('click', () => actions.refreshStatus());
+  $('#loadActivity').addEventListener('click', loadActivity);
+  $('#reloadStatus').addEventListener('click', manualRefresh);
   $('#autoChk').addEventListener('change', (e) => {
     state.autoRefresh = e.target.checked;
     clearInterval(state.autoTimer);
@@ -56,6 +63,46 @@ export function renderControl(body) {
     if (!ev.capability || !ev.attribute) return toast('Enter a capability and an attribute', 'err');
     sendEvents(state.selectedId, [ev]);
   });
+}
+
+// Refresh state button: spin while reading, then say when it was read and whether anything changed
+// (changed values also flash in the list).
+async function manualRefresh() {
+  const btn = $('#reloadStatus');
+  const note = $('#refreshNote');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  btn.classList.add('busy');
+  if (note) { note.textContent = 'Reading state from SmartThings…'; note.classList.remove('done'); }
+  const started = Date.now();
+  const r = await actions.refreshStatus(true);
+  await new Promise((res) => setTimeout(res, Math.max(0, 400 - (Date.now() - started)))); // keep the spin visible
+  const b = $('#reloadStatus');
+  if (b) { b.disabled = false; b.classList.remove('busy'); }
+  const n = $('#refreshNote');
+  if (!n) return;
+  n.textContent = r ? `Updated ${new Date().toLocaleTimeString()} · ${r.changed ? 'values changed (highlighted)' : 'no changes'}` : '';
+  n.classList.remove('done'); void n.offsetWidth; n.classList.add('done');
+}
+
+// Device history (devices:history): the latest recorded attribute changes, newest first.
+async function loadActivity() {
+  const box = $('#activityList');
+  const id = state.selectedId;
+  if (!box || !id) return;
+  box.innerHTML = '<div class="muted small pad"><span class="spinner"></span> Loading…</div>';
+  try {
+    const items = (await api('GET', `/api/devices/${id}/history`)) || [];
+    if (state.selectedId !== id || !$('#activityList')) return;
+    box.innerHTML = items.length
+      ? `<table class="map-table"><thead><tr><th>Time</th><th>Capability</th><th>Value</th></tr></thead><tbody>${items.map((h) => `
+          <tr><td class="muted">${esc(h.time ? new Date(h.time).toLocaleString() : '')}</td>
+          <td><code>${esc((h.component && h.component !== 'main' ? h.component + ': ' : '') + h.capability + '.' + h.attribute)}</code></td>
+          <td><b>${esc(typeof h.value === 'object' ? JSON.stringify(h.value) : String(h.value))}</b>${h.unit ? ' ' + esc(h.unit) : ''}</td></tr>`).join('')}</tbody></table>`
+      : '<div class="muted small pad">No activity recorded yet.</div>';
+  } catch (e) {
+    box.innerHTML = `<div class="muted small pad">Could not load the history: ${esc(e.message)}</div>`;
+  }
 }
 
 // One short value for a capability: its first scalar attribute (supported*/available* lists last).
@@ -122,8 +169,18 @@ function renderCapPane() {
   pane.querySelectorAll('.attr[data-attr]').forEach(wireAttr);
 }
 
+// Command-only capabilities (refresh, tone, audioNotification …) have no state to inject, so the list hides
+// them. They stay in the device profile, so other apps still see the same device as a real one.
+// A definition that failed to load has no `commands` field and is kept.
+const isCommandOnly = (id, version) => {
+  const def = getCapDef(id, version);
+  return !!def && !!def.commands && !Object.keys(def.attributes || {}).length;
+};
+
 function initCapMaster(comps) {
-  const entries = comps.flatMap((c) => (c.capabilities || []).map((cap) => ({ comp: c.id, id: cap.id, version: cap.version || 1, key: capKey(c.id, cap.id) })));
+  const all = comps.flatMap((c) => (c.capabilities || []).map((cap) => ({ comp: c.id, id: cap.id, version: cap.version || 1, key: capKey(c.id, cap.id) })));
+  const entries = all.filter((e) => !isCommandOnly(e.id, e.version));
+  capMaster.hidden = [...new Set(all.filter((e) => isCommandOnly(e.id, e.version)).map((e) => e.id))];
   const id = state.selectedId;
   capMaster.entries = entries;
   capMaster.pins = (store(`st.pin.${id}`) || []).filter((k) => entries.some((e) => e.key === k));
@@ -137,7 +194,8 @@ function initCapMaster(comps) {
     const pinned = capMaster.pins.map((k) => entries.find((e) => e.key === k)).filter(Boolean);
     const rest = entries.filter((e) => !capMaster.pins.includes(e.key));
     box.innerHTML = (pinned.length ? `<div class="cap-group">Pinned</div>${pinned.map(capItemHtml).join('')}<div class="cap-group">All capabilities</div>` : '')
-      + rest.map(capItemHtml).join('');
+      + rest.map(capItemHtml).join('')
+      + (capMaster.hidden.length ? `<div class="muted small pad" title="These capabilities only accept commands (for example from SmartThings or Homey) and have no state to inject. They are still part of the device.">Command-only, not listed: ${capMaster.hidden.map(esc).join(', ')}</div>` : '');
     applySearch();
   };
   const applySearch = () => {
@@ -268,7 +326,7 @@ function attrRow(comp, capId, version, attrName) {
   const hint = [s.type, s.min !== undefined ? `min ${s.min}` : '', s.max !== undefined ? `max ${s.max}` : ''].filter(Boolean).join(' · ');
   const infoHtml = listHint(attrName);
   return `
-    <div class="attr" data-comp="${esc(comp)}" data-cap="${esc(capId)}" data-ver="${esc(version)}" data-attr="${esc(attrName)}" data-type="${esc(s.type)}" data-opts="${esc(optsKey)}">
+    <div class="attr" data-comp="${esc(comp)}" data-cap="${esc(capId)}" data-ver="${esc(version)}" data-attr="${esc(attrName)}" data-type="${esc(s.type)}" data-opts="${esc(optsKey)}"${s.type === 'integer' || s.type === 'number' ? ` data-numeric-value="${esc(curVal ?? '')}"` : ''}>
       <div class="attr-top">
         <span class="attr-name">${esc(attrName)} <span class="range-hint">${esc(hint)}</span>${infoHtml ? ' <button type="button" class="info" title="What is this?" aria-label="What is this?">ⓘ</button>' : ''}</span>
         <span class="attr-cur"><span class="muted">current</span> <span class="val">${esc(fmtVal(curVal))}${curUnit ? ' ' + esc(curUnit) : ''}</span></span>
@@ -385,6 +443,17 @@ export function updateCurrentValues(flash) {
         el.parentElement.classList.add('flash');
         setTimeout(() => el.parentElement.classList.remove('flash'), 1500);
       }
+    }
+    if (row.dataset.type === 'integer' || row.dataset.type === 'number') {
+      const input = row.querySelector('input.inp');
+      const range = row.querySelector('input.rng');
+      const nextValue = cur?.value == null ? '' : String(cur.value);
+      if (input && input.value === row.dataset.numericValue &&
+          document.activeElement !== input && document.activeElement !== range) {
+        input.value = nextValue;
+        if (range && nextValue !== '') range.value = nextValue;
+      }
+      row.dataset.numericValue = nextValue;
     }
     row.querySelectorAll('.chip').forEach((c) => c.classList.toggle('current', String(cur?.value) === c.dataset.v));
   });

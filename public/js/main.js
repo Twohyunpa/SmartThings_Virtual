@@ -97,7 +97,7 @@ function renderDeviceList() {
     .sort((a, b) => (a.label || a.name || '').localeCompare(b.label || b.name || ''))
     .map((d) => `
       <button class="device-item ${d.deviceId === state.selectedId ? 'active' : ''}" data-id="${esc(d.deviceId)}">
-        <div class="name">${esc(d.label || d.name)}${String(store(`st.tpl.${d.deviceId}`) || '').startsWith('matter-') ? ' <span class="badge matter" title="Created from a Matter device template">Matter</span>' : ''}</div>
+        <div class="name">${esc(d.label || d.name)}${/^(iot|matter)-/.test(String(store(`st.tpl.${d.deviceId}`) || '')) ? ' <span class="badge iot" title="Created from an IoT device template">IoT</span>' : ''}</div>
         <div class="meta">${esc(d.deviceId.slice(0, 8))}… ${esc(locName(d.locationId))}</div>
       </button>`).join('');
 }
@@ -124,10 +124,11 @@ async function loadTemplates() {
     state.templatesMeta = r.generatedFrom || null;
   } catch { state.templates = []; }
   try {
-    const r = await api('GET', '/api/matter-templates');
-    state.matterTemplates = r.templates || [];
-    state.matterMeta = { ...(r.generatedFrom || {}), matterVersion: r.matterVersion };
-  } catch { state.matterTemplates = []; }
+    const r = await api('GET', '/api/iot-templates');
+    state.iotTemplates = r.templates || [];
+    state.iotMeta = r.generatedFrom || null;
+    if (Array.isArray(r.categories) && r.categories.length) state.categories = r.categories;
+  } catch { state.iotTemplates = []; }
   try { state.presets = (await api('GET', '/api/presets')) || []; } catch { state.presets = []; }
 }
 
@@ -173,12 +174,14 @@ async function refreshStatus(flash = true) {
   let nextStatus;
   try {
     nextStatus = await api('GET', `/api/devices/${id}/status`);
-  } catch (e) { toast(`Could not read status\n${e.message}`, 'err'); return; }
+  } catch (e) { toast(`Could not read status\n${e.message}`, 'err'); return null; }
   // Guard against stale responses after switching devices.
-  if (state.selectedId !== id) return;
+  if (state.selectedId !== id) return null;
   state.status = nextStatus;
-  if (state.tab === 'control') updateCurrentValues(flash && before !== JSON.stringify(state.status));
+  const changed = before !== JSON.stringify(state.status);
+  if (state.tab === 'control') updateCurrentValues(flash && changed);
   if (state.tab === 'raw') renderTabBody();
+  return { changed };
 }
 
 function renderDevice() {
@@ -196,6 +199,14 @@ function renderDevice() {
         <button class="btn small" id="renameBtn">Rename</button>
         <button class="btn small danger" id="deleteBtn">Delete</button>
       </div>
+    </div>
+    <div class="role-flow" title="This app plays the device. Other apps only talk to SmartThings, never to this app.">
+      <span class="rf-node you">This app<small>= the device</small></span>
+      <span class="rf-arrows"><span>state →</span><span>← commands</span></span>
+      <span class="rf-node">SmartThings cloud</span>
+      <span class="rf-arrows"><span>state →</span><span>← commands</span></span>
+      <span class="rf-node">Homey, apps, automations</span>
+      <span class="rf-note muted small">What you inject here is the state the device reports. Commands from other apps go to SmartThings; their effect shows up under <b>Recent activity</b>.</span>
     </div>
     <div class="tabs">
       <button class="tab" data-tab="control">State &amp; inject</button>

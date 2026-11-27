@@ -1,16 +1,14 @@
-// Device creation view (Appliance templates, Standard prototype, Device profile ID, Profile JSON)
+// Device creation view (Samsung appliances, IoT devices, Standard prototype, Device profile ID, Profile JSON)
 // and sample state injection.
 
 import { state, actions, PROTOTYPES, store, deviceCapSet } from '../state.js';
 import { $, esc, api, toast, sendEvents } from '../api.js';
 
-const createState = { mode: 'template', templateId: null, matterId: null, matterCat: '' };
-
-const MATTER_CATEGORIES = ['Lighting', 'Plugs & switches', 'Sensors', 'Security', 'Climate', 'Appliances', 'Energy'];
+const createState = { mode: 'template', templateId: null, iotId: null, cat: {}, filter: {} };
 
 const MODE_INTROS = {
-  template: '<b>Appliance templates</b> — pick a real appliance model (washer, oven, TV …) and get a virtual device with the same <em>standard</em> SmartThings capabilities. Best for trying an app or automation against Samsung-like devices. These are not official Samsung profiles: the capability lists and sample values were taken from real devices (Home Assistant test data), and Samsung-specific capabilities are left out.',
-  matter: '<b>Matter devices</b> — common Matter device types (Matter 1.0 to 1.5) with the same <em>standard</em> capabilities that SmartThings\' official Matter drivers give a real device of that type. Use it to check how an app, automation or API integration sees a Matter light, lock, sensor or appliance. <b>Limits:</b> it only looks like a Matter device inside SmartThings. The device is a cloud virtual device, so there is no commissioning (QR code), no Matter clusters or endpoints, and a camera shows no video.',
+  template: '<b>Samsung appliances</b> — pick a real Samsung appliance model (washer, oven, TV …) and get a virtual device with the same <em>standard</em> SmartThings capabilities. Best for trying an app or automation against Samsung-like devices. These are not official Samsung profiles: the capability lists and sample values were taken from real devices (Home Assistant test data), and Samsung-specific capabilities are left out.',
+  iot: '<b>IoT devices</b> — common smart home device types (lights, plugs, sensors, locks, blinds, climate, appliances, energy …) with the same <em>standard</em> capabilities that SmartThings\' official Edge drivers give a real device of that type. Use it to check how an app, automation or API integration sees such a device. <b>Limits:</b> the device is a cloud virtual device, so there is no pairing and no Matter, Zigbee or Z-Wave traffic, and a camera shows no video.',
   standard: '<b>Standard prototype</b> — one of SmartThings\' built-in virtual device types (switch, dimmer, motion sensor, lock, thermostat …). The quickest way to get a simple generic device; the capabilities are fixed by SmartThings.',
   profileId: '<b>Device profile ID</b> — reuse a device profile that already exists in your SmartThings account (for example one you made earlier with <code>smartthings deviceprofiles:create</code>). The list only shows profiles from your own account, so it is empty if you have not created any. In that case use another tab, or paste a profile UUID.',
   json: '<b>Profile JSON</b> — write your own profile and choose exactly which components and capabilities the device has. Use it for custom combinations or devices with several components. Find capability IDs with <code>smartthings capabilities</code>.',
@@ -25,8 +23,8 @@ export async function renderCreate() {
   main.innerHTML = `
     <div class="dev-head"><div><h2>New virtual device</h2><div class="muted small">The device is created for real in the selected location of your SmartThings account.</div></div></div>
     <div class="tabs">
-      <button class="tab ${createState.mode === 'template' ? 'active' : ''}" data-mode="template">Appliance templates</button>
-      <button class="tab ${createState.mode === 'matter' ? 'active' : ''}" data-mode="matter">Matter devices</button>
+      <button class="tab ${createState.mode === 'template' ? 'active' : ''}" data-mode="template">Samsung appliances</button>
+      <button class="tab ${createState.mode === 'iot' ? 'active' : ''}" data-mode="iot">IoT devices</button>
       <button class="tab ${createState.mode === 'standard' ? 'active' : ''}" data-mode="standard">Standard prototype</button>
       <button class="tab ${createState.mode === 'profileId' ? 'active' : ''}" data-mode="profileId">Device profile ID</button>
       <button class="tab ${createState.mode === 'json' ? 'active' : ''}" data-mode="json">Profile JSON</button>
@@ -72,41 +70,24 @@ function renderModeArea() {
   const area = $('#modeArea');
   const m = createState.mode;
   if (m === 'template') {
-    if (!createState.templateId && state.templates[0]) createState.templateId = state.templates[0].id;
+    if (!createState.templateId && state.templates[0]) createState.templateId = byName(state.templates)[0].id;
     const t = state.templates.find((x) => x.id === createState.templateId);
     const profile = t ? t.deviceProfile : null;
     const src = state.templatesMeta;
     area.innerHTML = `
       <div class="muted small" style="margin-bottom:8px">Capability lists and sample values come from real Samsung appliances
         (<a href="${esc(src?.repository || '#')}" target="_blank" rel="noopener">Home Assistant SmartThings test fixtures</a>, ${esc(src?.license || '')}). Only standard SmartThings capabilities are used; Samsung-specific ones (<code>samsungce.*</code>, <code>custom.*</code> …) are left out.</div>
+      ${categoryChips(state.templates, 'template')}
       <input id="tplFilter" placeholder="Filter templates (e.g. washer, oven, tv)" style="width:100%;margin-bottom:8px" />
-      <div class="tpl-grid">${state.templates.map((x) => `
-        <button class="tpl ${x.id === createState.templateId ? 'active' : ''}" data-id="${esc(x.id)}" data-search="${esc((x.name + ' ' + x.description).toLowerCase())}">
-          <span class="ic">${esc(x.icon || '▢')}</span><span class="nm">${esc(x.name)}</span><span class="ds">${esc(x.description)}</span>
-        </button>`).join('')}</div>
+      <div class="tpl-grid">${byName(state.templates).map((x) => templateCard(x, createState.templateId)).join('')}</div>
       <label class="small" style="display:block;margin:4px 0"><input type="checkbox" id="tplSample" ${createState.sample === false ? '' : 'checked'}/>
         Load the real device's sample state after creating</label>
       ${profile ? `<details><summary class="muted small">View / edit the profile definition (add or remove capabilities)</summary>
         <textarea id="tplJson" rows="12" style="margin-top:8px">${esc(JSON.stringify(profile, null, 2))}</textarea></details>`
         : t ? `<div class="muted small">Created from the standard prototype <code>${esc(t.prototype)}</code>.</div>` : ''}`;
-    $('#tplFilter').value = createState.filter || '';
-    const applyFilter = () => {
-      const q = ($('#tplFilter').value || '').trim().toLowerCase();
-      createState.filter = q;
-      area.querySelectorAll('.tpl').forEach((b) => { b.hidden = !!q && !b.dataset.search.includes(q); });
-    };
-    $('#tplFilter').addEventListener('input', applyFilter);
-    applyFilter();
-    $('#tplSample').addEventListener('change', (e) => { createState.sample = e.target.checked; });
-    area.querySelectorAll('.tpl').forEach((b) => b.addEventListener('click', () => {
-      createState.templateId = b.dataset.id;
-      renderModeArea();
-      const tt = state.templates.find((x) => x.id === b.dataset.id);
-      const nameEl = $('#cName');
-      if (nameEl && (!nameEl.value || nameEl.dataset.auto)) { nameEl.value = `Virtual ${tt.name.replace(/\s*\(.*\)/, '')}`; nameEl.dataset.auto = '1'; }
-    }));
-  } else if (m === 'matter') {
-    renderMatterArea(area);
+    wireTemplateGrid(area, 'template', state.templates, (id) => { createState.templateId = id; });
+  } else if (m === 'iot') {
+    renderIotArea(area);
   } else if (m === 'standard') {
     area.innerHTML = `<div class="form"><label for="cProto">Prototype</label>
       <select id="cProto">${PROTOTYPES.map(([id, nm]) => `<option value="${id}">${nm} — ${id}</option>`).join('')}</select></div>`;
@@ -134,68 +115,84 @@ function renderModeArea() {
   area.insertAdjacentHTML('afterbegin', `<div class="mode-intro">${MODE_INTROS[m] || ''}</div>`);
 }
 
-function matterCard(x) {
-  return `<button class="tpl ${x.id === createState.matterId ? 'active' : ''}" data-id="${esc(x.id)}" data-cat="${esc(x.category)}"
-      data-search="${esc([x.name, x.matter.deviceType, x.category, 'matter ' + x.matter.version].join(' ').toLowerCase())}">
-      <span class="ic">${esc(x.icon || '▢')}</span><span class="badge matter-ver" title="Device type added in Matter ${esc(x.matter.version)}">Matter ${esc(x.matter.version)}</span>
-      <span class="nm">${esc(x.name)}</span><span class="ds">${esc(x.matter.deviceType)}</span>
+// Template cards are listed alphabetically by name.
+const byName = (list) => [...list].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
+
+// Category chips (Matter Device Library chapters) above a template grid. `key` is 'template' or 'iot'.
+function categoryChips(list, key) {
+  const cats = state.categories.filter((c) => list.some((x) => x.category === c));
+  const cur = createState.cat[key] || '';
+  return `<div class="chips cat-chips" style="margin-bottom:8px">
+      <button class="chip ${cur ? '' : 'current'}" data-cat="">All (${list.length})</button>
+      ${cats.map((c) => `<button class="chip ${cur === c ? 'current' : ''}" data-cat="${esc(c)}">${esc(c)} (${list.filter((x) => x.category === c).length})</button>`).join('')}
+    </div>`;
+}
+
+function templateCard(x, activeId) {
+  return `<button class="tpl ${x.id === activeId ? 'active' : ''}" data-id="${esc(x.id)}" data-cat="${esc(x.category || '')}"
+      data-search="${esc([x.name, x.description, x.category].join(' ').toLowerCase())}">
+      <span class="ic">${esc(x.icon || '▢')}</span><span class="nm">${esc(x.name)}</span><span class="ds">${esc(x.description)}</span>
     </button>`;
 }
 
-function renderMatterArea(area) {
-  const list = state.matterTemplates;
-  if (!createState.matterId && list[0]) createState.matterId = list[0].id;
-  const t = list.find((x) => x.id === createState.matterId);
-  const src = state.matterMeta;
-  const cats = MATTER_CATEGORIES.filter((c) => list.some((x) => x.category === c));
-  const comps = t ? t.deviceProfile.components : [];
-  area.innerHTML = `
-    <div class="muted small" style="margin-bottom:8px">Capability lists come from the device profiles of
-      <a href="${esc(src?.repository || '#')}" target="_blank" rel="noopener">SmartThings' official Matter Edge drivers</a> (${esc(src?.license || '')}),
-      covering device types up to Matter ${esc(src?.matterVersion || '1.5')}. Firmware-update, command-only and camera streaming capabilities are left out.</div>
-    <div class="chips cat-chips" style="margin-bottom:8px">
-      <button class="chip ${createState.matterCat ? '' : 'current'}" data-cat="">All (${list.length})</button>
-      ${cats.map((c) => `<button class="chip ${createState.matterCat === c ? 'current' : ''}" data-cat="${esc(c)}">${esc(c)} (${list.filter((x) => x.category === c).length})</button>`).join('')}
-    </div>
-    <input id="tplFilter" placeholder="Filter Matter devices (e.g. light, lock, 1.5)" style="width:100%;margin-bottom:8px" />
-    <div class="tpl-grid">${list.map(matterCard).join('')}</div>
-    ${t ? `
-    <div class="matter-detail">
-      <div class="small"><b>${esc(t.icon)} ${esc(t.name)}</b> · Matter device type <b>${esc(t.matter.deviceType)}</b> (since Matter ${esc(t.matter.version)})
-        · ${comps.length > 1 ? `${comps.length} components (${comps.map((c) => esc(c.id)).join(', ')})` : 'one component'}</div>
-      <table class="map-table">
-        <thead><tr><th>Matter cluster (on a real device)</th><th>SmartThings capability (on this virtual device)</th></tr></thead>
-        <tbody>${t.mapping.map((r) => `<tr><td>${esc(r.cluster)}</td><td><code>${esc(r.capability)}</code></td></tr>`).join('')}</tbody>
-      </table>
-      <div class="muted small">Source profile: ${t.source.profiles.map((p) => `<code>${esc(p)}</code>`).join(', ')}</div>
-    </div>` : ''}
-    <label class="small" style="display:block;margin:8px 0 4px"><input type="checkbox" id="tplSample" ${createState.sample === false ? '' : 'checked'}/>
-      Load a typical starting state after creating</label>
-    ${t ? `<details><summary class="muted small">View / edit the profile definition (add or remove capabilities)</summary>
-      <textarea id="tplJson" rows="12" style="margin-top:8px">${esc(JSON.stringify(t.deviceProfile, null, 2))}</textarea></details>` : ''}`;
-
-  $('#tplFilter').value = createState.matterFilter || '';
+// Wire the filter box, category chips and card clicks of a template grid.
+function wireTemplateGrid(area, key, list, onPick) {
+  $('#tplFilter').value = createState.filter[key] || '';
   const applyFilter = () => {
     const q = ($('#tplFilter').value || '').trim().toLowerCase();
-    createState.matterFilter = q;
+    const cat = createState.cat[key] || '';
+    createState.filter[key] = q;
     area.querySelectorAll('.tpl').forEach((b) => {
-      b.hidden = (!!q && !b.dataset.search.includes(q)) || (!!createState.matterCat && b.dataset.cat !== createState.matterCat);
+      b.hidden = (!!q && !b.dataset.search.includes(q)) || (!!cat && b.dataset.cat !== cat);
     });
   };
   $('#tplFilter').addEventListener('input', applyFilter);
   applyFilter();
   area.querySelectorAll('.cat-chips .chip').forEach((c) => c.addEventListener('click', () => {
-    createState.matterCat = c.dataset.cat;
+    createState.cat[key] = c.dataset.cat;
     renderModeArea();
   }));
   $('#tplSample').addEventListener('change', (e) => { createState.sample = e.target.checked; });
   area.querySelectorAll('.tpl').forEach((b) => b.addEventListener('click', () => {
-    createState.matterId = b.dataset.id;
+    onPick(b.dataset.id);
     renderModeArea();
     const tt = list.find((x) => x.id === b.dataset.id);
     const nameEl = $('#cName');
-    if (nameEl && (!nameEl.value || nameEl.dataset.auto)) { nameEl.value = `Virtual Matter ${tt.name.replace(/\s*\(.*\)/, '')}`; nameEl.dataset.auto = '1'; }
+    if (nameEl && (!nameEl.value || nameEl.dataset.auto)) { nameEl.value = `Virtual ${tt.name.replace(/\s*\(.*\)/, '')}`; nameEl.dataset.auto = '1'; }
   }));
+}
+
+function renderIotArea(area) {
+  const list = state.iotTemplates;
+  if (!createState.iotId && list[0]) createState.iotId = byName(list)[0].id;
+  const t = list.find((x) => x.id === createState.iotId);
+  const src = state.iotMeta;
+  const comps = t ? t.deviceProfile.components : [];
+  area.innerHTML = `
+    <div class="muted small" style="margin-bottom:8px">Capability lists come from the device profiles of
+      <a href="${esc(src?.repository || '#')}" target="_blank" rel="noopener">SmartThings' official Edge drivers</a> (${esc(src?.license || '')}).
+      A few device types with no driver profile (gas meter, gas leak detector) come from real devices in the Home Assistant test fixtures.
+      Firmware-update, command-only and camera streaming capabilities are left out.</div>
+    ${categoryChips(list, 'iot')}
+    <input id="tplFilter" placeholder="Filter IoT devices (e.g. light, lock, sensor)" style="width:100%;margin-bottom:8px" />
+    <div class="tpl-grid">${byName(list).map((x) => templateCard(x, createState.iotId)).join('')}</div>
+    ${t ? `
+    <div class="tpl-detail">
+      <div class="small"><b>${esc(t.icon)} ${esc(t.name)}</b> · ${esc(t.category)}
+        · ${comps.length > 1 ? `${comps.length} components` : 'one component'}</div>
+      <table class="map-table">
+        <thead><tr><th>Component</th><th>SmartThings capabilities</th></tr></thead>
+        <tbody>${comps.map((c) => `<tr><td><code>${esc(c.id)}</code></td><td>${c.capabilities.map((x) => `<code>${esc(x.id)}</code>`).join(' ')}</td></tr>`).join('')}</tbody>
+      </table>
+      <div class="muted small">${t.source.profiles
+        ? `Source profile: ${t.source.profiles.map((p) => `<code>${esc(p)}</code>`).join(', ')}`
+        : `Source: a real device in the Home Assistant SmartThings test fixtures (<code>${esc(t.source.fixture)}</code>)`}</div>
+    </div>` : ''}
+    <label class="small" style="display:block;margin:8px 0 4px"><input type="checkbox" id="tplSample" ${createState.sample === false ? '' : 'checked'}/>
+      Load a typical starting state after creating</label>
+    ${t ? `<details><summary class="muted small">View / edit the profile definition (add or remove capabilities)</summary>
+      <textarea id="tplJson" rows="12" style="margin-top:8px">${esc(JSON.stringify(t.deviceProfile, null, 2))}</textarea></details>` : ''}`;
+  wireTemplateGrid(area, 'iot', list, (id) => { createState.iotId = id; });
 }
 
 async function submitCreate(dryRun) {
@@ -219,9 +216,9 @@ async function submitCreate(dryRun) {
         body = { name, locationId, roomId, deviceProfile: txt ? JSON.parse(txt) : t.deviceProfile };
         tplUsed = t;
       }
-    } else if (m === 'matter') {
-      const t = state.matterTemplates.find((x) => x.id === createState.matterId);
-      if (!t) throw new Error('Select a Matter device');
+    } else if (m === 'iot') {
+      const t = state.iotTemplates.find((x) => x.id === createState.iotId);
+      if (!t) throw new Error('Select a device type');
       const txt = $('#tplJson')?.value;
       url = '/api/devices/profile';
       body = { name, locationId, roomId, deviceProfile: txt ? JSON.parse(txt) : t.deviceProfile };
@@ -261,7 +258,7 @@ async function submitCreate(dryRun) {
       }
     }
   } catch (e) {
-    const hint = tplUsed && (tplUsed.id.startsWith('matter-') || /capabilit/i.test(e.message))
+    const hint = tplUsed && (tplUsed.id.startsWith('iot-') || /capabilit/i.test(e.message))
       ? '\n\nA capability in this profile may not be available to your account. Run "npm run check-capabilities" to see which, then remove it in "View / edit the profile definition" and try again.'
       : '';
     toast(`Creation failed\n${e.message}${hint}`, 'err');

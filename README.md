@@ -1,6 +1,13 @@
-# SmartThings Virtual Device Console
+# SmartThings Virtual Device Panel
 
 [English](README.md) | [한국어](README.ko.md)
+
+**You play the device.** This app is a control panel for SmartThings virtual devices. It sits where a real device would be: what you inject is the state the device reports, and other apps (Homey, the SmartThings app, automations) only ever talk to the SmartThings cloud.
+
+```
+ This app (= the device)   -- state -->    SmartThings cloud   -- state -->    Homey, apps, automations
+                           <-- commands --                     <-- commands --
+```
 
 ![screenshot](docs/screenshot.png)
 
@@ -78,13 +85,16 @@ npm test
 
 The **New virtual device** panel has five tabs, and each tab shows a short explanation of what it does and when to use it.
 
-- Appliance templates: 35 real models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, a cooktop, a range hood, a TV, a soundbar ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
-- Matter devices: 36 common Matter device types from Matter 1.0 to 1.5 (lights, plugs, buttons, sensors, door lock, thermostat, blinds, TV, air conditioner, fan, air purifier, smoke/CO alarm, robot vacuum, washer, dryer, dishwasher, refrigerator, oven, cooktop, range hood, microwave, water leak sensor, EV charger, solar, home battery, heat pump, water heater, camera/doorbell, garage door/gate, soil sensor). Filter by category or Matter version, and see which Matter cluster each capability stands for. See [Matter devices](#matter-devices).
+- Samsung appliances: 35 real Samsung models (washers, dryers, dishwashers, air conditioners, air purifiers, refrigerators, robot vacuums, ovens, a cooktop, a range hood, a TV, a soundbar ...). Their capability lists and sample attribute values are taken from real devices, see [Where the templates come from](#where-the-templates-come-from). You can open the profile JSON and add or remove capabilities.
+- IoT devices: 72 common smart home device types: lights, plugs, wall switches (one-gang, two-gang, dimmer), button, panic button, 20 kinds of sensors (contact, motion, presence, arrival, temperature, humidity, light, sound, pressure, flow, rain, water leak, water freeze, soil, air quality, multipurpose, security zone, weather station, smoke/CO, CO, gas leak, dew point and mold), siren, door lock, door opener, window opener, blinds (incl. venetian with tilt), garage door, water valve, gas valve, irrigation controller, thermostat, smart vent, pump, fan, air purifier, heat pump, TV, speaker, network speaker, soundbar, projector screen, robot vacuum, washer, dryer, dishwasher, refrigerator, oven, cooktop, range hood, microwave, air conditioner, EV charger, solar, home battery, water heater, power meters, gas meter and camera/doorbell. Cards are sorted by name; filter by category or search by name. See [IoT devices](#iot-devices).
 - Standard prototypes such as `VIRTUAL_SWITCH` and `VIRTUAL_MOTION_SENSOR` (17 in total, `virtualdevices:create-standard`).
 - Create from one of your own device profile IDs, or paste a profile JSON (`virtualdevices:create`).
 - The dry-run button shows the request JSON without creating anything.
 
 **State & inject**
+- A strip at the top of every device shows the direction: this app is the device, it reports state to SmartThings, and commands from other apps arrive at SmartThings.
+- **Recent activity** (`devices:history`) lists the last 20 state changes SmartThings recorded for the device, including changes made by commands from other apps. SmartThings records the resulting state, not the command itself.
+- Command-only capabilities (`refresh`, `tone`, `audioNotification`) have nothing to inject, so the list leaves them out and names them at the bottom. They stay in the device profile.
 - Two-pane layout: a capability list on the left (each entry shows its current value, with a filter box) and the details of the selected capability on the right.
 - A one-line **state summary** bar sits on top; click an item to jump to that capability.
 - **Custom event** (component / capability / attribute / value / unit) is always at the top of the right pane.
@@ -117,20 +127,21 @@ The templates are not hand-picked. They are generated from the SmartThings test 
 
 Only **standard SmartThings capabilities** (`switch`, `washerOperatingState`, `ovenMode`, `temperatureMeasurement` ...) are used, because they work for any virtual device. The Samsung-specific capabilities that the real devices also have (`custom.*`, `samsungce.*`, `hca.*`, `sec.*`) and the OCF/cloud plumbing ones (`ocf`, `execute`, `logTrigger`, `demandResponseLoadControl`) are deliberately left out, and models that end up with fewer than 4 standard capabilities are skipped. After creating a device, **Load sample state** injects the values recorded from the real appliance. To regenerate the templates from a newer Home Assistant checkout, see the header of `tools/build-templates.py`. `npm run check-capabilities` verifies that your account can see every capability the templates use.
 
-## Matter devices
+## IoT devices
 
-![Matter devices tab](docs/matter-devices.png)
+![IoT devices tab](docs/iot-devices.png)
 
-SmartThings supports Matter 1.5 (hub rollout completed in 2026). When a real Matter device is added, a SmartThings Matter Edge driver gives it a device profile made of **standard capabilities**: Matter's On/Off cluster becomes `switch`, Level Control becomes `switchLevel`, Door Lock becomes `lock`, and so on. The **Matter devices** tab creates a virtual device with the same profile, so apps, automations and API integrations see what they would see for a real Matter device of that type.
+When a real device is added to SmartThings, whether it speaks Matter, Zigbee or Z-Wave, a SmartThings Edge driver gives it a device profile made of **standard capabilities** (`switch`, `switchLevel`, `lock`, `temperatureMeasurement` ...). Apps, automations and cloud integrations only ever see that profile, not the radio protocol. The **IoT devices** tab creates a virtual device with the same profile, so they see what they would see for a real device of that type.
 
-- The profiles are taken from [SmartThings' official Matter Edge drivers](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers) (`drivers/SmartThings/matter-*/profiles`, Apache-2.0, see [NOTICE](NOTICE)) by `tools/build-matter-templates.py`. The upstream commit is recorded in `templates/matter-devices.json`.
+- **Device types and categories follow the Matter 1.5 Device Library.** There is no other cross-vendor list of smart home device types, so the templates are grouped by its chapters: Lighting, Plugs and actuators, Switches and controls, Sensors, Closures, HVAC, Media, Robotic, Appliances, Energy management, Cameras (and Other for anything that does not fit). The Samsung appliance templates use the same categories. Where a template matches a Matter device type, `templates/iot-devices.json` records it in the `matter` field, for reference only.
+- The profiles are taken from [SmartThings' official Edge drivers](https://github.com/SmartThingsCommunity/SmartThingsEdgeDrivers) (`drivers/SmartThings/*/profiles`, Apache-2.0, see [NOTICE](NOTICE)) by `tools/build-iot-templates.py`, mostly from the `matter-*` drivers and, for a few sensors with no Matter profile (arrival, sound, multipurpose, security zone, dew point and mold sensors, siren, panic button, valves, power meters, vent, window opener, projector screen, network speaker, soundbar), from `zigbee-*` / `zwave-*` drivers. Two device types that no driver profile covers (gas meter, gas leak detector) come from real devices in the Home Assistant SmartThings test fixtures, like the appliance templates. Both upstream commits are recorded in `templates/iot-devices.json`.
 - Left out: `firmwareUpdate`, command-only `stateless*` capabilities, camera streaming and storage capabilities (`webrtc`, `videoCapture2`, ...) and vendor capabilities such as `vision.*`.
 - Each device starts with a typical state (for example a light at 70 %, a lock locked), and presets such as *Lock: forced opening attempt*, *Alarm: smoke detected*, *Cycle: running* or *EV charger: plugged in, charging* appear on the **Presets & scenarios** tab.
-- Devices created from a Matter template are marked **Matter** in the device list.
+- Devices created from an IoT device template are marked **IoT** in the device list.
 
-**Limits.** These are cloud virtual devices, not Matter devices. There is no commissioning (QR / pairing code), no Matter clusters, endpoints or Matter traffic, and the camera shows no video. To test the Matter protocol itself, use a real or emulated Matter device with a SmartThings hub, for example Samsung's [Matter Virtual Device](https://developer.samsung.com/smartthings/blog/en/2023/12/14/creating-a-matter-virtual-device).
+**Limits.** These are cloud virtual devices. There is no pairing (QR / pairing code), no Matter, Zigbee or Z-Wave traffic, and the camera shows no video. To test the Matter protocol itself, use a real or emulated Matter device with a SmartThings hub, for example Samsung's [Matter Virtual Device](https://developer.samsung.com/smartthings/blog/en/2023/12/14/creating-a-matter-virtual-device).
 
-Some newer capabilities (for example `operationalState`, `evseState`, `cameraPrivacyMode`) may not be accepted for virtual devices on every account. Run `npm run check-capabilities` once (or, without cloning, `npx --yes -p github:Twohyunpa/SmartThings_Virtual st-check-capabilities`): it lists any capability your account cannot see and the templates that use it. Remove that capability in **View / edit the profile definition** before creating.
+Some newer capabilities (for example `operationalState`, `evseState`, `cameraPrivacyMode`, `rainSensor`) may not be accepted for virtual devices on every account. Run `npm run check-capabilities` once (or, without cloning, `npx --yes -p github:Twohyunpa/SmartThings_Virtual st-check-capabilities`): it lists any capability your account cannot see and the templates that use it. Remove that capability in **View / edit the profile definition** before creating.
 
 ## CLI commands used
 
