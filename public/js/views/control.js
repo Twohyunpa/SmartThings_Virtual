@@ -13,7 +13,8 @@ export function renderControl(body) {
   const comps = d.components || [];
   body.innerHTML = `
     <div class="toolbar">
-      <button class="btn small" id="reloadStatus">↻ Refresh state</button>
+      <button class="btn small" id="reloadStatus"><span class="ico">↻</span> Refresh state</button>
+      <span class="muted small refresh-note" id="refreshNote" aria-live="polite"></span>
       <label class="small"><input type="checkbox" id="autoChk" ${state.autoRefresh ? 'checked' : ''}/> Auto-refresh every 5 s</label>
       <span class="muted small">Click a value chip to inject it right away, or type a value and press <b>Inject</b>. <b>＋</b> adds it as a scenario step.</span>
     </div>
@@ -46,7 +47,7 @@ export function renderControl(body) {
 
   initCapMaster(comps);
   $('#loadActivity').addEventListener('click', loadActivity);
-  $('#reloadStatus').addEventListener('click', () => actions.refreshStatus());
+  $('#reloadStatus').addEventListener('click', manualRefresh);
   $('#autoChk').addEventListener('change', (e) => {
     state.autoRefresh = e.target.checked;
     clearInterval(state.autoTimer);
@@ -62,6 +63,26 @@ export function renderControl(body) {
     if (!ev.capability || !ev.attribute) return toast('Enter a capability and an attribute', 'err');
     sendEvents(state.selectedId, [ev]);
   });
+}
+
+// Refresh state button: spin while reading, then say when it was read and whether anything changed
+// (changed values also flash in the list).
+async function manualRefresh() {
+  const btn = $('#reloadStatus');
+  const note = $('#refreshNote');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  btn.classList.add('busy');
+  if (note) { note.textContent = 'Reading state from SmartThings…'; note.classList.remove('done'); }
+  const started = Date.now();
+  const r = await actions.refreshStatus(true);
+  await new Promise((res) => setTimeout(res, Math.max(0, 400 - (Date.now() - started)))); // keep the spin visible
+  const b = $('#reloadStatus');
+  if (b) { b.disabled = false; b.classList.remove('busy'); }
+  const n = $('#refreshNote');
+  if (!n) return;
+  n.textContent = r ? `Updated ${new Date().toLocaleTimeString()} · ${r.changed ? 'values changed (highlighted)' : 'no changes'}` : '';
+  n.classList.remove('done'); void n.offsetWidth; n.classList.add('done');
 }
 
 // Device history (devices:history): the latest recorded attribute changes, newest first.

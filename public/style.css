@@ -309,3 +309,9 @@ pre.json { background: var(--panel-2); border: 1px solid var(--border); border-r
 .panel.activity { margin-top: 12px; }
 .activity-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .activity-head h3 { margin: 0; }
+
+/* Refresh state feedback */
+#reloadStatus .ico { display: inline-block; }
+#reloadStatus.busy .ico { animation: spin .8s linear infinite; }
+.refresh-note.done { animation: note-in .6s ease-out; }
+@keyframes note-in { from { color: var(--accent); } to { color: var(--muted); } }

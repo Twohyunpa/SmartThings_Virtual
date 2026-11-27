@@ -174,12 +174,14 @@ async function refreshStatus(flash = true) {
   let nextStatus;
   try {
     nextStatus = await api('GET', `/api/devices/${id}/status`);
-  } catch (e) { toast(`Could not read status\n${e.message}`, 'err'); return; }
+  } catch (e) { toast(`Could not read status\n${e.message}`, 'err'); return null; }
   // Guard against stale responses after switching devices.
-  if (state.selectedId !== id) return;
+  if (state.selectedId !== id) return null;
   state.status = nextStatus;
-  if (state.tab === 'control') updateCurrentValues(flash && before !== JSON.stringify(state.status));
+  const changed = before !== JSON.stringify(state.status);
+  if (state.tab === 'control') updateCurrentValues(flash && changed);
   if (state.tab === 'raw') renderTabBody();
+  return { changed };
 }
 
 function renderDevice() {
