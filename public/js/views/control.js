@@ -6,7 +6,7 @@ import { $, esc, toast, sendEvents } from '../api.js';
 
 const capKey = (comp, capId) => `${comp}/${capId}`;
 const capName = (comp, capId) => (comp === 'main' ? '' : `${comp}: `) + capId;
-const capMaster = { entries: [], sel: null, pins: [] };
+const capMaster = { entries: [], sel: null, pins: [], hidden: [] };
 
 export function renderControl(body) {
   const d = state.device;
@@ -122,8 +122,18 @@ function renderCapPane() {
   pane.querySelectorAll('.attr[data-attr]').forEach(wireAttr);
 }
 
+// Command-only capabilities (refresh, tone, audioNotification …) have no state to inject, so the list hides
+// them. They stay in the device profile, so other apps still see the same device as a real one.
+// A definition that failed to load has no `commands` field and is kept.
+const isCommandOnly = (id, version) => {
+  const def = getCapDef(id, version);
+  return !!def && !!def.commands && !Object.keys(def.attributes || {}).length;
+};
+
 function initCapMaster(comps) {
-  const entries = comps.flatMap((c) => (c.capabilities || []).map((cap) => ({ comp: c.id, id: cap.id, version: cap.version || 1, key: capKey(c.id, cap.id) })));
+  const all = comps.flatMap((c) => (c.capabilities || []).map((cap) => ({ comp: c.id, id: cap.id, version: cap.version || 1, key: capKey(c.id, cap.id) })));
+  const entries = all.filter((e) => !isCommandOnly(e.id, e.version));
+  capMaster.hidden = [...new Set(all.filter((e) => isCommandOnly(e.id, e.version)).map((e) => e.id))];
   const id = state.selectedId;
   capMaster.entries = entries;
   capMaster.pins = (store(`st.pin.${id}`) || []).filter((k) => entries.some((e) => e.key === k));
@@ -137,7 +147,8 @@ function initCapMaster(comps) {
     const pinned = capMaster.pins.map((k) => entries.find((e) => e.key === k)).filter(Boolean);
     const rest = entries.filter((e) => !capMaster.pins.includes(e.key));
     box.innerHTML = (pinned.length ? `<div class="cap-group">Pinned</div>${pinned.map(capItemHtml).join('')}<div class="cap-group">All capabilities</div>` : '')
-      + rest.map(capItemHtml).join('');
+      + rest.map(capItemHtml).join('')
+      + (capMaster.hidden.length ? `<div class="muted small pad" title="These capabilities only accept commands (for example from SmartThings or Homey) and have no state to inject. They are still part of the device.">Command-only, not listed: ${capMaster.hidden.map(esc).join(', ')}</div>` : '');
     applySearch();
   };
   const applySearch = () => {

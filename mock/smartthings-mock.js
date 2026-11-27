@@ -203,7 +203,10 @@ switch (cmd) {
     break;
   case 'capabilities': {
     const id = pos[0];
-    out({ id, version: Number(pos[1] || 1), status: 'live', name: id, attributes: CAPS[id] || {}, commands: {} }); // unknown capabilities: empty definition
+    // Known capabilities get their attributes; unknown ones an empty definition without `commands`, so the
+    // UI treats them as "not loaded" rather than command-only.
+    out(CAPS[id] ? { id, version: Number(pos[1] || 1), status: 'live', name: id, attributes: CAPS[id], commands: {} }
+      : { id, version: Number(pos[1] || 1), status: 'live', name: id, attributes: {} });
     break;
   }
   case 'virtualdevices:create-standard': {
