@@ -305,7 +305,7 @@ function attrRow(comp, capId, version, attrName) {
   const hint = [s.type, s.min !== undefined ? `min ${s.min}` : '', s.max !== undefined ? `max ${s.max}` : ''].filter(Boolean).join(' · ');
   const infoHtml = listHint(attrName);
   return `
-    <div class="attr" data-comp="${esc(comp)}" data-cap="${esc(capId)}" data-ver="${esc(version)}" data-attr="${esc(attrName)}" data-type="${esc(s.type)}" data-opts="${esc(optsKey)}">
+    <div class="attr" data-comp="${esc(comp)}" data-cap="${esc(capId)}" data-ver="${esc(version)}" data-attr="${esc(attrName)}" data-type="${esc(s.type)}" data-opts="${esc(optsKey)}"${s.type === 'integer' || s.type === 'number' ? ` data-numeric-value="${esc(curVal ?? '')}"` : ''}>
       <div class="attr-top">
         <span class="attr-name">${esc(attrName)} <span class="range-hint">${esc(hint)}</span>${infoHtml ? ' <button type="button" class="info" title="What is this?" aria-label="What is this?">ⓘ</button>' : ''}</span>
         <span class="attr-cur"><span class="muted">current</span> <span class="val">${esc(fmtVal(curVal))}${curUnit ? ' ' + esc(curUnit) : ''}</span></span>
@@ -422,6 +422,17 @@ export function updateCurrentValues(flash) {
         el.parentElement.classList.add('flash');
         setTimeout(() => el.parentElement.classList.remove('flash'), 1500);
       }
+    }
+    if (row.dataset.type === 'integer' || row.dataset.type === 'number') {
+      const input = row.querySelector('input.inp');
+      const range = row.querySelector('input.rng');
+      const nextValue = cur?.value == null ? '' : String(cur.value);
+      if (input && input.value === row.dataset.numericValue &&
+          document.activeElement !== input && document.activeElement !== range) {
+        input.value = nextValue;
+        if (range && nextValue !== '') range.value = nextValue;
+      }
+      row.dataset.numericValue = nextValue;
     }
     row.querySelectorAll('.chip').forEach((c) => c.classList.toggle('current', String(cur?.value) === c.dataset.v));
   });
