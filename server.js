@@ -486,6 +486,7 @@ const routes = [
   }],
   ['GET', /^\/api\/devices\/([^/]+)$/, async (req, m) => { assertId(m[1]); return runCli(['devices', m[1]]); }],
   ['GET', /^\/api\/devices\/([^/]+)\/status$/, async (req, m) => { assertId(m[1]); return runCli(['devices:status', m[1]]); }],
+  ['GET', /^\/api\/devices\/([^/]+)\/history$/, async (req, m) => { assertId(m[1]); return runCli(['devices:history', m[1], '--limit', '20']); }],
   ['DELETE', /^\/api\/devices\/([^/]+)$/, async (req, m) => {
     assertId(m[1]);
     await assertVirtual(m[1]);

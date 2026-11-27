@@ -1,6 +1,13 @@
-# SmartThings 가상 기기 콘솔
+# SmartThings 가상 기기 패널 (Virtual Device Panel)
 
 [English](README.md) | **한국어**
+
+**이 앱이 기기 역할을 합니다.** SmartThings 가상 기기의 control panel입니다. 실제 기기가 있을 자리에 있어서, 여기서 넣는(inject) 값이 기기가 보고하는 상태가 되고, 다른 앱(Homey, SmartThings 앱, 자동화)은 SmartThings 클라우드하고만 이야기합니다.
+
+```
+ 이 앱 (= 기기)   -- 상태 -->    SmartThings 클라우드   -- 상태 -->    Homey, 앱, 자동화
+                 <-- 명령 --                          <-- 명령 --
+```
 
 ![screenshot](docs/screenshot.png)
 
@@ -83,6 +90,9 @@ npm test
 - dry-run 버튼으로 실제 생성 없이 요청 JSON을 확인할 수 있습니다.
 
 **상태 & 주입**
+- 기기 화면 위쪽 띠에 방향을 보여 줍니다: 이 앱이 기기이고, 상태를 SmartThings로 보고하며, 다른 앱의 명령은 SmartThings로 들어옵니다.
+- **Recent activity**(`devices:history`)는 SmartThings가 이 기기에 기록한 최근 상태 변화 20개를 보여 줍니다. 다른 앱의 명령으로 바뀐 상태도 나오지만, 명령 자체는 기록되지 않습니다.
+- 명령만 있는 capability(`refresh`, `tone`, `audioNotification`)는 넣을 값이 없어서 목록에서 빼고 맨 아래에 이름만 표시합니다. 기기 프로필에는 그대로 있습니다.
 - 왼쪽은 capability 목록(현재 값 표시, 필터), 오른쪽은 선택한 capability의 상세입니다. 맨 위에는 한 줄 상태 요약 바가 있고, 누르면 해당 capability로 이동합니다.
 - **Custom event**(component/capability/attribute/value/unit 직접 입력)는 오른쪽 맨 위에 항상 있습니다.
 - 자주 쓰는 capability는 별표(☆/★)로 고정하세요. 목록 맨 위 *Pinned* 그룹으로 올라가고, Custom event 바로 아래에 항상 펼쳐집니다. 마지막 선택과 고정 목록은 기기별로 기억됩니다.

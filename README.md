@@ -1,6 +1,13 @@
-# SmartThings Virtual Device Console
+# SmartThings Virtual Device Panel
 
 [English](README.md) | [한국어](README.ko.md)
+
+**You play the device.** This app is a control panel for SmartThings virtual devices. It sits where a real device would be: what you inject is the state the device reports, and other apps (Homey, the SmartThings app, automations) only ever talk to the SmartThings cloud.
+
+```
+ This app (= the device)   -- state -->    SmartThings cloud   -- state -->    Homey, apps, automations
+                           <-- commands --                     <-- commands --
+```
 
 ![screenshot](docs/screenshot.png)
 
@@ -85,6 +92,9 @@ The **New virtual device** panel has five tabs, and each tab shows a short expla
 - The dry-run button shows the request JSON without creating anything.
 
 **State & inject**
+- A strip at the top of every device shows the direction: this app is the device, it reports state to SmartThings, and commands from other apps arrive at SmartThings.
+- **Recent activity** (`devices:history`) lists the last 20 state changes SmartThings recorded for the device, including changes made by commands from other apps. SmartThings records the resulting state, not the command itself.
+- Command-only capabilities (`refresh`, `tone`, `audioNotification`) have nothing to inject, so the list leaves them out and names them at the bottom. They stay in the device profile.
 - Two-pane layout: a capability list on the left (each entry shows its current value, with a filter box) and the details of the selected capability on the right.
 - A one-line **state summary** bar sits on top; click an item to jump to that capability.
 - **Custom event** (component / capability / attribute / value / unit) is always at the top of the right pane.

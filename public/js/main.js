@@ -198,6 +198,14 @@ function renderDevice() {
         <button class="btn small danger" id="deleteBtn">Delete</button>
       </div>
     </div>
+    <div class="role-flow" title="This app plays the device. Other apps only talk to SmartThings, never to this app.">
+      <span class="rf-node you">This app<small>= the device</small></span>
+      <span class="rf-arrows"><span>state →</span><span>← commands</span></span>
+      <span class="rf-node">SmartThings cloud</span>
+      <span class="rf-arrows"><span>state →</span><span>← commands</span></span>
+      <span class="rf-node">Homey, apps, automations</span>
+      <span class="rf-note muted small">What you inject here is the state the device reports. Commands from other apps go to SmartThings; their effect shows up under <b>Recent activity</b>.</span>
+    </div>
     <div class="tabs">
       <button class="tab" data-tab="control">State &amp; inject</button>
       <button class="tab" data-tab="scenario">Presets &amp; scenarios</button>

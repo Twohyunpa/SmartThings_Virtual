@@ -2,7 +2,7 @@
 
 import { state, actions, store, fmtVal, getCapDef, currentCapStatus, currentAttr } from '../state.js';
 import { LIST_PREFIX, convertValue, valueSchema, valueOptions, listOptions, listHint } from '../schema.js';
-import { $, esc, toast, sendEvents } from '../api.js';
+import { $, esc, api, toast, sendEvents } from '../api.js';
 
 const capKey = (comp, capId) => `${comp}/${capId}`;
 const capName = (comp, capId) => (comp === 'main' ? '' : `${comp}: `) + capId;
@@ -37,9 +37,15 @@ export function renderControl(body) {
         <div id="capItems"></div>
       </aside>
       <section id="capPane" class="cap-pane"></section>
+    </div>
+    <div class="panel activity">
+      <div class="activity-head"><h3>Recent activity</h3><button class="btn small" id="loadActivity">Load</button></div>
+      <div class="muted small">The last 20 state changes SmartThings recorded for this device: values injected here and changes made by commands from other apps (for example Homey turning it on). SmartThings records the resulting state, not the command itself.</div>
+      <div id="activityList"></div>
     </div>`;
 
   initCapMaster(comps);
+  $('#loadActivity').addEventListener('click', loadActivity);
   $('#reloadStatus').addEventListener('click', () => actions.refreshStatus());
   $('#autoChk').addEventListener('change', (e) => {
     state.autoRefresh = e.target.checked;
@@ -56,6 +62,26 @@ export function renderControl(body) {
     if (!ev.capability || !ev.attribute) return toast('Enter a capability and an attribute', 'err');
     sendEvents(state.selectedId, [ev]);
   });
+}
+
+// Device history (devices:history): the latest recorded attribute changes, newest first.
+async function loadActivity() {
+  const box = $('#activityList');
+  const id = state.selectedId;
+  if (!box || !id) return;
+  box.innerHTML = '<div class="muted small pad"><span class="spinner"></span> Loading…</div>';
+  try {
+    const items = (await api('GET', `/api/devices/${id}/history`)) || [];
+    if (state.selectedId !== id || !$('#activityList')) return;
+    box.innerHTML = items.length
+      ? `<table class="map-table"><thead><tr><th>Time</th><th>Capability</th><th>Value</th></tr></thead><tbody>${items.map((h) => `
+          <tr><td class="muted">${esc(h.time ? new Date(h.time).toLocaleString() : '')}</td>
+          <td><code>${esc((h.component && h.component !== 'main' ? h.component + ': ' : '') + h.capability + '.' + h.attribute)}</code></td>
+          <td><b>${esc(typeof h.value === 'object' ? JSON.stringify(h.value) : String(h.value))}</b>${h.unit ? ' ' + esc(h.unit) : ''}</td></tr>`).join('')}</tbody></table>`
+      : '<div class="muted small pad">No activity recorded yet.</div>';
+  } catch (e) {
+    box.innerHTML = `<div class="muted small pad">Could not load the history: ${esc(e.message)}</div>`;
+  }
 }
 
 // One short value for a capability: its first scalar attribute (supported*/available* lists last).
